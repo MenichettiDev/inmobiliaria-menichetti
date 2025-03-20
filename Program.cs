@@ -1,4 +1,5 @@
 using InmobiliariaApp.Data;
+using InmobiliariaApp.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,14 @@ builder.Services.AddControllersWithViews();
 
 // Registrar la clase de conexión a la base de datos
 builder.Services.AddSingleton<DatabaseConnection>();
+
+//Registramos los repositorios
+builder.Services.AddScoped<PropietarioRepository>();
+builder.Services.AddScoped<InmuebleRepository>();
+builder.Services.AddScoped<InquilinoRepository>();
+builder.Services.AddScoped<ContratoRepository>();
+builder.Services.AddScoped<PagoRepository>();
+
 
 var app = builder.Build();
 
