@@ -15,9 +15,16 @@ builder.Services.AddScoped<InmuebleRepository>();
 builder.Services.AddScoped<InquilinoRepository>();
 builder.Services.AddScoped<ContratoRepository>();
 builder.Services.AddScoped<PagoRepository>();
+builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddSession(); // Agregar el servicio de sesión
+
 
 
 var app = builder.Build();
+
+
+//Middleware de sesiones
+app.UseSession();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -27,7 +34,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
