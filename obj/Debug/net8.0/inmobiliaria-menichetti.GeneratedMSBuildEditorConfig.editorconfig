@@ -26,6 +26,26 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/menic/OneDrive/Documentos/GitHub/inmobiliaria-menichetti/Views/Propietario/Detalles.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvcGlldGFyaW9cRGV0YWxsZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/menic/OneDrive/Documentos/GitHub/inmobiliaria-menichetti/Views/Propietario/Editar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvcGlldGFyaW9cRWRpdGFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/menic/OneDrive/Documentos/GitHub/inmobiliaria-menichetti/Views/Propietario/Eliminar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvcGlldGFyaW9cRWxpbWluYXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/menic/OneDrive/Documentos/GitHub/inmobiliaria-menichetti/Views/Propietario/Insertar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvcGlldGFyaW9cSW5zZXJ0YXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/menic/OneDrive/Documentos/GitHub/inmobiliaria-menichetti/Views/Propietario/Listar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvcGlldGFyaW9cTGlzdGFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/menic/OneDrive/Documentos/GitHub/inmobiliaria-menichetti/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
