@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\inmobiliaria-menichetti.props" />
+</Project>

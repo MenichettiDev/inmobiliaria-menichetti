@@ -1,7 +1,12 @@
+using InmobiliariaApp.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Registrar la clase de conexión a la base de datos
+builder.Services.AddSingleton<DatabaseConnection>();
 
 var app = builder.Build();
 
