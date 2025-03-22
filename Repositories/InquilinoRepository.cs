@@ -27,7 +27,7 @@ namespace InmobiliariaApp.Repositories
             {
                 inquilinos.Add(new Inquilino
                 {
-                    IdInquilino = reader.GetInt32("Id"),
+                    IdInquilino = reader.GetInt32("id_inquilino"),
                     Dni = reader.GetString("Dni"),
                     Apellido = reader.GetString("Apellido"),
                     Nombre = reader.GetString("Nombre"),
@@ -43,7 +43,7 @@ namespace InmobiliariaApp.Repositories
         public Inquilino? GetById(int id)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("SELECT * FROM Inquilino WHERE Id = @Id", connection);
+            using var command = new MySqlCommand("SELECT * FROM Inquilino WHERE id_inquilino = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
 
             using var reader = command.ExecuteReader();
@@ -51,7 +51,7 @@ namespace InmobiliariaApp.Repositories
             {
                 return new Inquilino
                 {
-                    IdInquilino = reader.GetInt32("Id"),
+                    IdInquilino = reader.GetInt32("id_inquilino"),
                     Dni = reader.GetString("Dni"),
                     Apellido = reader.GetString("Apellido"),
                     Nombre = reader.GetString("Nombre"),
@@ -86,7 +86,7 @@ namespace InmobiliariaApp.Repositories
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
                 "UPDATE Inquilino SET Dni = @Dni, Apellido = @Apellido, Nombre = @Nombre, Telefono = @Telefono, Email = @Email " +
-                "WHERE Id = @Id", connection);
+                "WHERE id_inquilino = @Id", connection);
 
             command.Parameters.AddWithValue("@Id", inquilino.IdInquilino);
             command.Parameters.AddWithValue("@Dni", inquilino.Dni);
@@ -102,7 +102,7 @@ namespace InmobiliariaApp.Repositories
         public void Delete(int id)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("DELETE FROM Inquilino WHERE Id = @Id", connection);
+            using var command = new MySqlCommand("DELETE FROM Inquilino WHERE id_inquilino = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
 
             command.ExecuteNonQuery();

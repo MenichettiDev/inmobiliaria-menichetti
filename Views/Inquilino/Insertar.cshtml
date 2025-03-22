@@ -1,0 +1,42 @@
+@model InmobiliariaApp.Models.Inquilino
+
+@{
+    ViewData["Title"] = "Insertar Inquilino";
+}
+
+<h1>Insertar Inquilino</h1>
+
+<form asp-action="Insertar">
+    <div class="form-group">
+        <label asp-for="Dni" class="control-label"></label>
+        <input asp-for="Dni" class="form-control" />
+        <span asp-validation-for="Dni" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Apellido" class="control-label"></label>
+        <input asp-for="Apellido" class="form-control" />
+        <span asp-validation-for="Apellido" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Nombre" class="control-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Telefono" class="control-label"></label>
+        <input asp-for="Telefono" class="form-control" />
+        <span asp-validation-for="Telefono" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Crear" class="btn btn-primary" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Listar">Volver a la Lista</a>
+</div>
