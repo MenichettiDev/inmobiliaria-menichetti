@@ -27,12 +27,12 @@ namespace InmobiliariaApp.Repositories
             {
                 propietarios.Add(new Propietario
                 {
-                    IdPropietario = reader.GetInt32("Id"),
-                    Dni = reader.GetString("Dni"),
-                    Apellido = reader.GetString("Apellido"),
-                    Nombre = reader.GetString("Nombre"),
-                    Telefono = reader.GetString("Telefono"),
-                    Email = reader.GetString("Email")
+                    IdPropietario = reader.GetInt32("id_propietario"),
+                    Dni = reader.GetString("dni"),
+                    Apellido = reader.GetString("apellido"),
+                    Nombre = reader.GetString("nombre"),
+                    Telefono = reader.GetString("telefono"),
+                    Email = reader.GetString("email")
                 });
             }
 
@@ -43,7 +43,7 @@ namespace InmobiliariaApp.Repositories
         public Propietario? GetById(int id)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("SELECT * FROM Propietario WHERE Id = @Id", connection);
+            using var command = new MySqlCommand("SELECT * FROM Propietario WHERE id_propietario = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
 
             using var reader = command.ExecuteReader();
@@ -51,12 +51,12 @@ namespace InmobiliariaApp.Repositories
             {
                 return new Propietario
                 {
-                    IdPropietario = reader.GetInt32("Id"),
-                    Dni = reader.GetString("Dni"),
-                    Apellido = reader.GetString("Apellido"),
-                    Nombre = reader.GetString("Nombre"),
-                    Telefono = reader.GetString("Telefono"),
-                    Email = reader.GetString("Email")
+                    IdPropietario = reader.GetInt32("id_propietario"),
+                    Dni = reader.GetString("dni"),
+                    Apellido = reader.GetString("apellido"),
+                    Nombre = reader.GetString("nombre"),
+                    Telefono = reader.GetString("telefono"),
+                    Email = reader.GetString("email")
                 };
             }
 
@@ -86,7 +86,7 @@ namespace InmobiliariaApp.Repositories
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
                 "UPDATE Propietario SET Dni = @Dni, Apellido = @Apellido, Nombre = @Nombre, Telefono = @Telefono, Email = @Email " +
-                "WHERE Id = @Id", connection);
+                "WHERE id_propietario = @Id", connection);
 
             command.Parameters.AddWithValue("@Id", propietario.IdPropietario);
             command.Parameters.AddWithValue("@Dni", propietario.Dni);
@@ -102,7 +102,7 @@ namespace InmobiliariaApp.Repositories
         public void Delete(int id)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("DELETE FROM Propietario WHERE Id = @Id", connection);
+            using var command = new MySqlCommand("DELETE FROM Propietario WHERE id_propietario = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
 
             command.ExecuteNonQuery();

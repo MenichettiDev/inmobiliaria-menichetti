@@ -8,5 +8,6 @@ namespace InmobiliariaApp.Models
         public string Apellido { get; set; } = string.Empty; // Apellido del propietario
         public string Telefono { get; set; } = string.Empty; // Teléfono de contacto
         public string Email { get; set; } = string.Empty; // Correo electrónico
+        
     }
 }

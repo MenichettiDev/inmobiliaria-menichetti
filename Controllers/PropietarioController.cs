@@ -128,7 +128,7 @@ namespace InmobiliariaApp.Controllers
             }
 
             // Solo los administradores pueden eliminar
-            if (ObtenerRolUsuario() != "Administrador")
+            if (ObtenerRolUsuario() != "Admin")
             {
                 return Forbid(); // Denegar acceso si no es administrador
             }
@@ -151,7 +151,7 @@ namespace InmobiliariaApp.Controllers
             }
 
             // Solo los administradores pueden eliminar
-            if (ObtenerRolUsuario() != "Administrador")
+            if (ObtenerRolUsuario() != "Admin")
             {
                 return Forbid(); // Denegar acceso si no es administrador
             }
