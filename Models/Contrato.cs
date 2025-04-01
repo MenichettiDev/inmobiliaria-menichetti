@@ -4,12 +4,19 @@ namespace InmobiliariaApp.Models
 {
     public class Contrato
     {
-        public int IdContrato { get; set; } // Identificador único
-        public int IdInquilino { get; set; } // ID del inquilino (relación)
-        public int IdInmueble { get; set; } // ID del inmueble (relación)
-        public DateTime FechaInicio { get; set; } // Fecha de inicio del contrato
-        public DateTime FechaFin { get; set; } // Fecha de finalización del contrato
-        public decimal MontoMensual { get; set; } // Monto mensual del alquiler
-        public bool Vigente { get; set; } // Estado del contrato (vigente o no)
+        public int IdContrato { get; set; }
+        public int IdInquilino { get; set; } // Clave foránea
+        public int IdInmueble { get; set; } // Clave foránea
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFin { get; set; }
+        public decimal MontoMensual { get; set; }
+        public string Estado { get; set; } // "vigente" o "terminado"
+        public DateTime? FechaTerminacionAnticipada { get; set; } // Opcional
+        public decimal? Multa { get; set; } // Opcional
+
+        // Auditoría
+        public int? CreadoPor { get; set; } // Clave foránea (Usuario)
+        public int? ModificadoPor { get; set; } // Clave foránea (Usuario)
+        public int? EliminadoPor { get; set; } // Clave foránea (Usuario)
     }
 }

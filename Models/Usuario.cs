@@ -3,8 +3,8 @@ namespace InmobiliariaApp.Models
     public class Usuario
     {
         public int IdUsuario { get; set; }
-        public string NombreUsuario { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string Rol { get; set; } = string.Empty;
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Rol { get; set; } // "Admin" o "Empleado"
     }
 }
