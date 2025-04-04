@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using InmobiliariaApp.Data;
@@ -20,7 +21,7 @@ namespace InmobiliariaApp.Repositories
             var inquilinos = new List<Inquilino>();
 
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("SELECT * FROM Inquilino", connection);
+            using var command = new MySqlCommand("SELECT * FROM inquilino", connection);
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -28,11 +29,15 @@ namespace InmobiliariaApp.Repositories
                 inquilinos.Add(new Inquilino
                 {
                     IdInquilino = reader.GetInt32("id_inquilino"),
-                    Dni = reader.GetString("Dni"),
-                    Apellido = reader.GetString("Apellido"),
-                    Nombre = reader.GetString("Nombre"),
-                    Telefono = reader.GetString("Telefono"),
-                    Email = reader.GetString("Email")
+                    Dni = reader.GetString("dni"),
+                    Apellido = reader.GetString("apellido"),
+                    Nombre = reader.GetString("nombre"),
+                    Telefono = reader.IsDBNull(reader.GetOrdinal("telefono"))
+                        ? null
+                        : reader.GetString("telefono"),
+                    Email = reader.IsDBNull(reader.GetOrdinal("email"))
+                        ? null
+                        : reader.GetString("email")
                 });
             }
 
@@ -43,7 +48,7 @@ namespace InmobiliariaApp.Repositories
         public Inquilino? GetById(int id)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("SELECT * FROM Inquilino WHERE id_inquilino = @Id", connection);
+            using var command = new MySqlCommand("SELECT * FROM inquilino WHERE id_inquilino = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
 
             using var reader = command.ExecuteReader();
@@ -52,11 +57,15 @@ namespace InmobiliariaApp.Repositories
                 return new Inquilino
                 {
                     IdInquilino = reader.GetInt32("id_inquilino"),
-                    Dni = reader.GetString("Dni"),
-                    Apellido = reader.GetString("Apellido"),
-                    Nombre = reader.GetString("Nombre"),
-                    Telefono = reader.GetString("Telefono"),
-                    Email = reader.GetString("Email")
+                    Dni = reader.GetString("dni"),
+                    Apellido = reader.GetString("apellido"),
+                    Nombre = reader.GetString("nombre"),
+                    Telefono = reader.IsDBNull(reader.GetOrdinal("telefono"))
+                        ? null
+                        : reader.GetString("telefono"),
+                    Email = reader.IsDBNull(reader.GetOrdinal("email"))
+                        ? null
+                        : reader.GetString("email")
                 };
             }
 
@@ -68,14 +77,14 @@ namespace InmobiliariaApp.Repositories
         {
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                "INSERT INTO Inquilino (Dni, Apellido, Nombre, Telefono, Email) " +
+                "INSERT INTO inquilino (dni, apellido, nombre, telefono, email) " +
                 "VALUES (@Dni, @Apellido, @Nombre, @Telefono, @Email)", connection);
 
             command.Parameters.AddWithValue("@Dni", inquilino.Dni);
             command.Parameters.AddWithValue("@Apellido", inquilino.Apellido);
             command.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
-            command.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
-            command.Parameters.AddWithValue("@Email", inquilino.Email);
+            command.Parameters.AddWithValue("@Telefono", string.IsNullOrEmpty(inquilino.Telefono) ? (object)DBNull.Value : inquilino.Telefono);
+            command.Parameters.AddWithValue("@Email", string.IsNullOrEmpty(inquilino.Email) ? (object)DBNull.Value : inquilino.Email);
 
             command.ExecuteNonQuery();
         }
@@ -85,15 +94,15 @@ namespace InmobiliariaApp.Repositories
         {
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                "UPDATE Inquilino SET Dni = @Dni, Apellido = @Apellido, Nombre = @Nombre, Telefono = @Telefono, Email = @Email " +
+                "UPDATE inquilino SET dni = @Dni, apellido = @Apellido, nombre = @Nombre, telefono = @Telefono, email = @Email " +
                 "WHERE id_inquilino = @Id", connection);
 
             command.Parameters.AddWithValue("@Id", inquilino.IdInquilino);
             command.Parameters.AddWithValue("@Dni", inquilino.Dni);
             command.Parameters.AddWithValue("@Apellido", inquilino.Apellido);
             command.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
-            command.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
-            command.Parameters.AddWithValue("@Email", inquilino.Email);
+            command.Parameters.AddWithValue("@Telefono", string.IsNullOrEmpty(inquilino.Telefono) ? (object)DBNull.Value : inquilino.Telefono);
+            command.Parameters.AddWithValue("@Email", string.IsNullOrEmpty(inquilino.Email) ? (object)DBNull.Value : inquilino.Email);
 
             command.ExecuteNonQuery();
         }
@@ -102,7 +111,7 @@ namespace InmobiliariaApp.Repositories
         public void Delete(int id)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("DELETE FROM Inquilino WHERE id_inquilino = @Id", connection);
+            using var command = new MySqlCommand("DELETE FROM inquilino WHERE id_inquilino = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
 
             command.ExecuteNonQuery();

@@ -9,8 +9,8 @@ namespace InmobiliariaApp.Models
         public required string Dni { get; set; } // DNI del propietario
         public required string Nombre { get; set; } 
         public required string Apellido { get; set; }
-        public required string Telefono { get; set; }
-        public required string Email { get; set; }
+        public string? Telefono { get; set; }
+        public string? Email { get; set; }
 
     }
 }
