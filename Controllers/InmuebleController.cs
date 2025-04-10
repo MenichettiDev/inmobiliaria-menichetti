@@ -14,14 +14,14 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para listar todos los inmuebles
-        public IActionResult Index()
+        public IActionResult Listar()
         {
             var inmuebles = _inmuebleRepository.GetAll();
             return View(inmuebles);
         }
 
         // Acción para mostrar detalles de un inmueble
-        public IActionResult Details(int id)
+        public IActionResult Detalles(int id)
         {
             var inmueble = _inmuebleRepository.GetById(id);
             if (inmueble == null)
@@ -32,25 +32,25 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de creación
-        public IActionResult Create()
+        public IActionResult Insertar()
         {
             return View();
         }
 
         // Acción para procesar el formulario de creación
         [HttpPost]
-        public IActionResult Create(Inmueble inmueble)
+        public IActionResult Insertar(Inmueble inmueble)
         {
             if (ModelState.IsValid)
             {
                 _inmuebleRepository.Add(inmueble);
-                return RedirectToAction("Index"); // Redirige a la lista de inmuebles
+                return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
             }
             return View(inmueble);
         }
 
         // Acción para mostrar el formulario de edición
-        public IActionResult Edit(int id)
+        public IActionResult Editar(int id)
         {
             var inmueble = _inmuebleRepository.GetById(id);
             if (inmueble == null)
@@ -62,7 +62,7 @@ namespace InmobiliariaApp.Controllers
 
         // Acción para procesar el formulario de edición
         [HttpPost]
-        public IActionResult Edit(int id, Inmueble inmueble)
+        public IActionResult Editar(int id, Inmueble inmueble)
         {
             if (id != inmueble.IdInmueble)
             {
@@ -72,13 +72,42 @@ namespace InmobiliariaApp.Controllers
             if (ModelState.IsValid)
             {
                 _inmuebleRepository.Update(inmueble);
-                return RedirectToAction("Index"); // Redirige a la lista de inmuebles
+                return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
             }
             return View(inmueble);
         }
 
+        // Acción para suspender el inmueble
+        [HttpPost]
+        public IActionResult BajaLogica(int id)
+        {
+            var inmueble = _inmuebleRepository.GetById(id);
+            if (inmueble == null)
+            {
+                return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
+            }
+
+            _inmuebleRepository.bajaLogica(inmueble);
+
+            return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+        }
+        // Acción para activar el inmueble
+        [HttpPost]
+        public IActionResult AltaLogica(int id)
+        {
+            var inmueble = _inmuebleRepository.GetById(id);
+            if (inmueble == null)
+            {
+                return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
+            }
+
+            _inmuebleRepository.altaLogica(inmueble);
+
+            return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+        }
+
         // Acción para mostrar la vista de confirmación de eliminación
-        public IActionResult Delete(int id)
+        public IActionResult Eliminar(int id)
         {
             var inmueble = _inmuebleRepository.GetById(id);
             if (inmueble == null)
@@ -93,7 +122,7 @@ namespace InmobiliariaApp.Controllers
         public IActionResult DeleteConfirmed(int id)
         {
             _inmuebleRepository.Delete(id);
-            return RedirectToAction("Index"); // Redirige a la lista de inmuebles
+            return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
         }
     }
 }

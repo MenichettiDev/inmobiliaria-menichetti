@@ -1,0 +1,41 @@
+@model InmobiliariaApp.Models.Pago
+
+@{
+    ViewData["Title"] = "Detalles del Pago";
+}
+
+<h1>Detalles del Pago</h1>
+
+<div>
+    <h4>Pago</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">ID Pago</dt>
+        <dd class="col-sm-10">@Model.IdPago</dd>
+
+        <dt class="col-sm-2">ID Contrato</dt>
+        <dd class="col-sm-10">@Model.IdContrato</dd>
+
+        <dt class="col-sm-2">Fecha de Pago</dt>
+        <dd class="col-sm-10">@Model.FechaPago.ToShortDateString()</dd>
+
+        <dt class="col-sm-2">Importe</dt>
+        <dd class="col-sm-10">@Model.Importe.ToString("C")</dd>
+
+        <dt class="col-sm-2">Detalle</dt>
+        <dd class="col-sm-10">@Model.Detalle</dd>
+
+        <dt class="col-sm-2">Creado Por</dt>
+        <dd class="col-sm-10">@Model.CreadoPor</dd>
+
+        <dt class="col-sm-2">Modificado Por</dt>
+        <dd class="col-sm-10">@Model.ModificadoPor</dd>
+
+        <dt class="col-sm-2">Eliminado Por</dt>
+        <dd class="col-sm-10">@Model.EliminadoPor</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Editar" asp-route-id="@Model.IdPago">Editar</a> |
+    <a asp-action="Listar">Volver a la Lista</a>
+</div>

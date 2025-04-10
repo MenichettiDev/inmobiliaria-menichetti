@@ -1,0 +1,44 @@
+@model InmobiliariaApp.Models.Inmueble
+
+@{
+    ViewData["Title"] = "Detalles del Inmueble";
+}
+
+<h1>Detalles del Inmueble</h1>
+
+<div>
+    <h4>Inmueble</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">ID Inmueble</dt>
+        <dd class="col-sm-10">@Model.IdInmueble</dd>
+
+        <dt class="col-sm-2">Propietario</dt>
+        <dd class="col-sm-10">@Model.IdPropietario</dd>
+
+        <dt class="col-sm-2">Dirección</dt>
+        <dd class="col-sm-10">@Model.Direccion</dd>
+
+        <dt class="col-sm-2">Coordenadas</dt>
+        <dd class="col-sm-10">@Model.Coordenadas</dd>
+
+        <dt class="col-sm-2">Uso</dt>
+        <dd class="col-sm-10">@Model.Uso</dd>
+
+        <dt class="col-sm-2">Tipo de Inmueble</dt>
+        <dd class="col-sm-10">@Model.IdTipoInmueble</dd>
+
+        <dt class="col-sm-2">Ambientes</dt>
+        <dd class="col-sm-10">@Model.Ambientes</dd>
+
+        <dt class="col-sm-2">Precio</dt>
+        <dd class="col-sm-10">@Model.Precio.ToString("C")</dd>
+
+        <dt class="col-sm-2">Estado</dt>
+        <dd class="col-sm-10">@Model.Estado</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Editar" asp-route-id="@Model.IdInmueble">Editar</a> |
+    <a asp-action="Listar">Volver a la Lista</a>
+</div>

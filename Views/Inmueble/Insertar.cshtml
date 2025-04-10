@@ -1,0 +1,79 @@
+@model InmobiliariaApp.Models.Inmueble
+
+@{
+    ViewData["Title"] = "Crear Inmueble";
+}
+
+<h1>Crear Inmueble</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Crear">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="IdPropietario" class="control-label">ID Propietario</label>
+                <input asp-for="IdPropietario" class="form-control" />
+                <span asp-validation-for="IdPropietario" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Direccion" class="control-label">Dirección</label>
+                <input asp-for="Direccion" class="form-control" />
+                <span asp-validation-for="Direccion" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Coordenadas" class="control-label">Coordenadas</label>
+                <input asp-for="Coordenadas" class="form-control" />
+                <span asp-validation-for="Coordenadas" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Uso" class="control-label">Uso</label>
+                <select asp-for="Uso" class="form-control">
+                    <option value="comercial">Comercial</option>
+                    <option value="residencial">Residencial</option>
+                </select>
+                <span asp-validation-for="Uso" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="IdTipoInmueble" class="control-label">Tipo de Inmueble</label>
+                <input asp-for="IdTipoInmueble" class="form-control" />
+                <span asp-validation-for="IdTipoInmueble" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Ambientes" class="control-label">Ambientes</label>
+                <input asp-for="Ambientes" class="form-control" />
+                <span asp-validation-for="Ambientes" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Precio" class="control-label">Precio</label>
+                <input asp-for="Precio" class="form-control" />
+                <span asp-validation-for="Precio" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Estado" class="control-label">Estado</label>
+                <select asp-for="Estado" class="form-control">
+                    <option value="disponible">Disponible</option>
+                    <option value="suspendido">Suspendido</option>
+                    <option value="ocupado">Ocupado</option>
+                </select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Crear" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Listar">Volver a la Lista</a>
+</div>

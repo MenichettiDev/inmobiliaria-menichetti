@@ -38,7 +38,8 @@ namespace InmobiliariaApp.Repositories
                     IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
                     Ambientes = reader.GetInt32("ambientes"),
                     Precio = reader.GetDecimal("precio"),
-                    Estado = reader.GetString("estado")
+                    Estado = reader.GetString("estado"),
+                    Activo = reader.GetInt32("activo")
                 });
             }
 
@@ -67,7 +68,8 @@ namespace InmobiliariaApp.Repositories
                     IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
                     Ambientes = reader.GetInt32("ambientes"),
                     Precio = reader.GetDecimal("precio"),
-                    Estado = reader.GetString("estado")
+                    Estado = reader.GetString("estado"),
+                    Activo = reader.GetInt32("activo")
                 };
             }
 
@@ -100,7 +102,7 @@ namespace InmobiliariaApp.Repositories
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
                 "UPDATE inmueble SET id_propietario = @IdPropietario, direccion = @Direccion, coordenadas = @Coordenadas, " +
-                "uso = @Uso, id_tipo_inmueble = @IdTipoInmueble, ambientes = @Ambientes, precio = @Precio, estado = @Estado " +
+                "uso = @Uso, id_tipo_inmueble = @IdTipoInmueble, ambientes = @Ambientes, precio = @Precio, estado = @Estado, activo = @Activo " +
                 "WHERE id_inmueble = @IdInmueble", connection);
 
             command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
@@ -112,15 +114,40 @@ namespace InmobiliariaApp.Repositories
             command.Parameters.AddWithValue("@Ambientes", inmueble.Ambientes);
             command.Parameters.AddWithValue("@Precio", inmueble.Precio);
             command.Parameters.AddWithValue("@Estado", inmueble.Estado);
+            command.Parameters.AddWithValue("@Activo", inmueble.Activo);
 
             command.ExecuteNonQuery();
         }
 
-        // Método para eliminar un inmueble
-        public void Delete(int id)
+        public void bajaLogica(Inmueble inmueble)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("DELETE FROM inmueble WHERE id_inmueble = @Id", connection);
+            using var command = new MySqlCommand(
+                "UPDATE inmueble SET activo = 0 " +
+                "WHERE id_inmueble = @IdInmueble", connection);
+
+                command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
+
+                command.ExecuteNonQuery();
+        }
+
+        public void altaLogica(Inmueble inmueble)
+        {
+            using var connection = _dbConnection.GetConnection();
+            using var command = new MySqlCommand(
+                "UPDATE inmueble SET activo = 1 " +
+                "WHERE id_inmueble = @IdInmueble", connection);
+
+                command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
+
+                command.ExecuteNonQuery();
+        }
+
+        public void Delete(int id)//baja logica
+        {
+            using var connection = _dbConnection.GetConnection();
+            using var command = new MySqlCommand("UPDATE inmueble SET estado = @Estado " +
+                "WHERE id_inmueble = @IdInmueble", connection);
             command.Parameters.AddWithValue("@Id", id);
 
             command.ExecuteNonQuery();

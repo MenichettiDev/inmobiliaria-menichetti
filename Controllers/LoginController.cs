@@ -24,12 +24,12 @@ namespace InmobiliariaApp.Controllers
         public IActionResult Index(string nombreUsuario, string contrasenia)
         {
             // Buscar el usuario en la base de datos
-            var usuario = _usuarioRepository.GetByNombreUsuario(nombreUsuario);
+            var usuario = _usuarioRepository.GetByEmail(nombreUsuario);
 
             if (usuario != null && usuario.Password == contrasenia)
             {
                 // Autenticación exitosa
-                HttpContext.Session.SetString("Usuario", usuario.NombreUsuario);
+                HttpContext.Session.SetString("Usuario", usuario.Email);
                 HttpContext.Session.SetString("Rol", usuario.Rol);
 
                 return RedirectToAction("Index", "Home"); // Redirigir al inicio
