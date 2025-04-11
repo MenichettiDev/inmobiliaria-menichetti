@@ -1,0 +1,45 @@
+@model IEnumerable<InmobiliariaApp.Models.Contrato>
+
+@{
+    ViewData["Title"] = "Lista de Contratos";
+}
+
+<h1>Lista de Contratos</h1>
+
+<p>
+    <a asp-action="Crear" class="btn btn-success">Crear Nuevo Contrato</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID Contrato</th>
+            <th>Inquilino</th>
+            <th>Inmueble</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Monto Mensual</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.IdContrato</td>
+                <td>@item.IdInquilino</td>
+                <td>@item.IdInmueble</td>
+                <td>@item.FechaInicio.ToShortDateString()</td>
+                <td>@item.FechaFin.ToShortDateString()</td>
+                <td>@item.MontoMensual.ToString("C")</td>
+                <td>@item.Estado</td>
+                <td>
+                    <a asp-action="Detalles" asp-route-id="@item.IdContrato" class="btn btn-info">Detalles</a> |
+                    <a asp-action="Editar" asp-route-id="@item.IdContrato" class="btn btn-warning">Editar</a> |
+                    <a asp-action="Eliminar" asp-route-id="@item.IdContrato" class="btn btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

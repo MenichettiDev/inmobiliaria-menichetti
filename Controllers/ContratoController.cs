@@ -14,14 +14,14 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para listar todos los contratos
-        public IActionResult Index()
+        public IActionResult Listar()
         {
             var contratos = _contratoRepository.GetAll();
             return View(contratos);
         }
 
         // Acción para mostrar detalles de un contrato
-        public IActionResult Details(int id)
+        public IActionResult Detalles(int id)
         {
             var contrato = _contratoRepository.GetById(id);
             if (contrato == null)
@@ -32,14 +32,14 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de creación
-        public IActionResult Create()
+        public IActionResult Insertar()
         {
             return View();
         }
 
         // Acción para procesar el formulario de creación
         [HttpPost]
-        public IActionResult Create(Contrato contrato)
+        public IActionResult Insertar(Contrato contrato)
         {
             if (ModelState.IsValid)
             {
@@ -50,7 +50,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de edición
-        public IActionResult Edit(int id)
+        public IActionResult Editar(int id)
         {
             var contrato = _contratoRepository.GetById(id);
             if (contrato == null)
@@ -62,7 +62,7 @@ namespace InmobiliariaApp.Controllers
 
         // Acción para procesar el formulario de edición
         [HttpPost]
-        public IActionResult Edit(int id, Contrato contrato)
+        public IActionResult Editar(int id, Contrato contrato)
         {
             if (id != contrato.IdContrato)
             {
@@ -72,13 +72,13 @@ namespace InmobiliariaApp.Controllers
             if (ModelState.IsValid)
             {
                 _contratoRepository.Update(contrato);
-                return RedirectToAction("Index"); // Redirige a la lista de contratos
+                return RedirectToAction("Listar"); // Redirige a la lista de contratos
             }
             return View(contrato);
         }
 
         // Acción para mostrar la vista de confirmación de eliminación
-        public IActionResult Delete(int id)
+        public IActionResult Eliminar(int id)
         {
             var contrato = _contratoRepository.GetById(id);
             if (contrato == null)
@@ -89,11 +89,11 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para confirmar la eliminación
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("Eliminar")]
         public IActionResult DeleteConfirmed(int id)
         {
             _contratoRepository.Delete(id);
-            return RedirectToAction("Index"); // Redirige a la lista de contratos
+            return RedirectToAction("Listar"); // Redirige a la lista de contratos
         }
     }
 }

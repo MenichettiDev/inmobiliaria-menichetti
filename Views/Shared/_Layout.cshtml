@@ -39,9 +39,6 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Contrato" asp-action="Listar">Contratos</a>
                             </li>
-                            @* <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Inquilino" asp-action="Listar">Inquilinos</a>
-                            </li> *@
 
                             <!-- Enlaces exclusivos para Administradores -->
                             @if (Context.Session.GetString("Rol") == "Administrador")
