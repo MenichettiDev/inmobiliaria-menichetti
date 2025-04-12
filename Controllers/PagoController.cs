@@ -14,14 +14,14 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para listar todos los pagos
-        public IActionResult Index()
+        public IActionResult Listar()
         {
             var pagos = _pagoRepository.GetAll();
             return View(pagos);
         }
 
         // Acción para mostrar detalles de un pago
-        public IActionResult Details(int id)
+        public IActionResult Detalles(int id)
         {
             var pago = _pagoRepository.GetById(id);
             if (pago == null)
@@ -32,25 +32,25 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de creación
-        public IActionResult Create()
+        public IActionResult Insertar()
         {
             return View();
         }
 
         // Acción para procesar el formulario de creación
         [HttpPost]
-        public IActionResult Create(Pago pago)
+        public IActionResult Insertar(Pago pago)
         {
             if (ModelState.IsValid)
             {
                 _pagoRepository.Add(pago);
-                return RedirectToAction("Index"); // Redirige a la lista de pagos
+                return RedirectToAction("Listar"); // Redirige a la lista de pagos
             }
             return View(pago);
         }
 
         // Acción para mostrar el formulario de edición
-        public IActionResult Edit(int id)
+        public IActionResult Editar(int id)
         {
             var pago = _pagoRepository.GetById(id);
             if (pago == null)
@@ -62,7 +62,7 @@ namespace InmobiliariaApp.Controllers
 
         // Acción para procesar el formulario de edición
         [HttpPost]
-        public IActionResult Edit(int id, Pago pago)
+        public IActionResult Editar(int id, Pago pago)
         {
             if (id != pago.IdPago)
             {
@@ -72,13 +72,13 @@ namespace InmobiliariaApp.Controllers
             if (ModelState.IsValid)
             {
                 _pagoRepository.Update(pago);
-                return RedirectToAction("Index"); // Redirige a la lista de pagos
+                return RedirectToAction("Listar"); // Redirige a la lista de pagos
             }
             return View(pago);
         }
 
         // Acción para mostrar la vista de confirmación de eliminación
-        public IActionResult Delete(int id)
+        public IActionResult Eliminar(int id)
         {
             var pago = _pagoRepository.GetById(id);
             if (pago == null)
@@ -89,11 +89,11 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para confirmar la eliminación
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("Eliminar")]
         public IActionResult DeleteConfirmed(int id)
         {
             _pagoRepository.Delete(id);
-            return RedirectToAction("Index"); // Redirige a la lista de pagos
+            return RedirectToAction("Listar"); // Redirige a la lista de pagos
         }
     }
 }
