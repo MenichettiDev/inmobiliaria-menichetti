@@ -30,9 +30,24 @@
         <dd class="col-sm-10">@Model.Estado</dd>
     </dl>
 
-    <form asp-action="Eliminar">
-        <input type="hidden" asp-for="IdInmueble" />
-        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
-        <a asp-action="Listar">Volver a la Lista</a>
+    @if (Model.Activo == 1)
+{
+    <form asp-action="BajaLogica" method="post" style="display:inline;">
+        <input type="hidden" name="id" value="@Model.IdInmueble" />
+        <button type="submit" class="btn btn-danger"
+                onclick="return confirm('¿Está seguro de que desea eliminar este inmueble?');">
+            Eliminar
+        </button>
     </form>
+}
+else
+{
+    <form asp-action="AltaLogica" method="post" style="display:inline;">
+        <input type="hidden" name="id" value="@Model.IdInmueble" />
+        <button type="submit" class="btn btn-success">Reactivar</button>
+    </form>
+}
+
+
+    <a asp-action="Listar" class="btn btn-secondary">Volver a la Lista</a>
 </div>

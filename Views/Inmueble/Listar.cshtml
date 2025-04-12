@@ -7,7 +7,7 @@
 <h1>Lista de Inmuebles</h1>
 
 <p>
-    <a asp-action="Crear" class="btn btn-success">Crear Nuevo Inmueble</a>
+    <a asp-action="Insertar" class="btn btn-success">Crear Nuevo Inmueble</a>
 </p>
 
 <table class="table">
@@ -39,17 +39,11 @@
                     <a asp-action="Editar" asp-route-id="@item.IdInmueble" class="btn btn-warning">Editar</a> |
                     @if (item.Activo == 1)
                     {
-                        <form asp-action="BajaLogica" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@item.IdInmueble" />
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                        </form>
+                        <a asp-action="Eliminar" asp-route-id="@item.IdInmueble" class="btn btn-danger">Eliminar</a>
                     }
                     else
                     {
-                        <form asp-action="AltaLogica" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@item.IdInmueble" />
-                            <button type="submit" class="btn btn-success">Reactivar</button>
-                        </form>
+                        <a asp-action="Eliminar" asp-route-id="@item.IdInmueble" class="btn btn-success">Reactivar</a>
                     }
                 </td>
             </tr>

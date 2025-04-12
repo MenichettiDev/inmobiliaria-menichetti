@@ -24,9 +24,9 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
-                        <!-- Enlaces condicionales para usuarios autenticados -->
-                        @if (Context.Session.GetString("Usuario") != null)
-                        {
+                        <!-- Enlaces condicionales para usuarios autenticados,# activar cuando se use por usuario -->
+                        @* @if (Context.Session.GetString("Usuario") != null)
+                        { *@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Propietario" asp-action="Listar">Propietarios</a>
                             </li>
@@ -39,6 +39,9 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Contrato" asp-action="Listar">Contratos</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="TipoInmueble" asp-action="Listar">Tipos Inmuebles</a>
+                            </li>
 
                             <!-- Enlaces exclusivos para Administradores -->
                             @if (Context.Session.GetString("Rol") == "Administrador")
@@ -47,7 +50,7 @@
                                     <a class="nav-link text-dark" asp-controller="Usuario" asp-action="Listar">Administrar Usuarios</a>
                                 </li>
                             }
-                        }
+                        @* } *@
                     </ul>
 
                     <!-- Sección para mostrar el nombre del usuario o el enlace de login -->

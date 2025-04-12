@@ -77,6 +77,35 @@ namespace InmobiliariaApp.Controllers
             return View(contrato);
         }
 
+        // Acción para suspender el inmueble
+        [HttpPost]
+        public IActionResult BajaLogica(int id)
+        {
+            var inmueble = _contratoRepository.GetById(id);
+            if (inmueble == null)
+            {
+                return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
+            }
+
+            _contratoRepository.bajaLogica(inmueble);
+
+            return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+        }
+        // Acción para activar el inmueble
+        [HttpPost]
+        public IActionResult AltaLogica(int id)
+        {
+            var inmueble = _contratoRepository.GetById(id);
+            if (inmueble == null)
+            {
+                return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
+            }
+
+            _contratoRepository.altaLogica(inmueble);
+
+            return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+        }
+
         // Acción para mostrar la vista de confirmación de eliminación
         public IActionResult Eliminar(int id)
         {

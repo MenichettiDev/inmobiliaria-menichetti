@@ -9,12 +9,14 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Crear">
+        <form asp-action="Insertar">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group">
-                <label asp-for="IdPropietario" class="control-label">ID Propietario</label>
-                <input asp-for="IdPropietario" class="form-control" />
+                <label asp-for="IdPropietario" class="control-label">Propietario</label>
+                <select asp-for="IdPropietario" class="form-control" asp-items="ViewBag.Propietarios">
+                    <option value="">Seleccione un propietario</option>
+                </select>
                 <span asp-validation-for="IdPropietario" class="text-danger"></span>
             </div>
 
@@ -41,9 +43,12 @@
 
             <div class="form-group">
                 <label asp-for="IdTipoInmueble" class="control-label">Tipo de Inmueble</label>
-                <input asp-for="IdTipoInmueble" class="form-control" />
+                <select asp-for="IdTipoInmueble" class="form-control" asp-items="ViewBag.TipoInmueble">
+                    <option value="">Seleccione un Tipo de inmueble</option>
+                </select>
                 <span asp-validation-for="IdTipoInmueble" class="text-danger"></span>
             </div>
+                
 
             <div class="form-group">
                 <label asp-for="Ambientes" class="control-label">Ambientes</label>
@@ -68,7 +73,7 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Crear" class="btn btn-primary" />
+                <input type="submit" value="Insertar" class="btn btn-primary" />
             </div>
         </form>
     </div>

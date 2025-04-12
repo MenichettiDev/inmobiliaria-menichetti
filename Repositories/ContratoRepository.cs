@@ -49,7 +49,9 @@ namespace InmobiliariaApp.Repositories
                         : (int?)reader.GetInt32("modificado_por"),
                     EliminadoPor = reader.IsDBNull(reader.GetOrdinal("eliminado_por"))
                         ? null
-                        : (int?)reader.GetInt32("eliminado_por")
+                        : (int?)reader.GetInt32("eliminado_por"),
+                    Activo = reader.GetInt32("activo"),
+
                 });
             }
 
@@ -89,7 +91,8 @@ namespace InmobiliariaApp.Repositories
                         : (int?)reader.GetInt32("modificado_por"),
                     EliminadoPor = reader.IsDBNull(reader.GetOrdinal("eliminado_por"))
                         ? null
-                        : (int?)reader.GetInt32("eliminado_por")
+                        : (int?)reader.GetInt32("eliminado_por"),
+                    Activo = reader.GetInt32("activo"),
                 };
             }
 
@@ -127,7 +130,7 @@ namespace InmobiliariaApp.Repositories
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
                 "UPDATE contrato SET id_inquilino = @IdInquilino, id_inmueble = @IdInmueble, fecha_inicio = @FechaInicio, " +
-                "fecha_fin = @FechaFin, monto_mensual = @MontoMensual, estado = @Estado, " +
+                "fecha_fin = @FechaFin, monto_mensual = @MontoMensual, estado = @Estado, activo = @Activo, " +
                 "fecha_terminacion_anticipada = @FechaTerminacionAnticipada, multa = @Multa, " +
                 "creado_por = @CreadoPor, modificado_por = @ModificadoPor, eliminado_por = @EliminadoPor " +
                 "WHERE id_contrato = @IdContrato", connection);
@@ -139,6 +142,7 @@ namespace InmobiliariaApp.Repositories
             command.Parameters.AddWithValue("@FechaFin", contrato.FechaFin);
             command.Parameters.AddWithValue("@MontoMensual", contrato.MontoMensual);
             command.Parameters.AddWithValue("@Estado", contrato.Estado);
+            command.Parameters.AddWithValue("@Activo", contrato.Activo);
             command.Parameters.AddWithValue("@FechaTerminacionAnticipada", contrato.FechaTerminacionAnticipada ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Multa", contrato.Multa ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@CreadoPor", contrato.CreadoPor ?? (object)DBNull.Value);
@@ -148,6 +152,29 @@ namespace InmobiliariaApp.Repositories
             command.ExecuteNonQuery();
         }
 
+        public void bajaLogica(Contrato contrato)
+        {
+            using var connection = _dbConnection.GetConnection();
+            using var command = new MySqlCommand(
+                "UPDATE contrato SET activo = 0 " +
+                "WHERE id_contrato = @IdContrato", connection);
+
+            command.Parameters.AddWithValue("@IdContrato", contrato.IdContrato);
+
+            command.ExecuteNonQuery();
+        }
+
+        public void altaLogica(Contrato contrato)
+        {
+            using var connection = _dbConnection.GetConnection();
+            using var command = new MySqlCommand(
+                "UPDATE contrato SET activo = 1 " +
+                "WHERE id_contrato = @IdContrato", connection);
+
+            command.Parameters.AddWithValue("@IdContrato", contrato.IdContrato);
+
+            command.ExecuteNonQuery();
+        }
         // Método para eliminar un contrato
         public void Delete(int id)
         {

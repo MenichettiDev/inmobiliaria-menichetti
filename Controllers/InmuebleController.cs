@@ -1,16 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InmobiliariaApp.Controllers
 {
     public class InmuebleController : Controller
     {
         private readonly InmuebleRepository _inmuebleRepository;
+        private readonly PropietarioRepository _propietarioRepository;
+        private readonly TipoInmuebleRepository _tipoInmuebleRepository;
 
-        public InmuebleController(InmuebleRepository inmuebleRepository)
+        public InmuebleController(InmuebleRepository inmuebleRepository, PropietarioRepository propietarioRepository, TipoInmuebleRepository tipoInmuebleRepository)
         {
             _inmuebleRepository = inmuebleRepository;
+            _propietarioRepository = propietarioRepository;
+            _tipoInmuebleRepository = tipoInmuebleRepository;
         }
 
         // Acción para listar todos los inmuebles
@@ -34,6 +39,10 @@ namespace InmobiliariaApp.Controllers
         // Acción para mostrar el formulario de creación
         public IActionResult Insertar()
         {
+            var propietarios = _propietarioRepository.GetAll(); // O el método que uses
+            ViewData["Propietarios"] = new SelectList(propietarios, "IdPropietario", "NombreCompleto");
+            var tiposInmueble = _tipoInmuebleRepository.GetAll(); // O el método que uses
+            ViewData["TipoInmueble"] = new SelectList(tiposInmueble, "IdTipoInmueble", "Nombre");
             return View();
         }
 
@@ -41,6 +50,7 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Insertar(Inmueble inmueble)
         {
+            Console.WriteLine("Insertar Inmueble: " + inmueble.ToString());
             if (ModelState.IsValid)
             {
                 _inmuebleRepository.Add(inmueble);

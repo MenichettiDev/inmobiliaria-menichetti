@@ -6,7 +6,7 @@ namespace InmobiliariaApp.Models
     public class TipoInmueble
     {
         public int IdTipoInmueble { get; set; }
-        public required string Nombre { get; set; }
+        public string? Nombre { get; set; }
 
     }
 }
