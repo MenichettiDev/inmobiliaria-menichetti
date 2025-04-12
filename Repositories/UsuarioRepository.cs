@@ -13,6 +13,48 @@ namespace InmobiliariaApp.Repositories
             _dbConnection = dbConnection;
         }
 
+        // Obtener todos los usuarios
+        public List<Usuario> GetAll()
+        {
+            var usuarios = new List<Usuario>();
+            using var connection = _dbConnection.GetConnection();
+            using var command = new MySqlCommand("SELECT * FROM usuario", connection);
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                usuarios.Add(new Usuario
+                {
+                    IdUsuario = reader.GetInt32("id_usuario"),
+                    Email = reader.GetString("email"),
+                    Password = reader.GetString("password"),
+                    Rol = reader.GetString("rol")
+                });
+            }
+            return usuarios;
+        }
+
+        // Obtener un usuario por ID
+        public Usuario? GetById(int id)
+        {
+            using var connection = _dbConnection.GetConnection();
+            using var command = new MySqlCommand("SELECT * FROM usuario WHERE id_usuario = @Id", connection);
+            command.Parameters.AddWithValue("@Id", id);
+
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Usuario
+                {
+                    IdUsuario = reader.GetInt32("id_usuario"),
+                    Email = reader.GetString("email"),
+                    Password = reader.GetString("password"),
+                    Rol = reader.GetString("rol")
+                };
+            }
+            return null;
+        }
+
         // Método para buscar un usuario por email
         public Usuario? GetByEmail(string email)
         {

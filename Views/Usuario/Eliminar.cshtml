@@ -1,0 +1,17 @@
+@model InmobiliariaApp.Models.Usuario
+@{
+    ViewData["Title"] = "Eliminar Usuario";
+}
+
+<h1>¿Estás seguro que querés eliminar este usuario?</h1>
+<hr />
+<div>
+    <p><strong>Email:</strong> @Model.Email</p>
+    <p><strong>Rol:</strong> @Model.Rol</p>
+
+    <form asp-action="EliminarConfirmado">
+        <input type="hidden" asp-for="IdUsuario" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-action="Listar" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

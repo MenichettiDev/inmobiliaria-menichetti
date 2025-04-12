@@ -28,10 +28,10 @@ namespace InmobiliariaApp.Controllers
         // Acción para listar todos los propietarios
         public IActionResult Listar()
         {
-            if (!UsuarioAutenticado())
-            {
-                return RedirectToAction("Index", "Login"); // Redirigir al login si no está autenticado
-            }
+            // if (!UsuarioAutenticado())
+            // {
+            //     return RedirectToAction("Index", "Login"); // Redirigir al login si no está autenticado
+            // }
 
             var propietarios = _propietarioRepository.GetAll();
             return View(propietarios);

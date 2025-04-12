@@ -17,6 +17,7 @@ builder.Services.AddScoped<ContratoRepository>();
 builder.Services.AddScoped<PagoRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<TipoInmuebleRepository>();
+builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddSession(); // Agregar el servicio de sesión
 
 

@@ -1,0 +1,31 @@
+@model IEnumerable<InmobiliariaApp.Models.Usuario>
+@{
+    ViewData["Title"] = "Lista de Usuarios";
+}
+
+<h1>Usuarios</h1>
+<a asp-action="Insertar" class="btn btn-success mb-3">Agregar Usuario</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var usuario in Model)
+    {
+        <tr>
+            <td>@usuario.Email</td>
+            <td>@usuario.Rol</td>
+            <td>
+                <a asp-action="Detalles" asp-route-id="@usuario.IdUsuario" class="btn btn-info btn-sm">Ver</a>
+                <a asp-action="Editar" asp-route-id="@usuario.IdUsuario" class="btn btn-warning btn-sm">Editar</a>
+                <a asp-action="Eliminar" asp-route-id="@usuario.IdUsuario" class="btn btn-danger btn-sm">Eliminar</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

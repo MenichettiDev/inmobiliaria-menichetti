@@ -1,0 +1,14 @@
+@model InmobiliariaApp.Models.Usuario
+@{
+    ViewData["Title"] = "Detalles de Usuario";
+}
+
+<h1>Detalles de Usuario</h1>
+<hr />
+<div>
+    <p><strong>Email:</strong> @Model.Email</p>
+    <p><strong>Rol:</strong> @Model.Rol</p>
+
+    <a asp-action="Editar" asp-route-id="@Model.IdUsuario" class="btn btn-warning">Editar</a>
+    <a asp-action="Listar" class="btn btn-secondary">Volver</a>
+</div>
