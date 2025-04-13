@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using Inmobiliaria_.Net_Core.Models;
+
 namespace InmobiliariaApp.Models
 {
     // Modelo Inmueble
@@ -15,5 +18,7 @@ namespace InmobiliariaApp.Models
         public required int Activo { get; set; } // "disponible", "suspendido", "ocupado"
 
         public string? Portada { get; set; }
+        [ForeignKey(nameof(Imagen.InmuebleId))]
+		public IList<Imagen> Imagenes { get; set; } = new List<Imagen>();
     }
 }

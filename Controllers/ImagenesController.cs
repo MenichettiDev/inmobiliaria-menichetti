@@ -106,7 +106,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
         [HttpPost]
         public IActionResult Editar(int id, Imagen imagen)
         {
-            if (id != imagen.Id)
+            if (id != imagen.IdImagen)
                 return BadRequest();
 
             if (ModelState.IsValid)

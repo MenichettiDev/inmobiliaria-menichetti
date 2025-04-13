@@ -20,7 +20,7 @@ namespace InmobiliariaApp.Models
             int res = -1;
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                @"INSERT INTO Imagenes (inmueble_id, url) 
+                @"INSERT INTO Imagenes (id_inmueble, url) 
                 VALUES (@InmuebleId, @Url)", connection);
 
             command.Parameters.AddWithValue("@InmuebleId", imagen.InmuebleId);
@@ -35,7 +35,7 @@ namespace InmobiliariaApp.Models
             int res = -1;
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                @"DELETE FROM Imagenes WHERE id = @Id", connection);
+                @"DELETE FROM Imagenes WHERE id_imagen = @Id", connection);
 
             command.Parameters.AddWithValue("@Id", id);
             res = command.ExecuteNonQuery();
@@ -48,9 +48,9 @@ namespace InmobiliariaApp.Models
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
                 @"UPDATE Imagenes SET url = @Url 
-                WHERE id = @Id", connection);
+                WHERE id_imagen = @Id", connection);
 
-            command.Parameters.AddWithValue("@Id", imagen.Id);
+            command.Parameters.AddWithValue("@Id", imagen.IdImagen);
             command.Parameters.AddWithValue("@Url", imagen.Url);
 
             res = command.ExecuteNonQuery();
@@ -62,9 +62,9 @@ namespace InmobiliariaApp.Models
             Imagen? res = null;
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                @"SELECT id, inmueble_id, url 
+                @"SELECT id_imagen, id_inmueble, url 
                 FROM Imagenes 
-                WHERE id = @Id", connection);
+                WHERE id_imagen = @Id", connection);
 
             command.Parameters.AddWithValue("@Id", id);
 
@@ -73,8 +73,8 @@ namespace InmobiliariaApp.Models
             {
                 res = new Imagen
                 {
-                    Id = reader.GetInt32("id"),
-                    InmuebleId = reader.GetInt32("inmueble_id"),
+                    IdImagen = reader.GetInt32("id_imagen"),
+                    InmuebleId = reader.GetInt32("id_inmueble"),
                     Url = reader.GetString("url")
                 };
             }
@@ -87,7 +87,7 @@ namespace InmobiliariaApp.Models
             var res = new List<Imagen>();
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                @"SELECT id, inmueble_id, url 
+                @"SELECT id_imagen, inmueble_id, url 
                 FROM Imagenes", connection);
 
             using var reader = command.ExecuteReader();
@@ -95,7 +95,7 @@ namespace InmobiliariaApp.Models
             {
                 res.Add(new Imagen
                 {
-                    Id = reader.GetInt32("id"),
+                    IdImagen = reader.GetInt32("id_imagen"),
                     InmuebleId = reader.GetInt32("inmueble_id"),
                     Url = reader.GetString("url")
                 });
@@ -109,9 +109,9 @@ namespace InmobiliariaApp.Models
             var res = new List<Imagen>();
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                @"SELECT id, inmueble_id, url 
+                @"SELECT id_imagen, id_inmueble, url 
                 FROM Imagenes 
-                WHERE inmueble_id = @InmuebleId", connection);
+                WHERE id_inmueble = @InmuebleId", connection);
 
             command.Parameters.AddWithValue("@InmuebleId", inmuebleId);
 
@@ -120,8 +120,8 @@ namespace InmobiliariaApp.Models
             {
                 res.Add(new Imagen
                 {
-                    Id = reader.GetInt32("id"),
-                    InmuebleId = reader.GetInt32("inmueble_id"),
+                    IdImagen = reader.GetInt32("id_imagen"),
+                    InmuebleId = reader.GetInt32("id_inmueble"),
                     Url = reader.GetString("url")
                 });
             }

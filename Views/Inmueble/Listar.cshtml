@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Lista de Inmuebles";
-	var rnd = new Random();
+    var rnd = new Random();
 }
 
 <h1>Lista de Inmuebles</h1>
@@ -30,17 +30,17 @@
         {
             <tr>
                 <td>
-					@if (!String.IsNullOrEmpty(item.Portada))
-					{
-						var x = item.Portada + "?" + rnd.Next();
-						<img width="32" src="@x" />
-					}
-					else
-					{
-						<span>Sin foto</span>
-					}
+                    @if (!String.IsNullOrEmpty(item.Portada))
+                    {
+                        var x = item.Portada + "?" + rnd.Next();
+                        <img width="32" src="@x" />
+                    }
+                    else
+                    {
+                        <span>Sin foto</span>
+                    }
 
-				</td>
+                </td>
                 <td>@item.IdInmueble</td>
                 <td>@item.IdPropietario</td>
                 <td>@item.Direccion</td>
@@ -49,6 +49,9 @@
                 <td>@item.Precio.ToString("C")</td>
                 <td>@item.Estado</td>
                 <td>
+                    <a class="btn btn-secondary" asp-action="Imagenes" asp-route-id="@item.IdInmueble" title="Ver imágenes">
+                        <i class="fa-solid fa-images"></i>
+                    </a>
                     <a asp-action="Detalles" asp-route-id="@item.IdInmueble" class="btn btn-info">Detalles</a> |
                     <a asp-action="Editar" asp-route-id="@item.IdInmueble" class="btn btn-warning">Editar</a> |
                     @if (item.Activo == 1)
