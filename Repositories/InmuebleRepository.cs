@@ -126,9 +126,9 @@ namespace InmobiliariaApp.Repositories
                 "UPDATE inmueble SET activo = 0 " +
                 "WHERE id_inmueble = @IdInmueble", connection);
 
-                command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
+            command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
 
-                command.ExecuteNonQuery();
+            command.ExecuteNonQuery();
         }
 
         public void altaLogica(Inmueble inmueble)
@@ -138,9 +138,9 @@ namespace InmobiliariaApp.Repositories
                 "UPDATE inmueble SET activo = 1 " +
                 "WHERE id_inmueble = @IdInmueble", connection);
 
-                command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
+            command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
 
-                command.ExecuteNonQuery();
+            command.ExecuteNonQuery();
         }
 
         public void Delete(int id)//baja logica
@@ -151,6 +151,24 @@ namespace InmobiliariaApp.Repositories
             command.Parameters.AddWithValue("@Id", id);
 
             command.ExecuteNonQuery();
+        }
+
+        //metodo para subir la portada de un inmueble
+        public int ModificarPortada(int id, string url)
+        {
+            int res = -1;
+            using var connection = _dbConnection.GetConnection();
+            using var command = new MySqlCommand(@"UPDATE inmueble SET portada=@Portada 
+                WHERE id_inmueble = @IdInmueble", connection);
+            command.Parameters.AddWithValue("@Id", id);
+
+            command.Parameters.AddWithValue("@portada", String.IsNullOrEmpty(url) ? DBNull.Value : url);
+            command.Parameters.AddWithValue("@id", id);
+            res = command.ExecuteNonQuery();
+            connection.Close();
+
+
+            return res;
         }
     }
 }

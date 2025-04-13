@@ -1,4 +1,5 @@
 using InmobiliariaApp.Data;
+using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,7 @@ builder.Services.AddScoped<PagoRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<TipoInmuebleRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddScoped<ImagenRepository>();
 builder.Services.AddSession(); // Agregar el servicio de sesión
 
 

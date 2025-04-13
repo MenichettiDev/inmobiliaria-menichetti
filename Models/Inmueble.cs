@@ -14,6 +14,6 @@ namespace InmobiliariaApp.Models
         public required string Estado { get; set; } // "disponible", "suspendido", "ocupado"
         public required int Activo { get; set; } // "disponible", "suspendido", "ocupado"
 
-        
+        public string? Portada { get; set; }
     }
 }

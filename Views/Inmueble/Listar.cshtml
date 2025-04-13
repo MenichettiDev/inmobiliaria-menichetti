@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Lista de Inmuebles";
+	var rnd = new Random();
 }
 
 <h1>Lista de Inmuebles</h1>
@@ -13,6 +14,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th>Portada</th>
             <th>ID Inmueble</th>
             <th>Propietario</th>
             <th>Dirección</th>
@@ -27,6 +29,18 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td>
+					@if (!String.IsNullOrEmpty(item.Portada))
+					{
+						var x = item.Portada + "?" + rnd.Next();
+						<img width="32" src="@x" />
+					}
+					else
+					{
+						<span>Sin foto</span>
+					}
+
+				</td>
                 <td>@item.IdInmueble</td>
                 <td>@item.IdPropietario</td>
                 <td>@item.Direccion</td>
