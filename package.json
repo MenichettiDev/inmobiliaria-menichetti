@@ -1,0 +1,7 @@
+{
+    "name": "mi-proyecto-dotnet",
+    "version": "1.0.0",
+    "scripts": {
+        "dev": "nodemon --exec \"dotnet run\" --ext cs,cshtml"
+    }
+}

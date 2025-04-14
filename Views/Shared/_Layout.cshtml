@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,14 +8,16 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/inmobiliaria_menichetti.styles.css" asp-append-version="true" />
+    
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Menichetti Propiedades</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -27,35 +30,38 @@
                         <!-- Enlaces condicionales para usuarios autenticados,# activar cuando se use por usuario -->
                         @* @if (Context.Session.GetString("Usuario") != null)
                         { *@
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Propietario" asp-action="Listar">Propietarios</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Inquilino" asp-action="Listar">Inquilinos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Inmueble" asp-action="Listar">Inmuebles</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Contrato" asp-action="Listar">Contratos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="TipoInmueble" asp-action="Listar">Tipos Inmuebles</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Pago" asp-action="Listar">Pagos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Usuario" asp-action="Listar">Usuarios</a>
-                            </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Propietario"
+                                asp-action="Listar">Propietarios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Inquilino" asp-action="Listar">Inquilinos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Inmueble" asp-action="Listar">Inmuebles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Contrato" asp-action="Listar">Contratos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="TipoInmueble" asp-action="Listar">Tipos
+                                Inmuebles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Pago" asp-action="Listar">Pagos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Usuario" asp-action="Listar">Usuarios</a>
+                        </li>
 
-                            <!-- Enlaces exclusivos para Administradores -->
-                            @if (Context.Session.GetString("Rol") == "Administrador")
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Usuario" asp-action="Listar">Administrar Usuarios</a>
-                                </li>
-                            }
+                        <!-- Enlaces exclusivos para Administradores -->
+                        @if (Context.Session.GetString("Rol") == "Administrador")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Usuario" asp-action="Listar">Administrar
+                                    Usuarios</a>
+                            </li>
+                        }
                         @* } *@
                     </ul>
 
@@ -64,11 +70,13 @@
                         @if (Context.Session.GetString("Usuario") != null)
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
                                     @Context.Session.GetString("Usuario")
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item" asp-controller="Login" asp-action="Logout">Cerrar Sesión</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Login" asp-action="Logout">Cerrar
+                                            Sesión</a></li>
                                 </ul>
                             </li>
                         }
@@ -99,4 +107,5 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

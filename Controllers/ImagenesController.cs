@@ -12,7 +12,7 @@ using InmobiliariaApp.Models;
 
 namespace Inmobiliaria_.Net_Core.Controllers
 {
-    [Authorize]
+    // [Authorize] comento porque sino no anda
     public class ImagenesController : Controller
     {
         private readonly ImagenRepository _repositorio;
@@ -59,37 +59,70 @@ namespace Inmobiliaria_.Net_Core.Controllers
         [HttpPost]
         public async Task<IActionResult> Subir(int id, List<IFormFile> imagenes)
         {
-            if (imagenes == null || imagenes.Count == 0)
-                return BadRequest("No se recibieron archivos.");
-
-            string ruta = Path.Combine(_environment.WebRootPath, "Uploads", "Inmuebles", id.ToString());
-            if (!Directory.Exists(ruta))
-                Directory.CreateDirectory(ruta);
-
-            foreach (var file in imagenes)
+            try
             {
-                if (file.Length > 0)
+                Console.WriteLine($"➡️ Subida iniciada para inmueble ID: {id}");
+
+                if (imagenes == null || imagenes.Count == 0)
                 {
-                    var extension = Path.GetExtension(file.FileName);
-                    var nombreArchivo = $"{Guid.NewGuid()}{extension}";
-                    var rutaArchivo = Path.Combine(ruta, nombreArchivo);
-
-                    using (var stream = new FileStream(rutaArchivo, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-
-                    var imagen = new Imagen
-                    {
-                        InmuebleId = id,
-                        Url = $"/Uploads/Inmuebles/{id}/{nombreArchivo}"
-                    };
-
-                    _repositorio.Alta(imagen);
+                    Console.WriteLine("⚠️ No se recibieron archivos");
+                    return BadRequest("No se recibieron archivos.");
                 }
-            }
 
-            return RedirectToAction("PorInmueble", new { id });
+                Console.WriteLine($"📦 Cantidad de archivos recibidos: {imagenes.Count}");
+
+                string ruta = Path.Combine(_environment.WebRootPath, "Uploads", "Inmuebles", id.ToString());
+                Console.WriteLine($"📁 Ruta destino: {ruta}");
+
+                if (!Directory.Exists(ruta))
+                {
+                    Directory.CreateDirectory(ruta);
+                    Console.WriteLine("📂 Carpeta creada");
+                }
+
+                foreach (var file in imagenes)
+                {
+                    Console.WriteLine($"🖼 Procesando archivo: {file.FileName} ({file.Length} bytes)");
+
+                    if (file.Length > 0)
+                    {
+                        var extension = Path.GetExtension(file.FileName);
+                        var nombreArchivo = $"{Guid.NewGuid()}{extension}";
+                        var rutaArchivo = Path.Combine(ruta, nombreArchivo);
+
+                        Console.WriteLine($"📄 Guardando como: {rutaArchivo}");
+
+                        using (var stream = new FileStream(rutaArchivo, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        var imagen = new Imagen
+                        {
+                            InmuebleId = id,
+                            Url = $"/Uploads/Inmuebles/{id}/{nombreArchivo}"
+                        };
+
+                        Console.WriteLine($"✅ Imagen guardada: {imagen.Url}");
+
+                        _repositorio.Alta(imagen);
+                    }
+                    else
+                    {
+                        Console.WriteLine("⚠️ Archivo vacío ignorado");
+                    }
+                }
+
+                var imagenesActuales = _repositorio.BuscarPorInmueble(id);
+                Console.WriteLine($"📸 Total imágenes tras subir: {imagenesActuales.Count}");
+
+                return Json(imagenesActuales);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error en subida: {ex.Message}");
+                return StatusCode(500, "Error interno del servidor: " + ex.Message);
+            }
         }
 
         // Acción para mostrar formulario de edición

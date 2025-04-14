@@ -22,7 +22,8 @@
 					<img src="@Model.Portada" class="img-thumbnail" style="max-width: 100%;" />
 					<form asp-controller="Inmuebles" asp-action="Portada" method="post" class="d-inline">
 						<input type="hidden" name="InmuebleId" value="@Id" />
-						<button type="submit" class="btn btn-danger btn-sm mt-2"><i class="fas fa-trash-alt"></i> Eliminar</button>
+						<button type="submit" class="btn btn-danger btn-sm mt-2"><i class="fas fa-trash-alt"></i>
+							Eliminar</button>
 					</form>
 				</div>
 			}
@@ -43,14 +44,17 @@
 				<label>Imágenes actuales:</label>
 				<div class="d-flex flex-wrap" id="galeriaActual">
 					@if (Model?.Imagenes?.Count > 0) foreach (var imagen in Model.Imagenes)
+						{
+							<div class="m-2 position-relative imagen-con-hover">
+								<img src="@imagen.Url" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
+								<button type="button" class="btn btn-danger btn-sm btn-eliminar-imagen"
+									onclick="eliminarImagen(@imagen.Id)">
+									<i class="fas fa-times"></i>
+								</button>
+							</div>
+						}
+					else
 					{
-						<div class="m-2 position-relative imagen-con-hover">
-							<img src="@imagen.Url" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
-							<button type="button" class="btn btn-danger btn-sm btn-eliminar-imagen" onclick="eliminarImagen(@imagen.Id)">
-								<i class="fas fa-times"></i>
-							</button>
-						</div>
-					} else {
 						<p>No hay imágenes interiores disponibles.</p>
 					}
 				</div>
@@ -58,8 +62,8 @@
 			<form id="formInterior" enctype="multipart/form-data" onsubmit="subirImagenes(event)">
 				<div class="form-group">
 					<label for="imagenes">Seleccionar imágenes</label>
-					<input type="file" class="form-control-file" id="imagenes" name="imagenes" onchange="previsualizar(event)"
-						accept="image/*" multiple required>
+					<input type="file" class="form-control-file" id="imagenes" name="imagenes"
+						onchange="previsualizar(event)" accept="image/*" multiple required>
 				</div>
 				<button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Subir</button>
 			</form>
@@ -71,6 +75,13 @@
 		</div>
 	</div>
 </div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script>
+	const notyf = new Notyf();
+</script>
+
 
 @section Scripts {
 	<script>
@@ -84,10 +95,10 @@
 				const reader = new FileReader();
 				reader.onload = function (e) {
 					$('#preview').append(`
-						<div class="m-2">
-							<img src="${e.target.result}" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
-						</div>
-					`);
+							<div class="m-2">
+								<img src="${e.target.result}" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
+							</div>
+						`);
 				};
 				reader.readAsDataURL(file);
 			});
@@ -96,36 +107,55 @@
 		// Función para subir imágenes por AJAX
 		function subirImagenes(event) {
 			event.preventDefault(); // Evitar el envío del formulario por defecto
+
+			console.log("🔁 Evento de subida disparado");
+
 			const files = document.querySelector('#imagenes').files;
 			if (files.length === 0) {
+				console.log("⚠️ No se seleccionaron archivos");
 				notyf.error("Selecciona al menos una imagen");
 				return;
 			}
+
 			const formData = new FormData();
 			for (let i = 0; i < files.length; i++) {
+				console.log(`📎 Agregando archivo: ${files[i].name}`);
 				formData.append('imagenes', files[i]);
 			}
 
+			console.log(`📤 Enviando ${files.length} archivos al backend`);
+
+			// Asegurate que la variable `id` esté definida antes de usarla
+			if (typeof id === "undefined") {
+				console.error("❌ La variable 'id' no está definida");
+				notyf.error("Error interno: ID no definido");
+				return;
+			}
+
+			console.log(`🌐 URL destino: /Imagenes/Subir/${id}`);
+
 			$.ajax({
-				url: `@Url.Action("Alta", "Imagenes", new {Id=Id})`,
-				//url: `/Imagenes/Alta/${id}`,
+				url: `/Imagenes/Subir/${id}`,
 				type: 'POST',
 				data: formData,
 				contentType: false,
 				processData: false,
 			}).done(function (imagenes) {
+				console.log("✅ Imágenes subidas:", imagenes);
 				notyf.success('Imágenes subidas con éxito');
 				mostrarImagenes(imagenes);
-			}).fail(function () {
+			}).fail(function (jqXHR, textStatus, errorThrown) {
+				console.error("❌ Error en subida AJAX", textStatus, errorThrown, jqXHR.responseText);
 				notyf.error('Error al subir las imágenes');
 			}).always(function () {
-				// Limpiar el formulario después de la subida
+				console.log("🧹 Limpieza post-subida");
 				document.getElementById('formInterior').reset();
 				$('#preview').empty(); // Limpiar la previsualización
 				$('#imagenes').val("");
 			});
 		}
-		
+
+
 		function eliminarImagen(imagenId) {
 			$.post(`/Imagenes/Eliminar/${imagenId}`).done(function (imagenes) {
 				notyf.success('Imagen eliminada');
@@ -140,13 +170,13 @@
 				let html = ``;
 				imagenes.forEach(img => {
 					html += `
-						<div class="m-2 position-relative imagen-con-hover">
-							<img src="${img.url}" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
-							<button type="button" class="btn btn-danger btn-sm btn-eliminar-imagen" onclick="eliminarImagen(${img.id})">
-								<i class="fas fa-times"></i>
-							</button>
-						</div>
-					`;
+							<div class="m-2 position-relative imagen-con-hover">
+								<img src="${img.url}" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
+								<button type="button" class="btn btn-danger btn-sm btn-eliminar-imagen" onclick="eliminarImagen(${img.id})">
+									<i class="fas fa-times"></i>
+								</button>
+							</div>
+						`;
 				});
 				$('#galeriaActual').html(html);
 			} else {
