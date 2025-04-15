@@ -69,7 +69,10 @@ namespace InmobiliariaApp.Repositories
                     Ambientes = reader.GetInt32("ambientes"),
                     Precio = reader.GetDecimal("precio"),
                     Estado = reader.GetString("estado"),
-                    Activo = reader.GetInt32("activo")
+                    Activo = reader.GetInt32("activo"),
+                    Portada = reader.IsDBNull(reader.GetOrdinal("portada"))
+                        ? null
+                        : reader.GetString("portada")
                 };
             }
 
@@ -158,17 +161,17 @@ namespace InmobiliariaApp.Repositories
         {
             int res = -1;
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand(@"UPDATE inmueble SET portada=@Portada 
-                WHERE id_inmueble = @IdInmueble", connection);
-            command.Parameters.AddWithValue("@Id", id);
+            using var command = new MySqlCommand(@"UPDATE inmueble SET portada = @Portada 
+                                        WHERE id_inmueble = @IdInmueble", connection);
 
-            command.Parameters.AddWithValue("@portada", String.IsNullOrEmpty(url) ? DBNull.Value : url);
-            command.Parameters.AddWithValue("@id", id);
+            command.Parameters.AddWithValue("@Portada", string.IsNullOrEmpty(url) ? DBNull.Value : url);
+            command.Parameters.AddWithValue("@IdInmueble", id);
+
             res = command.ExecuteNonQuery();
             connection.Close();
 
-
             return res;
         }
+
     }
 }

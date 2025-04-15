@@ -49,8 +49,8 @@
                 <td>@item.Precio.ToString("C")</td>
                 <td>@item.Estado</td>
                 <td>
-                    <a class="btn btn-secondary" asp-action="Imagenes" asp-route-id="@item.IdInmueble" title="Ver imágenes">
-                        <i class="fa-solid fa-images"></i>
+                    <a asp-action="Imagenes" asp-route-id="@item.IdInmueble" class="btn btn-secondary">
+                        <i class="fa-solid fa-images"></i>Imagenes
                     </a>
                     <a asp-action="Detalles" asp-route-id="@item.IdInmueble" class="btn btn-info">Detalles</a> |
                     <a asp-action="Editar" asp-route-id="@item.IdInmueble" class="btn btn-warning">Editar</a> |

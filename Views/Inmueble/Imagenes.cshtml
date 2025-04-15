@@ -20,14 +20,14 @@
 				<div class="mb-3">
 					<label>Portada actual:</label><br />
 					<img src="@Model.Portada" class="img-thumbnail" style="max-width: 100%;" />
-					<form asp-controller="Inmuebles" asp-action="Portada" method="post" class="d-inline">
+					<form asp-controller="Inmueble" asp-action="Portada" method="post" class="d-inline">
 						<input type="hidden" name="InmuebleId" value="@Id" />
 						<button type="submit" class="btn btn-danger btn-sm mt-2"><i class="fas fa-trash-alt"></i>
 							Eliminar</button>
 					</form>
 				</div>
 			}
-			<form asp-controller="Inmuebles" asp-action="Portada" method="post" enctype="multipart/form-data">
+			<form asp-controller="Inmueble" asp-action="Portada" method="post" enctype="multipart/form-data">
 				<div class="form-group">
 					<label for="portada">Seleccionar imagen</label>
 					<input type="file" class="form-control-file" id="Archivo" name="Archivo" accept="image/*" required>
