@@ -141,6 +141,7 @@ namespace InmobiliariaApp.Controllers
         public ActionResult Imagenes(int id, [FromServices] ImagenRepository _imagenRepository)
         {
             var inmueble = _inmuebleRepository.GetById(id);
+            if (inmueble == null) return NotFound(); 
             inmueble.Imagenes = _imagenRepository.BuscarPorInmueble(id);
             return View(inmueble);
         }

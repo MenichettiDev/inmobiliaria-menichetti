@@ -167,12 +167,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
         public IActionResult EliminarConfirmado(int id)
         {
             var imagen = _imagenRepositorio.ObtenerPorId(id);
-            if (imagen == null)
-            {
-                Console.WriteLine($"❌ Imagen no encontrada: ID {id}");
-
-                return NotFound();
-            }
+            if (imagen == null) return NotFound();
 
             try
             {

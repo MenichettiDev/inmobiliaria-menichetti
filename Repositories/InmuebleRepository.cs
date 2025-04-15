@@ -21,7 +21,7 @@ namespace InmobiliariaApp.Repositories
             var inmuebles = new List<Inmueble>();
 
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("SELECT * FROM inmueble", connection);
+            using var command = new MySqlCommand("SELECT * FROM inmueble i, propietario p where p.id_propietario = i.id_propietario", connection);
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -30,6 +30,15 @@ namespace InmobiliariaApp.Repositories
                 {
                     IdInmueble = reader.GetInt32("id_inmueble"),
                     IdPropietario = reader.GetInt32("id_propietario"),
+                    Duenio = new Propietario
+                    {
+                        IdPropietario = reader.GetInt32("id_propietario"),
+                        Nombre = reader.GetString("nombre"),
+                        Apellido = reader.GetString("apellido"),
+                        Telefono = reader.GetString("telefono"),
+                        Email = reader.GetString("dni"),
+                        Dni = reader.GetString("email"),
+                    },
                     Direccion = reader.GetString("direccion"),
                     Coordenadas = reader.IsDBNull(reader.GetOrdinal("coordenadas"))
                         ? null
@@ -62,7 +71,15 @@ namespace InmobiliariaApp.Repositories
                 return new Inmueble
                 {
                     IdInmueble = reader.GetInt32("id_inmueble"),
-                    IdPropietario = reader.GetInt32("id_propietario"),
+                    Duenio = new Propietario
+                    {
+                        IdPropietario = reader.GetInt32("id_propietario"),
+                        Nombre = reader.GetString("nombre"),
+                        Apellido = reader.GetString("apellido"),
+                        Telefono = reader.GetString("telefono"),
+                        Email = reader.GetString("dni"),
+                        Dni = reader.GetString("email"),
+                    },
                     Direccion = reader.GetString("direccion"),
                     Coordenadas = reader.IsDBNull(reader.GetOrdinal("coordenadas"))
                         ? null

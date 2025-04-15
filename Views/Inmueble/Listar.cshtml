@@ -15,7 +15,7 @@
     <thead>
         <tr>
             <th>Portada</th>
-            <th>ID Inmueble</th>
+            @* <th>ID Inmueble</th> *@
             <th>Propietario</th>
             <th>Dirección</th>
             <th>Uso</th>
@@ -37,12 +37,12 @@
                     }
                     else
                     {
-                        <span>Sin foto</span>
+                        <i class="bi bi-house"></i>
                     }
 
                 </td>
-                <td>@item.IdInmueble</td>
-                <td>@item.IdPropietario</td>
+                @* <td>@item.IdInmueble</td> *@
+                <td>@item.Duenio?.NombreCompleto</td>
                 <td>@item.Direccion</td>
                 <td>@item.Uso</td>
                 <td>@item.Ambientes</td>

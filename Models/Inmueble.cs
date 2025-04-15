@@ -20,5 +20,7 @@ namespace InmobiliariaApp.Models
         public string? Portada { get; set; }
         [ForeignKey(nameof(Imagen.InmuebleId))]
 		public IList<Imagen> Imagenes { get; set; } = new List<Imagen>();
+        [ForeignKey(nameof(Propietario.IdPropietario))]
+		public Propietario? Duenio { get; set; }
     }
 }
