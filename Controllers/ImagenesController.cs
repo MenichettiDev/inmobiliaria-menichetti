@@ -168,7 +168,11 @@ namespace Inmobiliaria_.Net_Core.Controllers
         {
             var imagen = _imagenRepositorio.ObtenerPorId(id);
             if (imagen == null)
+            {
+                Console.WriteLine($"❌ Imagen no encontrada: ID {id}");
+
                 return NotFound();
+            }
 
             try
             {
@@ -179,7 +183,11 @@ namespace Inmobiliaria_.Net_Core.Controllers
                 }
 
                 _imagenRepositorio.Baja(id);
-                return RedirectToAction("Imagenes", new { id = imagen.InmuebleId });
+
+
+                // Devolver la nueva lista de imágenes del inmueble
+                var imagenes = _imagenRepositorio.BuscarPorInmueble(imagen.InmuebleId);
+                return Json(imagenes.Select(i => new { id = i.IdImagen, url = i.Url }));
             }
             catch (Exception ex)
             {
