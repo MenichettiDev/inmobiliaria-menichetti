@@ -39,7 +39,10 @@ namespace InmobiliariaApp.Repositories
                     Ambientes = reader.GetInt32("ambientes"),
                     Precio = reader.GetDecimal("precio"),
                     Estado = reader.GetString("estado"),
-                    Activo = reader.GetInt32("activo")
+                    Activo = reader.GetInt32("activo"),
+                    Portada = reader.IsDBNull(reader.GetOrdinal("portada"))
+                        ? null
+                        : reader.GetString("portada")
                 });
             }
 
