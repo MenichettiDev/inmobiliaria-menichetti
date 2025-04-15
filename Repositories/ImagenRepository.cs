@@ -63,7 +63,7 @@ namespace InmobiliariaApp.Models
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
                 @"SELECT id_imagen, id_inmueble, url 
-                FROM Imagenes 
+                FROM imagenes 
                 WHERE id_imagen = @Id", connection);
 
             command.Parameters.AddWithValue("@Id", id);
@@ -110,7 +110,7 @@ namespace InmobiliariaApp.Models
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
                 @"SELECT id_imagen, id_inmueble, url 
-                FROM Imagenes 
+                FROM imagenes 
                 WHERE id_inmueble = @InmuebleId", connection);
 
             command.Parameters.AddWithValue("@InmuebleId", inmuebleId);
