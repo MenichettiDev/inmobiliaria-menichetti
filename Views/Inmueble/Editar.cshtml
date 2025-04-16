@@ -14,8 +14,9 @@
             <input type="hidden" asp-for="IdInmueble" />
 
             <div class="form-group">
-                <label asp-for="IdPropietario" class="control-label">ID Propietario</label>
-                <input asp-for="IdPropietario" class="form-control" />
+                <label asp-for="IdPropietario" class="control-label">Propietario</label>
+                <select asp-for="IdPropietario" class="form-control" asp-items="ViewBag.Propietarios">
+                </select>
                 <span asp-validation-for="IdPropietario" class="text-danger"></span>
             </div>
 
@@ -42,7 +43,8 @@
 
             <div class="form-group">
                 <label asp-for="IdTipoInmueble" class="control-label">Tipo de Inmueble</label>
-                <input asp-for="IdTipoInmueble" class="form-control" />
+                <select asp-for="IdTipoInmueble" class="form-control" asp-items="ViewBag.TipoInmueble">
+                </select>
                 <span asp-validation-for="IdTipoInmueble" class="text-danger"></span>
             </div>
 

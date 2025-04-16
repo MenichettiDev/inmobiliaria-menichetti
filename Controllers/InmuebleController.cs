@@ -64,6 +64,13 @@ namespace InmobiliariaApp.Controllers
         public IActionResult Editar(int id)
         {
             var inmueble = _inmuebleRepository.GetById(id);
+
+            var propietarios = _propietarioRepository.GetAll(); // O el método que uses
+            ViewData["Propietarios"] = new SelectList(propietarios, "IdPropietario", "NombreCompleto");
+
+            var tiposInmueble = _tipoInmuebleRepository.GetAll(); // O el método que uses
+            ViewData["TipoInmueble"] = new SelectList(tiposInmueble, "IdTipoInmueble", "Nombre");
+
             if (inmueble == null)
             {
                 return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
@@ -75,6 +82,12 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Editar(int id, Inmueble inmueble)
         {
+        //     var tiposInmueble = _tipoInmuebleRepository.GetAll(); // O el método que uses
+        //     ViewData["TipoInmueble"] = new SelectList(tiposInmueble, "IdTipoInmueble", "Nombre");
+
+        //     var propietarios = _propietarioRepository.GetAll(); // O el método que uses
+        //     ViewData["Propietarios"] = new SelectList(propietarios, "IdPropietario", "NombreCompleto");
+
             if (id != inmueble.IdInmueble)
             {
                 return BadRequest(); // Retorna un error 400 si los IDs no coinciden
@@ -141,7 +154,7 @@ namespace InmobiliariaApp.Controllers
         public ActionResult Imagenes(int id, [FromServices] ImagenRepository _imagenRepository)
         {
             var inmueble = _inmuebleRepository.GetById(id);
-            if (inmueble == null) return NotFound(); 
+            if (inmueble == null) return NotFound();
             inmueble.Imagenes = _imagenRepository.BuscarPorInmueble(id);
             return View(inmueble);
         }

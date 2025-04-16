@@ -45,6 +45,11 @@ namespace InmobiliariaApp.Repositories
                         : reader.GetString("coordenadas"),
                     Uso = reader.GetString("uso"),
                     IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
+                    Tipo = new TipoInmueble
+                    {
+                        IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
+                        Nombre = reader.GetString("nombre")
+                    },
                     Ambientes = reader.GetInt32("ambientes"),
                     Precio = reader.GetDecimal("precio"),
                     Estado = reader.GetString("estado"),
@@ -62,7 +67,11 @@ namespace InmobiliariaApp.Repositories
         public Inmueble? GetById(int id)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("SELECT * FROM inmueble WHERE id_inmueble = @Id", connection);
+            using var command = new MySqlCommand(@"
+                SELECT i.*, p.nombre, p.apellido, t.nombre as tipo_nombre FROM inmueble i
+                JOIN propietario p ON i.id_propietario = p.id_propietario
+                JOIN tipo_inmueble t ON i.id_tipo_inmueble = t.id_tipo_inmueble
+                WHERE i.id_inmueble = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
 
             using var reader = command.ExecuteReader();
@@ -76,9 +85,6 @@ namespace InmobiliariaApp.Repositories
                         IdPropietario = reader.GetInt32("id_propietario"),
                         Nombre = reader.GetString("nombre"),
                         Apellido = reader.GetString("apellido"),
-                        Telefono = reader.GetString("telefono"),
-                        Email = reader.GetString("dni"),
-                        Dni = reader.GetString("email"),
                     },
                     Direccion = reader.GetString("direccion"),
                     Coordenadas = reader.IsDBNull(reader.GetOrdinal("coordenadas"))
@@ -86,6 +92,10 @@ namespace InmobiliariaApp.Repositories
                         : reader.GetString("coordenadas"),
                     Uso = reader.GetString("uso"),
                     IdTipoInmueble = reader.GetInt32("id_tipo_inmueble"),
+                    Tipo = new TipoInmueble
+                    {
+                        Nombre = reader.GetString("tipo_nombre")
+                    },
                     Ambientes = reader.GetInt32("ambientes"),
                     Precio = reader.GetDecimal("precio"),
                     Estado = reader.GetString("estado"),
@@ -125,7 +135,7 @@ namespace InmobiliariaApp.Repositories
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
                 "UPDATE inmueble SET id_propietario = @IdPropietario, direccion = @Direccion, coordenadas = @Coordenadas, " +
-                "uso = @Uso, id_tipo_inmueble = @IdTipoInmueble, ambientes = @Ambientes, precio = @Precio, estado = @Estado, activo = @Activo " +
+                "uso = @Uso, id_tipo_inmueble = @IdTipoInmueble, ambientes = @Ambientes, precio = @Precio, estado = @Estado " +
                 "WHERE id_inmueble = @IdInmueble", connection);
 
             command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
@@ -137,7 +147,7 @@ namespace InmobiliariaApp.Repositories
             command.Parameters.AddWithValue("@Ambientes", inmueble.Ambientes);
             command.Parameters.AddWithValue("@Precio", inmueble.Precio);
             command.Parameters.AddWithValue("@Estado", inmueble.Estado);
-            command.Parameters.AddWithValue("@Activo", inmueble.Activo);
+            // command.Parameters.AddWithValue("@Activo", inmueble.Activo);
 
             command.ExecuteNonQuery();
         }
