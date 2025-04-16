@@ -17,5 +17,7 @@ namespace InmobiliariaApp.Models
         public int? ModificadoPor { get; set; } // Clave foránea (Usuario)
         public int? EliminadoPor { get; set; } // Clave foránea (Usuario)
         public int Activo { get; set; }
+        public Inquilino? Inquilino { get; set; } // Relación con el modelo Inquilino
+        public Inmueble? Inmueble { get; set; } // Relación con el modelo Inmueble
     }
 }

@@ -21,7 +21,8 @@ namespace InmobiliariaApp.Repositories
             var contratos = new List<Contrato>();
 
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("SELECT * FROM contrato", connection);
+            using var command = new MySqlCommand(@$"SELECT * FROM contrato c, inquilino i, inmueble f 
+            where c.id_inquilino = i.id_inquilino and c.id_inmueble = f.id_inmueble", connection);
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -30,7 +31,19 @@ namespace InmobiliariaApp.Repositories
                 {
                     IdContrato = reader.GetInt32("id_contrato"),
                     IdInquilino = reader.GetInt32("id_inquilino"),
+                    Inquilino = new Inquilino
+                    {
+                        Nombre = reader.GetString("nombre"),
+                        Apellido = reader.GetString("apellido")
+                    },
                     IdInmueble = reader.GetInt32("id_inmueble"),
+                    Inmueble = new Inmueble
+                    {
+                        Uso = reader.GetString("uso"),
+                        Precio = reader.GetDecimal("precio"),
+                        Estado = reader.GetString("estado"),
+                        Activo = reader.GetInt32("activo"),
+                    },
                     FechaInicio = reader.GetDateTime("fecha_inicio"),
                     FechaFin = reader.GetDateTime("fecha_fin"),
                     MontoMensual = reader.GetDecimal("monto_mensual"),
