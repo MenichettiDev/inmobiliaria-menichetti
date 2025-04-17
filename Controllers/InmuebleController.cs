@@ -20,11 +20,35 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para listar todos los inmuebles
-        public IActionResult Listar()
+        // public IActionResult Listar()
+        // {
+        //     var inmuebles = _inmuebleRepository.GetAll();
+        //     return View(inmuebles);
+        // }
+
+        public IActionResult Listar(string uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string estado )
         {
-            var inmuebles = _inmuebleRepository.GetAll();
+            var inmuebles = _inmuebleRepository.ObtenerFiltrados(uso, ambientes, precioDesde, precioHasta, estado); // o como estés trayendo los datos
+
+            if (!string.IsNullOrEmpty(uso))
+                inmuebles = inmuebles.Where(i => i.Uso.Contains(uso)).ToList();
+
+            if (ambientes.HasValue)
+                inmuebles = inmuebles.Where(i => i.Ambientes == ambientes).ToList();
+
+            if (precioDesde.HasValue)
+                inmuebles = inmuebles.Where(i => i.Precio >= precioDesde).ToList();
+
+            if (precioHasta.HasValue)
+                inmuebles = inmuebles.Where(i => i.Precio <= precioHasta).ToList();
+
+            if (!string.IsNullOrEmpty(estado))
+                inmuebles = inmuebles.Where(i => i.Estado == estado).ToList();
+
             return View(inmuebles);
         }
+
+
 
         // Acción para mostrar detalles de un inmueble
         public IActionResult Detalles(int id)
@@ -82,11 +106,11 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Editar(int id, Inmueble inmueble)
         {
-        //     var tiposInmueble = _tipoInmuebleRepository.GetAll(); // O el método que uses
-        //     ViewData["TipoInmueble"] = new SelectList(tiposInmueble, "IdTipoInmueble", "Nombre");
+            //     var tiposInmueble = _tipoInmuebleRepository.GetAll(); // O el método que uses
+            //     ViewData["TipoInmueble"] = new SelectList(tiposInmueble, "IdTipoInmueble", "Nombre");
 
-        //     var propietarios = _propietarioRepository.GetAll(); // O el método que uses
-        //     ViewData["Propietarios"] = new SelectList(propietarios, "IdPropietario", "NombreCompleto");
+            //     var propietarios = _propietarioRepository.GetAll(); // O el método que uses
+            //     ViewData["Propietarios"] = new SelectList(propietarios, "IdPropietario", "NombreCompleto");
 
             if (id != inmueble.IdInmueble)
             {

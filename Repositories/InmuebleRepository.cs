@@ -15,6 +15,82 @@ namespace InmobiliariaApp.Repositories
             _dbConnection = dbConnection;
         }
 
+
+
+
+        public List<Inmueble> ObtenerFiltrados(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string? estado)
+        {
+            var lista = new List<Inmueble>();
+
+            using var connection = _dbConnection.GetConnection();
+
+            var sql = @"SELECT i.*, p.Nombre, ' ', p.Apellido
+                FROM Inmueble i
+                INNER JOIN Propietario p ON i.id_propietario = p.id_propietario
+                WHERE 1=1";
+
+            using var command = new MySqlCommand();
+            command.Connection = connection;
+
+            if (!string.IsNullOrEmpty(uso))
+            {
+                sql += " AND i.Uso LIKE @uso";
+                command.Parameters.AddWithValue("@uso", "%" + uso + "%");
+            }
+
+            if (ambientes.HasValue)
+            {
+                sql += " AND i.Ambientes = @ambientes";
+                command.Parameters.AddWithValue("@ambientes", ambientes.Value);
+            }
+
+            if (precioDesde.HasValue)
+            {
+                sql += " AND i.Precio >= @precioDesde";
+                command.Parameters.AddWithValue("@precioDesde", precioDesde.Value);
+            }
+
+            if (precioHasta.HasValue)
+            {
+                sql += " AND i.Precio <= @precioHasta";
+                command.Parameters.AddWithValue("@precioHasta", precioHasta.Value);
+            }
+
+            if (!string.IsNullOrEmpty(estado))
+            {
+                sql += " AND i.Estado = @estado";
+                command.Parameters.AddWithValue("@estado", estado);
+            }
+
+            command.CommandText = sql;
+
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                lista.Add(new Inmueble
+                {
+                    IdInmueble = Convert.ToInt32(reader["id_inmueble"]),
+                    Nombre = reader["Nombre"].ToString(),
+                    Direccion = reader["Direccion"].ToString(),
+                    Uso = reader["Uso"].ToString()!,
+                    Ambientes = Convert.ToInt32(reader["Ambientes"]),
+                    Precio = Convert.ToDecimal(reader["Precio"]),
+                    Estado = reader["Estado"].ToString()!,
+                    Activo = Convert.ToInt32(reader["Activo"]),
+                    Portada = reader["Portada"].ToString(),
+                    Duenio = new Propietario
+                    {
+                        Nombre = reader["Nombre"].ToString()!,
+                        Apellido = reader["Apellido"].ToString()!,
+                    }
+                });
+            }
+
+            return lista;
+        }
+
+
         // Método para obtener todos los inmuebles
         public List<Inmueble> GetAll()
         {
