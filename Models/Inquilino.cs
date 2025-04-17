@@ -8,5 +8,7 @@ namespace InmobiliariaApp.Models
         public required string Apellido { get; set; }
         public string? Telefono { get; set; }
         public string? Email { get; set; }
+        public string NombreCompleto => $"{Nombre} {Apellido}";
+
     }
 }

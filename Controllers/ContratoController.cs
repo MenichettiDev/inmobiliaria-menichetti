@@ -7,19 +7,31 @@ namespace InmobiliariaApp.Controllers
     public class ContratoController : Controller
     {
         private readonly ContratoRepository _contratoRepository;
+        private readonly InquilinoRepository _inquilinoRepo;
+        private readonly InmuebleRepository _inmuebleRepo;
 
-        public ContratoController(ContratoRepository contratoRepository)
+        public ContratoController(ContratoRepository contratoRepository, InquilinoRepository inquilinoRepo, InmuebleRepository inmuebleRepo)
         {
+            _inquilinoRepo = inquilinoRepo;
+            _inmuebleRepo = inmuebleRepo;
             _contratoRepository = contratoRepository;
         }
 
         // Acción para listar todos los contratos
-        public IActionResult Listar()
+        // public IActionResult Listar()
+        // {
+        //     var contratos = _contratoRepository.GetAll();
+        //     return View(contratos);
+        // }
+
+        public IActionResult Listar(int? idInquilino, int? idInmueble, DateTime? fechaDesde, DateTime? fechaHasta, decimal? montoDesde, decimal? montoHasta, string? estado, int? activo)
         {
-            var contratos = _contratoRepository.GetAll();
+            ViewBag.Inquilinos = _inquilinoRepo.GetAll();
+            ViewBag.Inmuebles = _inmuebleRepo.GetAll();
+
+            var contratos = _contratoRepository.ObtenerFiltrados(idInquilino, idInmueble, fechaDesde, fechaHasta, montoDesde, montoHasta, estado, activo);
             return View(contratos);
         }
-
         // Acción para mostrar detalles de un contrato
         public IActionResult Detalles(int id)
         {

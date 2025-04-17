@@ -15,6 +15,95 @@ namespace InmobiliariaApp.Repositories
             _dbConnection = dbConnection;
         }
 
+        //Metodo para obtener contratos filtrados
+        public List<Contrato> ObtenerFiltrados(int? idInquilino, int? idInmueble, DateTime? fechaDesde, DateTime? fechaHasta, decimal? montoDesde, decimal? montoHasta, string? estado, int? activo)
+        {
+            var lista = new List<Contrato>();
+            using var conn = _dbConnection.GetConnection();
+            var sql = @"SELECT c.*, i.Nombre AS InmuebleNombre, q.Nombre AS InquilinoNombre, q.Apellido AS InquilinoApellido
+                FROM Contrato c
+                INNER JOIN Inmueble i ON c.id_inmueble = i.id_inmueble
+                INNER JOIN Inquilino q ON c.id_inquilino = q.id_inquilino";
+            var where = new List<string>();
+            var command = new MySqlCommand();
+            command.Connection = conn;
+
+            if (idInquilino.HasValue)
+            {
+                where.Add("c.id_inquilino = @idInquilino");
+                command.Parameters.AddWithValue("@idInquilino", idInquilino);
+            }
+            if (idInmueble.HasValue)
+            {
+                where.Add("c.id_inmueble = @idInmueble");
+                command.Parameters.AddWithValue("@idInmueble", idInmueble);
+            }
+            if (fechaDesde.HasValue)
+            {
+                where.Add("c.FechaInicio >= @fechaDesde");
+                command.Parameters.AddWithValue("@fechaDesde", fechaDesde);
+            }
+            if (fechaHasta.HasValue)
+            {
+                where.Add("c.FechaFin <= @fechaHasta");
+                command.Parameters.AddWithValue("@fechaHasta", fechaHasta);
+            }
+            if (montoDesde.HasValue)
+            {
+                where.Add("c.MontoMensual >= @montoDesde");
+                command.Parameters.AddWithValue("@montoDesde", montoDesde);
+            }
+            if (montoHasta.HasValue)
+            {
+                where.Add("c.MontoMensual <= @montoHasta");
+                command.Parameters.AddWithValue("@montoHasta", montoHasta);
+            }
+            if (!string.IsNullOrEmpty(estado))
+            {
+                where.Add("c.Estado = @estado");
+                command.Parameters.AddWithValue("@estado", estado);
+            }
+            if (activo.HasValue)
+            {
+                where.Add("c.Activo = @activo");
+                command.Parameters.AddWithValue("@activo", activo);
+            }
+
+            if (where.Count > 0)
+            {
+                sql += " WHERE " + string.Join(" AND ", where);
+            }
+
+            command.CommandText = sql;
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new Contrato
+                {
+                    IdContrato = (int)reader["id_contrato"],
+                    IdInquilino = (int)reader["id_inquilino"],
+                    IdInmueble = (int)reader["id_inmueble"],
+                    FechaInicio = (DateTime)reader["fecha_inicio"],
+                    FechaFin = (DateTime)reader["fecha_fin"],
+                    MontoMensual = (decimal)reader["monto_mensual"],
+                    Estado = reader["Estado"].ToString()!,
+                    FechaTerminacionAnticipada = reader["fecha_terminacion_anticipada"] as DateTime?,
+                    Multa = reader["Multa"] as decimal?,
+                    Activo = Convert.ToInt32(reader["Activo"]),
+                    Inquilino = new Inquilino
+                    {
+                        Nombre = reader["InquilinoNombre"].ToString()!,
+                        Apellido = reader["InquilinoApellido"].ToString()!
+                    },
+                    Inmueble = new Inmueble { Nombre = reader["InmuebleNombre"].ToString() }
+                });
+            }
+
+            return lista;
+        }
+
+
         // Método para obtener todos los contratos
         public List<Contrato> GetAll()
         {

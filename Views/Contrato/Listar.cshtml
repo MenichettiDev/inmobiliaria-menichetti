@@ -10,6 +10,74 @@
     <a asp-action="Insertar" class="btn btn-success">Crear Nuevo Contrato</a>
 </p>
 
+<form method="get" class="mb-4">
+    <div class="row">
+        <div class="col-md-3">
+            <label>Inquilino</label>
+            <select name="idInquilino" class="form-control">
+                <option value="">Todos</option>
+                @foreach (var i in ViewBag.Inquilinos)
+                {
+                    <option value="@i.IdInquilino"
+                        selected="@(Context.Request.Query["idInquilino"] == i.IdInquilino.ToString())">@i.Nombre @i.Apellido
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label>Inmueble</label>
+            <select name="idInmueble" class="form-control">
+                <option value="">Todos</option>
+                @foreach (var i in ViewBag.Inmuebles)
+                {
+                    <option value="@i.IdInmueble"
+                        selected="@(Context.Request.Query["idInmueble"] == i.IdInmueble.ToString())">@i.Nombre</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Fecha Desde</label>
+            <input type="date" name="fechaDesde" value="@Context.Request.Query["fechaDesde"]" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label>Fecha Hasta</label>
+            <input type="date" name="fechaHasta" value="@Context.Request.Query["fechaHasta"]" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label>Monto Mayor a</label>
+            <input type="number" name="montoDesde" value="@Context.Request.Query["montoDesde"]" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label>Monto Menor a</label>
+            <input type="number" name="montoHasta" value="@Context.Request.Query["montoHasta"]" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label>Estado</label>
+            <select name="estado" class="form-control">
+                <option value="">Todos</option>
+                <option value="vigente" selected="@(Context.Request.Query["estado"] == "vigente")">Vigente</option>
+                <option value="terminado" selected="@(Context.Request.Query["estado"] == "terminado")">Terminado
+                </option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Activo</label>
+            <select name="activo" class="form-control">
+                <option value="">Todos</option>
+                <option value="1" selected="@(Context.Request.Query["activo"] == "1")">Activo</option>
+                <option value="0" selected="@(Context.Request.Query["activo"] == "0")">Inactivo</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <a href="@Url.Action("Listar", "Contrato")" class="btn btn-secondary w-100">Limpiar Filtros</a>
+        </div>
+
+    </div>
+</form>
+
 <table class="table">
     <thead>
         <tr>
@@ -28,8 +96,8 @@
         {
             <tr>
                 <td>@item.IdContrato</td>
-                <td>@item.IdInquilino</td>
-                <td>@item.IdInmueble</td>
+                <td>@item.Inquilino?.NombreCompleto</td>
+                <td>@item.Inmueble?.Nombre</td>
                 <td>@item.FechaInicio.ToShortDateString()</td>
                 <td>@item.FechaFin.ToShortDateString()</td>
                 <td>@item.MontoMensual.ToString("C")</td>
