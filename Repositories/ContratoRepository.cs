@@ -202,7 +202,7 @@ namespace InmobiliariaApp.Repositories
         }
 
         // Método para agregar un nuevo contrato
-        public int Add(Contrato contrato)
+        public void Add(Contrato contrato)
         {
             // Validaciones
             ValidarFechas(contrato.FechaInicio, contrato.FechaFin);
@@ -211,11 +211,11 @@ namespace InmobiliariaApp.Repositories
             if (InmuebleEstaOcupado(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin))
                 throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
 
-
+            Console.WriteLine("Contrato a insertar: " + contrato.IdInmueble + " " + contrato.IdInquilino + " " + contrato.FechaInicio + " " + contrato.FechaFin + " " + contrato.MontoMensual);
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
                 "INSERT INTO contrato (id_inquilino, id_inmueble, fecha_inicio, fecha_fin, monto_mensual, " +
-                "creado_por, modificado_por, eliminado_por) " +
+                "creado_por) " +
                 "VALUES (@IdInquilino, @IdInmueble, @FechaInicio, @FechaFin, @MontoMensual, " +
                 " @CreadoPor)", connection);
 
@@ -227,7 +227,6 @@ namespace InmobiliariaApp.Repositories
             command.Parameters.AddWithValue("@CreadoPor", contrato.CreadoPor ?? (object)DBNull.Value);
 
             command.ExecuteNonQuery();
-            return (int)command.LastInsertedId; // Devuelve el ID del contrato recién creado
         }
 
         // Método para actualizar un contrato

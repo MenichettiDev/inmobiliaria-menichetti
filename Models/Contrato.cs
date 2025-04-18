@@ -10,7 +10,7 @@ namespace InmobiliariaApp.Models
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
         public decimal MontoMensual { get; set; }
-        public required string Estado { get; set; } // "vigente" o "terminado"
+        public string? Estado { get; set; } // "vigente" o "terminado"
         public DateTime? FechaTerminacionAnticipada { get; set; } // Opcional
         public decimal? Multa { get; set; } // Opcional
         public int? CreadoPor { get; set; } // Clave foránea (Usuario)

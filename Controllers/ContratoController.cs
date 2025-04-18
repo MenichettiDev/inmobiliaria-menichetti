@@ -59,10 +59,11 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Insertar(Contrato contrato)
         {
+                // Console.WriteLine("Contrato a insertar: " + contrato.IdInmueble + " " + contrato.IdInquilino + " " + contrato.FechaInicio + " " + contrato.FechaFin + " " + contrato.MontoMensual );
             if (ModelState.IsValid)
             {
                 _contratoRepository.Add(contrato);
-                return RedirectToAction("Index"); // Redirige a la lista de contratos
+                return RedirectToAction("Listar"); // Redirige a la lista de contratos
             }
             return View(contrato);
         }
