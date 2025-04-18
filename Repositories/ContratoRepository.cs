@@ -40,32 +40,32 @@ namespace InmobiliariaApp.Repositories
             }
             if (fechaDesde.HasValue)
             {
-                where.Add("c.FechaInicio >= @fechaDesde");
+                where.Add("c.fecha_inicio >= @fechaDesde");
                 command.Parameters.AddWithValue("@fechaDesde", fechaDesde);
             }
             if (fechaHasta.HasValue)
             {
-                where.Add("c.FechaFin <= @fechaHasta");
+                where.Add("c.fecha_fin <= @fechaHasta");
                 command.Parameters.AddWithValue("@fechaHasta", fechaHasta);
             }
             if (montoDesde.HasValue)
             {
-                where.Add("c.MontoMensual >= @montoDesde");
+                where.Add("c.monto_mensual >= @montoDesde");
                 command.Parameters.AddWithValue("@montoDesde", montoDesde);
             }
             if (montoHasta.HasValue)
             {
-                where.Add("c.MontoMensual <= @montoHasta");
+                where.Add("c.monto_mensual <= @montoHasta");
                 command.Parameters.AddWithValue("@montoHasta", montoHasta);
             }
             if (!string.IsNullOrEmpty(estado))
             {
-                where.Add("c.Estado = @estado");
+                where.Add("c.estado = @estado");
                 command.Parameters.AddWithValue("@estado", estado);
             }
             if (activo.HasValue)
             {
-                where.Add("c.Activo = @activo");
+                where.Add("c.activo = @activo");
                 command.Parameters.AddWithValue("@activo", activo);
             }
 
@@ -87,10 +87,10 @@ namespace InmobiliariaApp.Repositories
                     FechaInicio = (DateTime)reader["fecha_inicio"],
                     FechaFin = (DateTime)reader["fecha_fin"],
                     MontoMensual = (decimal)reader["monto_mensual"],
-                    Estado = reader["Estado"].ToString()!,
+                    Estado = reader["estado"].ToString()!,
                     FechaTerminacionAnticipada = reader["fecha_terminacion_anticipada"] as DateTime?,
-                    Multa = reader["Multa"] as decimal?,
-                    Activo = Convert.ToInt32(reader["Activo"]),
+                    Multa = reader["multa"] as decimal?,
+                    Activo = Convert.ToInt32(reader["activo"]),
                     Inquilino = new Inquilino
                     {
                         Nombre = reader["InquilinoNombre"].ToString()!,
@@ -202,37 +202,49 @@ namespace InmobiliariaApp.Repositories
         }
 
         // Método para agregar un nuevo contrato
-        public void Add(Contrato contrato)
+        public int Add(Contrato contrato)
         {
+            // Validaciones
+            ValidarFechas(contrato.FechaInicio, contrato.FechaFin);
+            ValidarMonto(contrato.MontoMensual);
+
+            if (InmuebleEstaOcupado(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin))
+                throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
+
+
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                "INSERT INTO contrato (id_inquilino, id_inmueble, fecha_inicio, fecha_fin, monto_mensual, estado, " +
-                "fecha_terminacion_anticipada, multa, creado_por, modificado_por, eliminado_por) " +
-                "VALUES (@IdInquilino, @IdInmueble, @FechaInicio, @FechaFin, @MontoMensual, @Estado, " +
-                "@FechaTerminacionAnticipada, @Multa, @CreadoPor, @ModificadoPor, @EliminadoPor)", connection);
+                "INSERT INTO contrato (id_inquilino, id_inmueble, fecha_inicio, fecha_fin, monto_mensual, " +
+                "creado_por, modificado_por, eliminado_por) " +
+                "VALUES (@IdInquilino, @IdInmueble, @FechaInicio, @FechaFin, @MontoMensual, " +
+                " @CreadoPor)", connection);
 
             command.Parameters.AddWithValue("@IdInquilino", contrato.IdInquilino);
             command.Parameters.AddWithValue("@IdInmueble", contrato.IdInmueble);
             command.Parameters.AddWithValue("@FechaInicio", contrato.FechaInicio);
             command.Parameters.AddWithValue("@FechaFin", contrato.FechaFin);
             command.Parameters.AddWithValue("@MontoMensual", contrato.MontoMensual);
-            command.Parameters.AddWithValue("@Estado", contrato.Estado);
-            command.Parameters.AddWithValue("@FechaTerminacionAnticipada", contrato.FechaTerminacionAnticipada ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Multa", contrato.Multa ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@CreadoPor", contrato.CreadoPor ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@ModificadoPor", contrato.ModificadoPor ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@EliminadoPor", contrato.EliminadoPor ?? (object)DBNull.Value);
 
             command.ExecuteNonQuery();
+            return (int)command.LastInsertedId; // Devuelve el ID del contrato recién creado
         }
 
         // Método para actualizar un contrato
         public void Update(Contrato contrato)
         {
+            // Validaciones
+            ValidarFechas(contrato.FechaInicio, contrato.FechaFin);
+            ValidarMonto(contrato.MontoMensual);
+
+            if (InmuebleEstaOcupado(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin, contrato.IdContrato))
+                throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
+
+
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
                 "UPDATE contrato SET id_inquilino = @IdInquilino, id_inmueble = @IdInmueble, fecha_inicio = @FechaInicio, " +
-                "fecha_fin = @FechaFin, monto_mensual = @MontoMensual, estado = @Estado, activo = @Activo, " +
+                "fecha_fin = @FechaFin, monto_mensual = @MontoMensual, estado = @Estado, " +
                 "fecha_terminacion_anticipada = @FechaTerminacionAnticipada, multa = @Multa, " +
                 "creado_por = @CreadoPor, modificado_por = @ModificadoPor, eliminado_por = @EliminadoPor " +
                 "WHERE id_contrato = @IdContrato", connection);
@@ -244,7 +256,6 @@ namespace InmobiliariaApp.Repositories
             command.Parameters.AddWithValue("@FechaFin", contrato.FechaFin);
             command.Parameters.AddWithValue("@MontoMensual", contrato.MontoMensual);
             command.Parameters.AddWithValue("@Estado", contrato.Estado);
-            command.Parameters.AddWithValue("@Activo", contrato.Activo);
             command.Parameters.AddWithValue("@FechaTerminacionAnticipada", contrato.FechaTerminacionAnticipada ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Multa", contrato.Multa ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@CreadoPor", contrato.CreadoPor ?? (object)DBNull.Value);
@@ -286,5 +297,42 @@ namespace InmobiliariaApp.Repositories
 
             command.ExecuteNonQuery();
         }
+
+        //==========================================================Validacion de existencia de un contrato==========================================================
+        private void ValidarFechas(DateTime inicio, DateTime fin)
+        {
+            if (inicio >= fin)
+                throw new ArgumentException("La fecha de inicio debe ser anterior a la de fin.");
+        }
+
+        private void ValidarMonto(decimal monto)
+        {
+            if (monto <= 0)
+                throw new ArgumentException("El monto mensual debe ser mayor a cero.");
+        }
+
+        private bool InmuebleEstaOcupado(int idInmueble, DateTime fechaInicio, DateTime fechaFin, int? idContratoActual = null)
+        {
+            using var connection = _dbConnection.GetConnection();
+            var query = @"
+        SELECT COUNT(*) FROM contrato 
+        WHERE id_inmueble = @IdInmueble 
+        AND activo = 1
+        AND (@FechaInicio <= fecha_fin AND @FechaFin >= fecha_inicio)
+        " + (idContratoActual.HasValue ? "AND id_contrato != @IdContratoActual" : "");
+
+            using var command = new MySqlCommand(query, connection);
+            command.Parameters.AddWithValue("@IdInmueble", idInmueble);
+            command.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+            command.Parameters.AddWithValue("@FechaFin", fechaFin);
+
+            if (idContratoActual.HasValue)
+                command.Parameters.AddWithValue("@IdContratoActual", idContratoActual.Value);
+
+            var count = Convert.ToInt32(command.ExecuteScalar());
+            return count > 0;
+        }
+
+
     }
 }

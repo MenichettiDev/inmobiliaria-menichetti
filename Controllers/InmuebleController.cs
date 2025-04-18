@@ -26,12 +26,12 @@ namespace InmobiliariaApp.Controllers
         //     return View(inmuebles);
         // }
 
-        public IActionResult Listar(string uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string estado )
+        public IActionResult Listar(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string estado )
         {
             var inmuebles = _inmuebleRepository.ObtenerFiltrados(uso, ambientes, precioDesde, precioHasta, estado); // o como estés trayendo los datos
 
             if (!string.IsNullOrEmpty(uso))
-                inmuebles = inmuebles.Where(i => i.Uso.Contains(uso)).ToList();
+                inmuebles = inmuebles.Where(i => i.Uso == uso).ToList();
 
             if (ambientes.HasValue)
                 inmuebles = inmuebles.Where(i => i.Ambientes == ambientes).ToList();

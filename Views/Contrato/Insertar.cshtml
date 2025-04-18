@@ -4,7 +4,7 @@
     ViewData["Title"] = "Insertar Contrato";
 }
 
-<h1>Insertar Contrato</h1>
+<h1>Crear Contrato</h1>
 
 <hr />
 <div class="row">
@@ -13,14 +13,18 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group">
-                <label asp-for="IdInquilino" class="control-label">ID Inquilino</label>
-                <input asp-for="IdInquilino" class="form-control" />
+                <label asp-for="IdInquilino" class="control-label">Inquilino</label>
+                <select asp-for="IdInquilino" class="form-control" asp-items="ViewBag.Inquilinos">
+                    <option value="">Seleccione un Inquilino</option>
+                </select>
                 <span asp-validation-for="IdInquilino" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="IdInmueble" class="control-label">ID Inmueble</label>
-                <input asp-for="IdInmueble" class="form-control" />
+                <label asp-for="IdInmueble" class="control-label">Nombre Inmueble</label>
+                <select asp-for="IdInmueble" class="form-control" asp-items="ViewBag.Inmuebles">
+                    <option value="">Seleccione un Inmueble</option>
+                </select>
                 <span asp-validation-for="IdInmueble" class="text-danger"></span>
             </div>
 
@@ -43,27 +47,6 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Estado" class="control-label">Estado</label>
-                <select asp-for="Estado" class="form-control">
-                    <option value="vigente">Vigente</option>
-                    <option value="terminado">Terminado</option>
-                </select>
-                <span asp-validation-for="Estado" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="FechaTerminacionAnticipada" class="control-label">Fecha Terminación Anticipada</label>
-                <input asp-for="FechaTerminacionAnticipada" class="form-control" type="date" />
-                <span asp-validation-for="FechaTerminacionAnticipada" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Multa" class="control-label">Multa</label>
-                <input asp-for="Multa" class="form-control" />
-                <span asp-validation-for="Multa" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
                 <input type="submit" value="Insertar" class="btn btn-primary" />
             </div>
         </form>
@@ -73,3 +56,4 @@
 <div>
     <a asp-action="Listar">Volver a la Lista</a>
 </div>
+

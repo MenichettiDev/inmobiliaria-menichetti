@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InmobiliariaApp.Controllers
 {
@@ -46,6 +47,11 @@ namespace InmobiliariaApp.Controllers
         // Acción para mostrar el formulario de creación
         public IActionResult Insertar()
         {
+            var inquilinos = _inquilinoRepo.GetAll(); // O el método que uses
+            ViewData["Inquilinos"] = new SelectList(inquilinos, "IdInquilino", "NombreCompleto");
+            var inmuebles = _inmuebleRepo.GetAll(); // O el método que uses
+            ViewData["Inmuebles"] = new SelectList(inmuebles, "IdInmueble", "Nombre");
+
             return View();
         }
 
@@ -60,6 +66,7 @@ namespace InmobiliariaApp.Controllers
             }
             return View(contrato);
         }
+
 
         // Acción para mostrar el formulario de edición
         public IActionResult Editar(int id)
@@ -89,33 +96,33 @@ namespace InmobiliariaApp.Controllers
             return View(contrato);
         }
 
-        // Acción para suspender el inmueble
+        // Acción para suspender el contrato
         [HttpPost]
         public IActionResult BajaLogica(int id)
         {
-            var inmueble = _contratoRepository.GetById(id);
-            if (inmueble == null)
+            var contrato = _contratoRepository.GetById(id);
+            if (contrato == null)
             {
-                return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
+                return NotFound(); // Retorna un error 404 si no se encuentra el contrato
             }
 
-            _contratoRepository.bajaLogica(inmueble);
+            _contratoRepository.bajaLogica(contrato);
 
-            return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+            return RedirectToAction("Listar"); // Redirige a la lista de contrato
         }
-        // Acción para activar el inmueble
+        // Acción para activar el contrato
         [HttpPost]
         public IActionResult AltaLogica(int id)
         {
-            var inmueble = _contratoRepository.GetById(id);
-            if (inmueble == null)
+            var contrato = _contratoRepository.GetById(id);
+            if (contrato == null)
             {
-                return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
+                return NotFound(); // Retorna un error 404 si no se encuentra el contrato
             }
 
-            _contratoRepository.altaLogica(inmueble);
+            _contratoRepository.altaLogica(contrato);
 
-            return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+            return RedirectToAction("Listar"); // Redirige a la lista de contrato
         }
 
         // Acción para mostrar la vista de confirmación de eliminación
