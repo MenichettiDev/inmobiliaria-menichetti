@@ -59,15 +59,30 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Insertar(Contrato contrato)
         {
-                // Console.WriteLine("Contrato a insertar: " + contrato.IdInmueble + " " + contrato.IdInquilino + " " + contrato.FechaInicio + " " + contrato.FechaFin + " " + contrato.MontoMensual );
-            if (ModelState.IsValid)
+            try
             {
-                _contratoRepository.Add(contrato);
-                TempData["SuccessMessage"] = "Contrato creado exitosamente";
-                return RedirectToAction("Listar"); // Redirige a la lista de contratos
+                if (ModelState.IsValid)
+                {
+                    _contratoRepository.Add(contrato);
+                    TempData["SuccessMessage"] = "Contrato creado exitosamente";
+                    return RedirectToAction("Listar");
+                }
+
+                return View(contrato);
             }
-            return View(contrato);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al crear el contrato: {ex.Message}";
+
+                var inquilinos = _inquilinoRepo.GetAll(); // O el método que uses
+                ViewData["Inquilinos"] = new SelectList(inquilinos, "IdInquilino", "NombreCompleto");
+                var inmuebles = _inmuebleRepo.GetAll(); // O el método que uses
+                ViewData["Inmuebles"] = new SelectList(inmuebles, "IdInmueble", "Nombre");
+
+                return View("Insertar");
+            }
         }
+
 
 
         // Acción para mostrar el formulario de edición
