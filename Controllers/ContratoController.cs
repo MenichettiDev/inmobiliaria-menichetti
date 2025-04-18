@@ -117,7 +117,9 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult BajaLogica(int id)
         {
+            Console.WriteLine("BajaLogica: " + id);
             var contrato = _contratoRepository.GetById(id);
+            Console.WriteLine("contrato: " + contrato);
             if (contrato == null)
             {
                 return NotFound(); // Retorna un error 404 si no se encuentra el contrato

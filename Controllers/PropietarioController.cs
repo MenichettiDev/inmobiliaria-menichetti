@@ -40,10 +40,10 @@ namespace InmobiliariaApp.Controllers
         // Acción para mostrar detalles de un propietario
         public IActionResult Detalles(int id)
         {
-            if (!UsuarioAutenticado())
-            {
-                return RedirectToAction("Index", "Login");
-            }
+            // if (!UsuarioAutenticado())
+            // {
+            //     return RedirectToAction("Index", "Login");
+            // }
 
             var propietario = _propietarioRepository.GetById(id);
             if (propietario == null)
@@ -56,10 +56,10 @@ namespace InmobiliariaApp.Controllers
         // Acción para mostrar el formulario de creación
         public IActionResult Insertar()
         {
-            if (!UsuarioAutenticado())
-            {
-                return RedirectToAction("Index", "Login");
-            }
+            // if (!UsuarioAutenticado())
+            // {
+            //     return RedirectToAction("Index", "Login");
+            // }
 
             return View();
         }
@@ -68,10 +68,10 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Insertar(Propietario propietario)
         {
-            if (!UsuarioAutenticado())
-            {
-                return RedirectToAction("Index", "Login");
-            }
+            // if (!UsuarioAutenticado())
+            // {
+            //     return RedirectToAction("Index", "Login");
+            // }
 
             if (ModelState.IsValid)
             {
@@ -84,10 +84,10 @@ namespace InmobiliariaApp.Controllers
         // Acción para mostrar el formulario de edición
         public IActionResult Editar(int id)
         {
-            if (!UsuarioAutenticado())
-            {
-                return RedirectToAction("Index", "Login");
-            }
+            // if (!UsuarioAutenticado())
+            // {
+            //     return RedirectToAction("Index", "Login");
+            // }
 
             var propietario = _propietarioRepository.GetById(id);
             if (propietario == null)
@@ -101,10 +101,10 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Editar(int id, Propietario propietario)
         {
-            if (!UsuarioAutenticado())
-            {
-                return RedirectToAction("Index", "Login");
-            }
+            // if (!UsuarioAutenticado())
+            // {
+            //     return RedirectToAction("Index", "Login");
+            // }
 
             if (id != propietario.IdPropietario)
             {
@@ -122,10 +122,10 @@ namespace InmobiliariaApp.Controllers
         // Acción para mostrar la vista de confirmación de eliminación
         public IActionResult Eliminar(int id)
         {
-            if (!UsuarioAutenticado())
-            {
-                return RedirectToAction("Index", "Login");
-            }
+            // if (!UsuarioAutenticado())
+            // {
+            //     return RedirectToAction("Index", "Login");
+            // }
 
             // Solo los administradores pueden eliminar
             if (ObtenerRolUsuario() != "Admin")
@@ -145,10 +145,10 @@ namespace InmobiliariaApp.Controllers
         [HttpPost, ActionName("Eliminar")]
         public IActionResult EliminarConfirmed(int id)
         {
-            if (!UsuarioAutenticado())
-            {
-                return RedirectToAction("Index", "Login");
-            }
+            // if (!UsuarioAutenticado())
+            // {
+            //     return RedirectToAction("Index", "Login");
+            // }
 
             // Solo los administradores pueden eliminar
             if (ObtenerRolUsuario() != "Admin")

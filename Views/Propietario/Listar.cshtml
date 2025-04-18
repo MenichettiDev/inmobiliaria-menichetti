@@ -7,7 +7,7 @@
 <h1>Listar Propietarios</h1>
 
 <p>
-    <a asp-action="Insertar">Crear Nuevo Propietario</a>
+    <a asp-action="Insertar" class="btn btn-success">Crear Nuevo Propietario</a>
 </p>
 
 <table class="table">
@@ -33,9 +33,9 @@
                 <td>@item.Telefono</td>
                 <td>@item.Email</td>
                 <td>
-                    <a asp-action="Detalles" asp-route-id="@item.IdPropietario">Detalles</a> |
-                    <a asp-action="Editar" asp-route-id="@item.IdPropietario">Editar</a> |
-                    <a asp-action="Eliminar" asp-route-id="@item.IdPropietario">Eliminar</a>
+                    <a asp-action="Detalles" asp-route-id="@item.IdPropietario" class="btn btn-info">Detalles</a> |
+                    <a asp-action="Editar" asp-route-id="@item.IdPropietario" class="btn btn-secondary">Editar</a> |
+                    <a asp-action="Eliminar" asp-route-id="@item.IdPropietario" class="btn btn-danger">Eliminar</a>
                 </td>
             </tr>
         }
