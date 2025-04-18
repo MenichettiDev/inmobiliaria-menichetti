@@ -211,7 +211,7 @@ namespace InmobiliariaApp.Repositories
             if (InmuebleEstaOcupado(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin))
                 throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
 
-            Console.WriteLine("Contrato a insertar: " + contrato.IdInmueble + " " + contrato.IdInquilino + " " + contrato.FechaInicio + " " + contrato.FechaFin + " " + contrato.MontoMensual);
+            // Console.WriteLine("Contrato a insertar: " + contrato.IdInmueble + " " + contrato.IdInquilino + " " + contrato.FechaInicio + " " + contrato.FechaFin + " " + contrato.MontoMensual);
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
                 "INSERT INTO contrato (id_inquilino, id_inmueble, fecha_inicio, fecha_fin, monto_mensual, " +

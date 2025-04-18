@@ -63,6 +63,7 @@ namespace InmobiliariaApp.Controllers
             if (ModelState.IsValid)
             {
                 _contratoRepository.Add(contrato);
+                TempData["SuccessMessage"] = "Contrato creado exitosamente";
                 return RedirectToAction("Listar"); // Redirige a la lista de contratos
             }
             return View(contrato);
