@@ -71,7 +71,7 @@ namespace InmobiliariaApp.Repositories
                 lista.Add(new Inmueble
                 {
                     IdInmueble = Convert.ToInt32(reader["id_inmueble"]),
-                    Nombre = reader["Nombre"].ToString(),
+                    NombreInmueble = reader["nombre_inmueble"].ToString(),
                     Direccion = reader["Direccion"].ToString(),
                     Uso = reader["Uso"].ToString()!,
                     Ambientes = Convert.ToInt32(reader["Ambientes"]),
@@ -105,7 +105,7 @@ namespace InmobiliariaApp.Repositories
                 inmuebles.Add(new Inmueble
                 {
                     IdInmueble = reader.GetInt32("id_inmueble"),
-                    Nombre = reader.GetString("nombre"),
+                    NombreInmueble = reader.GetString("nombre_inmueble"),
                     IdPropietario = reader.GetInt32("id_propietario"),
                     Duenio = new Propietario
                     {
@@ -157,7 +157,7 @@ namespace InmobiliariaApp.Repositories
                 return new Inmueble
                 {
                     IdInmueble = reader.GetInt32("id_inmueble"),
-                    Nombre = reader.GetString("nombre"),
+                    NombreInmueble = reader.GetString("nombre_inmueble"),
                     Duenio = new Propietario
                     {
                         IdPropietario = reader.GetInt32("id_propietario"),
@@ -192,11 +192,11 @@ namespace InmobiliariaApp.Repositories
         {
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                "INSERT INTO inmueble (id_propietario, nombre, direccion, coordenadas, uso, id_tipo_inmueble, ambientes, precio, estado) " +
+                "INSERT INTO inmueble (id_propietario, nombre_inmueble, direccion, coordenadas, uso, id_tipo_inmueble, ambientes, precio, estado) " +
                 "VALUES (@IdPropietario, @Nombre, @Direccion, @Coordenadas, @Uso, @IdTipoInmueble, @Ambientes, @Precio, @Estado)", connection);
 
             command.Parameters.AddWithValue("@IdPropietario", inmueble.IdPropietario);
-            command.Parameters.AddWithValue("@Nombre", inmueble.Nombre);
+            command.Parameters.AddWithValue("@Nombre", inmueble.NombreInmueble);
             command.Parameters.AddWithValue("@Direccion", inmueble.Direccion);
             command.Parameters.AddWithValue("@Coordenadas", string.IsNullOrEmpty(inmueble.Coordenadas) ? (object)DBNull.Value : inmueble.Coordenadas);
             command.Parameters.AddWithValue("@Uso", inmueble.Uso);
@@ -213,12 +213,12 @@ namespace InmobiliariaApp.Repositories
         {
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                "UPDATE inmueble SET id_propietario = @IdPropietario, nombre = @Nombre, direccion = @Direccion, coordenadas = @Coordenadas, " +
+                "UPDATE inmueble SET id_propietario = @IdPropietario, nombre_inmueble = @Nombre, direccion = @Direccion, coordenadas = @Coordenadas, " +
                 "uso = @Uso, id_tipo_inmueble = @IdTipoInmueble, ambientes = @Ambientes, precio = @Precio, estado = @Estado " +
                 "WHERE id_inmueble = @IdInmueble", connection);
 
             command.Parameters.AddWithValue("@IdInmueble", inmueble.IdInmueble);
-            command.Parameters.AddWithValue("@Nombre", inmueble.Nombre);
+            command.Parameters.AddWithValue("@Nombre", inmueble.NombreInmueble);
             command.Parameters.AddWithValue("@IdPropietario", inmueble.IdPropietario);
             command.Parameters.AddWithValue("@Direccion", inmueble.Direccion);
             command.Parameters.AddWithValue("@Coordenadas", string.IsNullOrEmpty(inmueble.Coordenadas) ? (object)DBNull.Value : inmueble.Coordenadas);

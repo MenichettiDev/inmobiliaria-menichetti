@@ -7,7 +7,7 @@ namespace InmobiliariaApp.Models
     public class Inmueble
     {
         public int IdInmueble { get; set; }
-        public string? Nombre { get; set; } // Clave foránea
+        public string? NombreInmueble { get; set; } // Clave foránea
         public int IdPropietario { get; set; } // Clave foránea
         public string? Direccion { get; set; }
         public string? Coordenadas { get; set; } 

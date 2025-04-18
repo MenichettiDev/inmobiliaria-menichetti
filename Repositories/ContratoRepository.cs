@@ -20,7 +20,7 @@ namespace InmobiliariaApp.Repositories
         {
             var lista = new List<Contrato>();
             using var conn = _dbConnection.GetConnection();
-            var sql = @"SELECT c.*, i.Nombre AS InmuebleNombre, q.Nombre AS InquilinoNombre, q.Apellido AS InquilinoApellido
+            var sql = @"SELECT c.*, i.nombre_inmueble, q.Nombre AS InquilinoNombre, q.Apellido AS InquilinoApellido
                 FROM Contrato c
                 INNER JOIN Inmueble i ON c.id_inmueble = i.id_inmueble
                 INNER JOIN Inquilino q ON c.id_inquilino = q.id_inquilino";
@@ -96,7 +96,7 @@ namespace InmobiliariaApp.Repositories
                         Nombre = reader["InquilinoNombre"].ToString()!,
                         Apellido = reader["InquilinoApellido"].ToString()!
                     },
-                    Inmueble = new Inmueble { Nombre = reader["InmuebleNombre"].ToString() }
+                    Inmueble = new Inmueble { NombreInmueble = reader["nombre_inmueble"].ToString() }
                 });
             }
 
@@ -132,6 +132,7 @@ namespace InmobiliariaApp.Repositories
                         Precio = reader.GetDecimal("precio"),
                         Estado = reader.GetString("estado"),
                         Activo = reader.GetInt32("activo"),
+                        NombreInmueble = reader.GetString("nombre_inmueble"),
                     },
                     FechaInicio = reader.GetDateTime("fecha_inicio"),
                     FechaFin = reader.GetDateTime("fecha_fin"),
@@ -164,7 +165,13 @@ namespace InmobiliariaApp.Repositories
         public Contrato? GetById(int id)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("SELECT * FROM contrato WHERE id_contrato = @Id", connection);
+            using var command = new MySqlCommand(@"
+                SELECT * 
+                FROM contrato c
+                JOIN inquilino i ON c.id_inquilino = i.id_inquilino
+                JOIN inmueble f ON c.id_inmueble = f.id_inmueble
+                WHERE c.id_contrato = @Id", connection);
+
             command.Parameters.AddWithValue("@Id", id);
 
             using var reader = command.ExecuteReader();
@@ -174,7 +181,20 @@ namespace InmobiliariaApp.Repositories
                 {
                     IdContrato = reader.GetInt32("id_contrato"),
                     IdInquilino = reader.GetInt32("id_inquilino"),
+                    Inquilino = new Inquilino
+                    {
+                        Nombre = reader.GetString("nombre"),
+                        Apellido = reader.GetString("apellido")
+                    },
                     IdInmueble = reader.GetInt32("id_inmueble"),
+                    Inmueble = new Inmueble
+                    {
+                        Uso = reader.GetString("uso"),
+                        NombreInmueble = reader.GetString("nombre_inmueble"),
+                        Precio = reader.GetDecimal("precio"),
+                        Estado = reader.GetString("estado"),
+                        Activo = reader.GetInt32("activo"),
+                    },
                     FechaInicio = reader.GetDateTime("fecha_inicio"),
                     FechaFin = reader.GetDateTime("fecha_fin"),
                     MontoMensual = reader.GetDecimal("monto_mensual"),

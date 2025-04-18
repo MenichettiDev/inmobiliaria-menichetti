@@ -53,7 +53,7 @@
                 @foreach (var i in ViewBag.Inmuebles)
                 {
                     <option value="@i.IdInmueble"
-                        selected="@(Context.Request.Query["idInmueble"] == i.IdInmueble.ToString())">@i.Nombre</option>
+                        selected="@(Context.Request.Query["idInmueble"] == i.IdInmueble.ToString())">@i.NombreInmueble</option>
                 }
             </select>
         </div>
@@ -119,7 +119,7 @@
             <tr>
                 <td>@item.IdContrato</td>
                 <td>@item.Inquilino?.NombreCompleto</td>
-                <td>@item.Inmueble?.Nombre</td>
+                <td>@item.Inmueble?.NombreInmueble</td>
                 <td>@item.FechaInicio.ToShortDateString()</td>
                 <td>@item.FechaFin.ToShortDateString()</td>
                 <td>@item.MontoMensual.ToString("C")</td>
