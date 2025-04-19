@@ -262,6 +262,54 @@ namespace InmobiliariaApp.Repositories
             command.ExecuteNonQuery();
         }
 
+        public void RenovarContrato(Contrato contratoBase, DateTime nuevaFechaInicio, DateTime nuevaFechaFin)
+        {
+            try
+            {
+                // Validaciones
+                ValidarFechas(nuevaFechaInicio, nuevaFechaFin);
+                ValidarMonto(contratoBase.MontoMensual);
+
+                if (InmuebleEstaOcupado(contratoBase.IdInmueble, nuevaFechaInicio, nuevaFechaFin))
+                    throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
+
+                using var connection = _dbConnection.GetConnection();
+                using var command = new MySqlCommand(
+                    @"INSERT INTO contrato (
+                id_inquilino, 
+                id_inmueble, 
+                fecha_inicio, 
+                fecha_fin, 
+                monto_mensual, 
+                creado_por
+            ) 
+            VALUES (
+                @IdInquilino, 
+                @IdInmueble, 
+                @FechaInicio, 
+                @FechaFin, 
+                @MontoMensual, 
+                @CreadoPor
+            )", connection);
+
+                command.Parameters.AddWithValue("@IdInquilino", contratoBase.IdInquilino);
+                command.Parameters.AddWithValue("@IdInmueble", contratoBase.IdInmueble);
+                command.Parameters.AddWithValue("@FechaInicio", nuevaFechaInicio);
+                command.Parameters.AddWithValue("@FechaFin", nuevaFechaFin);
+                command.Parameters.AddWithValue("@MontoMensual", contratoBase.MontoMensual);
+                command.Parameters.AddWithValue("@CreadoPor", contratoBase.CreadoPor ?? (object)DBNull.Value);
+
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                // Podés loguear el error si usás un logger, o lanzar uno más específico si preferís
+                Console.WriteLine($"[ERROR] al renovar contrato: {ex.Message}");
+                throw new Exception("Error al renovar el contrato: " + ex.Message, ex);
+            }
+        }
+
+
         // Método para actualizar un contrato
         public void Update(Contrato contrato)
         {

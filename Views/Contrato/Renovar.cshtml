@@ -1,0 +1,73 @@
+
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: '¡Error!',
+            text: @Html.Raw(Json.Serialize(ViewBag.ErrorMessage))
+            });
+    </script>
+}
+
+@model InmobiliariaApp.Models.Contrato
+
+@{
+    ViewData["Title"] = "Renovar Contrato";
+}
+
+<h1>Renovar Contrato</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Renovar">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="IdContrato" />
+
+            <!-- Inquilino (solo lectura) -->
+            <div class="form-group">
+                <label class="control-label">Inquilino</label>
+                <input value="@Model.Inquilino?.NombreCompleto" class="form-control" readonly />
+            </div>
+
+            <!-- Inmueble (solo lectura) -->
+            <div class="form-group">
+                <label class="control-label">Inmueble</label>
+                <input value="@Model.Inmueble?.NombreInmueble" class="form-control" readonly />
+            </div>
+
+            <!-- Estado (solo lectura) -->
+            <div class="form-group">
+                <label class="control-label">Estado Actual</label>
+                <input value="@Model.Estado" class="form-control" readonly />
+            </div>
+
+            <!-- Fechas nuevas -->
+            <div class="form-group">
+                <label asp-for="FechaInicio" class="control-label">Nueva Fecha Inicio</label>
+                <input asp-for="FechaInicio" class="form-control" type="date" />
+                <span asp-validation-for="FechaInicio" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="FechaFin" class="control-label">Nueva Fecha Fin</label>
+                <input asp-for="FechaFin" class="form-control" type="date" />
+                <span asp-validation-for="FechaFin" class="text-danger"></span>
+            </div>
+
+            <!-- Monto mensual (solo lectura) -->
+            <div class="form-group">
+                <label asp-for="MontoMensual" class="control-label">Monto Mensual</label>
+                <input asp-for="MontoMensual" class="form-control" />
+                <span asp-validation-for="MontoMensual" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <a asp-action="Listar" class="btn btn-secondary">Volver a la Lista</a>
+                <input type="submit" value="Renovar Contrato" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>

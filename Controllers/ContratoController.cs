@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Org.BouncyCastle.Tls;
 
 namespace InmobiliariaApp.Controllers
 {
@@ -85,33 +86,49 @@ namespace InmobiliariaApp.Controllers
 
 
 
-        // Acción para mostrar el formulario de edición
-        public IActionResult Editar(int id)
+        // GET: Renovar contrato - muestra el formulario con los datos actuales
+        // GET: Renovar contrato - muestra el formulario con los datos actuales
+        public IActionResult Renovar(int id)
         {
             var contrato = _contratoRepository.GetById(id);
+
             if (contrato == null)
             {
-                return NotFound(); // Retorna un error 404 si no se encuentra el contrato
+                return NotFound(); // 404 si no existe
             }
+
+
             return View(contrato);
         }
 
-        // Acción para procesar el formulario de edición
         [HttpPost]
-        public IActionResult Editar(int id, Contrato contrato)
+        public IActionResult Renovar(int id, Contrato contrato)
         {
-            if (id != contrato.IdContrato)
+            try
             {
-                return BadRequest(); // Retorna un error 400 si los IDs no coinciden
+                if (id != contrato.IdContrato)
+                {
+                    return BadRequest(); // ID inconsistente
+                }
+                contrato = _contratoRepository.GetById(id); // Obtener el contrato existente
+                if (contrato == null)
+                {
+                    return NotFound(); // 404 si no existe
+                }
+                // Crear un nuevo contrato basado en el original, con fechas nuevas
+                _contratoRepository.RenovarContrato(contrato, contrato.FechaInicio, contrato.FechaFin);
+                TempData["SuccessMessage"] = "Contrato renovado correctamente.";
+                return RedirectToAction("Listar");
             }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al renovar el contrato: {ex.Message}";
 
-            if (ModelState.IsValid)
-            {
-                _contratoRepository.Update(contrato);
-                return RedirectToAction("Listar"); // Redirige a la lista de contratos
+                return View("Renovar", contrato); // Retorna a la vista de renovación con el contrato actual
             }
-            return View(contrato);
         }
+
+
 
         // Acción para suspender el contrato
         [HttpPost]
