@@ -117,9 +117,7 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult BajaLogica(int id)
         {
-            Console.WriteLine("BajaLogica: " + id);
             var contrato = _contratoRepository.GetById(id);
-            Console.WriteLine("contrato: " + contrato);
             if (contrato == null)
             {
                 return NotFound(); // Retorna un error 404 si no se encuentra el contrato
@@ -156,11 +154,11 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para confirmar la eliminación
-        [HttpPost, ActionName("Eliminar")]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            _contratoRepository.Delete(id);
-            return RedirectToAction("Listar"); // Redirige a la lista de contratos
-        }
+        // [HttpPost, ActionName("Eliminar")]
+        // public IActionResult DeleteConfirmed(int id)
+        // {
+        //     _contratoRepository.Delete(id);
+        //     return RedirectToAction("Listar"); // Redirige a la lista de contratos
+        // }
     }
 }

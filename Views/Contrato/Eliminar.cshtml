@@ -6,7 +6,7 @@
 
 <h1>Eliminar Contrato</h1>
 
-<h3>¿Está seguro de que desea eliminar este contrato?</h3>
+<h3>¿Está seguro de que desea Cancelar/Reactivar este contrato?</h3>
 <div>
     <h4>Contrato</h4>
     <hr />
@@ -15,10 +15,10 @@
         <dd class="col-sm-10">@Model.IdContrato</dd>
 
         <dt class="col-sm-2">Inquilino</dt>
-        <dd class="col-sm-10">@Model.IdInquilino</dd>
+        <dd class="col-sm-10">@Model.Inquilino!.NombreCompleto</dd>
 
         <dt class="col-sm-2">Inmueble</dt>
-        <dd class="col-sm-10">@Model.IdInmueble</dd>
+        <dd class="col-sm-10">@Model.Inmueble!.NombreInmueble</dd>
 
         <dt class="col-sm-2">Fecha Inicio</dt>
         <dd class="col-sm-10">@Model.FechaInicio.ToShortDateString()</dd>
@@ -42,10 +42,10 @@
     @if (Model.Activo == 1)
     {
         <form asp-action="BajaLogica" method="post" style="display:inline;">
-            <input type="hidden" name="id" value="@Model.IdInmueble" />
+            <input type="hidden" name="id" value="@Model.IdContrato" />
             <button type="submit" class="btn btn-danger"
-                onclick="return confirm('¿Está seguro de que desea eliminar este inmueble?');">
-                Eliminar
+                onclick="return confirm('¿Está seguro de que desea dar de baja este contrato?');">
+                Dar de Baja
             </button>
             <a asp-action="Listar" class="btn btn-secondary">Volver a la Lista</a>
         </form>
@@ -53,8 +53,10 @@
     else
     {
         <form asp-action="AltaLogica" method="post" style="display:inline;">
-            <input type="hidden" name="id" value="@Model.IdInmueble" />
-            <button type="submit" class="btn btn-success">Reactivar</button>
+            <input type="hidden" name="id" value="@Model.IdContrato" />
+            <button type="submit" class="btn btn-success"
+            onclick="return confirm('¿Está seguro de que desea reactivar este contrato?');">
+            Reactivar</button>
             <a asp-action="Listar" class="btn btn-secondary">Volver a la Lista</a>
         </form>
     }

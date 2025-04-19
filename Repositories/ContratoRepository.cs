@@ -164,61 +164,74 @@ namespace InmobiliariaApp.Repositories
         // Método para obtener un contrato por ID
         public Contrato? GetById(int id)
         {
-            using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand(@"
-                SELECT * 
-                FROM contrato c
-                JOIN inquilino i ON c.id_inquilino = i.id_inquilino
-                JOIN inmueble f ON c.id_inmueble = f.id_inmueble
-                WHERE c.id_contrato = @Id", connection);
-
-            command.Parameters.AddWithValue("@Id", id);
-
-            using var reader = command.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                return new Contrato
-                {
-                    IdContrato = reader.GetInt32("id_contrato"),
-                    IdInquilino = reader.GetInt32("id_inquilino"),
-                    Inquilino = new Inquilino
-                    {
-                        Nombre = reader.GetString("nombre"),
-                        Apellido = reader.GetString("apellido")
-                    },
-                    IdInmueble = reader.GetInt32("id_inmueble"),
-                    Inmueble = new Inmueble
-                    {
-                        Uso = reader.GetString("uso"),
-                        NombreInmueble = reader.GetString("nombre_inmueble"),
-                        Precio = reader.GetDecimal("precio"),
-                        Estado = reader.GetString("estado"),
-                        Activo = reader.GetInt32("activo"),
-                    },
-                    FechaInicio = reader.GetDateTime("fecha_inicio"),
-                    FechaFin = reader.GetDateTime("fecha_fin"),
-                    MontoMensual = reader.GetDecimal("monto_mensual"),
-                    Estado = reader.GetString("estado"),
-                    FechaTerminacionAnticipada = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion_anticipada"))
-                        ? null
-                        : (DateTime?)reader.GetDateTime("fecha_terminacion_anticipada"),
-                    Multa = reader.IsDBNull(reader.GetOrdinal("multa"))
-                        ? null
-                        : (decimal?)reader.GetDecimal("multa"),
-                    CreadoPor = reader.IsDBNull(reader.GetOrdinal("creado_por"))
-                        ? null
-                        : (int?)reader.GetInt32("creado_por"),
-                    ModificadoPor = reader.IsDBNull(reader.GetOrdinal("modificado_por"))
-                        ? null
-                        : (int?)reader.GetInt32("modificado_por"),
-                    EliminadoPor = reader.IsDBNull(reader.GetOrdinal("eliminado_por"))
-                        ? null
-                        : (int?)reader.GetInt32("eliminado_por"),
-                    Activo = reader.GetInt32("activo"),
-                };
-            }
+                using var connection = _dbConnection.GetConnection();
+                using var command = new MySqlCommand(@"
+            SELECT 
+                c.id_contrato, c.id_inquilino, c.id_inmueble, c.fecha_inicio, c.fecha_fin, 
+                c.monto_mensual, c.estado AS estado_contrato, c.fecha_terminacion_anticipada, 
+                c.multa, c.creado_por, c.modificado_por, c.eliminado_por, c.activo AS activo_contrato,
+                i.nombre AS inq_nombre, i.apellido AS inq_apellido,
+                f.uso AS inmueble_uso, f.nombre_inmueble, f.precio, f.estado AS estado_inmueble, f.activo AS activo_inmueble
+            FROM contrato c
+            JOIN inquilino i ON c.id_inquilino = i.id_inquilino
+            JOIN inmueble f ON c.id_inmueble = f.id_inmueble
+            WHERE c.id_contrato = @Id", connection);
 
-            return null; // Devuelve null si no se encuentra ningún contrato
+                command.Parameters.AddWithValue("@Id", id);
+
+                using var reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    return new Contrato
+                    {
+                        IdContrato = reader.GetInt32("id_contrato"),
+                        IdInquilino = reader.GetInt32("id_inquilino"),
+                        Inquilino = new Inquilino
+                        {
+                            Nombre = reader.GetString("inq_nombre"),
+                            Apellido = reader.GetString("inq_apellido")
+                        },
+                        IdInmueble = reader.GetInt32("id_inmueble"),
+                        Inmueble = new Inmueble
+                        {
+                            Uso = reader.GetString("inmueble_uso"),
+                            NombreInmueble = reader.GetString("nombre_inmueble"),
+                            Precio = reader.GetDecimal("precio"),
+                            Estado = reader.GetString("estado_inmueble"),
+                            Activo = reader.GetInt32("activo_inmueble"),
+                        },
+                        FechaInicio = reader.GetDateTime("fecha_inicio"),
+                        FechaFin = reader.GetDateTime("fecha_fin"),
+                        MontoMensual = reader.GetDecimal("monto_mensual"),
+                        Estado = reader.GetString("estado_contrato"),
+                        FechaTerminacionAnticipada = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion_anticipada"))
+                            ? null
+                            : reader.GetDateTime("fecha_terminacion_anticipada"),
+                        Multa = reader.IsDBNull(reader.GetOrdinal("multa"))
+                            ? null
+                            : reader.GetDecimal("multa"),
+                        CreadoPor = reader.IsDBNull(reader.GetOrdinal("creado_por"))
+                            ? null
+                            : reader.GetInt32("creado_por"),
+                        ModificadoPor = reader.IsDBNull(reader.GetOrdinal("modificado_por"))
+                            ? null
+                            : reader.GetInt32("modificado_por"),
+                        EliminadoPor = reader.IsDBNull(reader.GetOrdinal("eliminado_por"))
+                            ? null
+                            : reader.GetInt32("eliminado_por"),
+                        Activo = reader.GetInt32("activo_contrato"),
+                    };
+                }
+
+                return null; // No encontrado
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] al obtener contrato por ID {id}: {ex.Message}");
+                return null;
+            }
         }
 
         // Método para agregar un nuevo contrato
@@ -308,14 +321,14 @@ namespace InmobiliariaApp.Repositories
             command.ExecuteNonQuery();
         }
         // Método para eliminar un contrato
-        public void Delete(int id)
-        {
-            using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("DELETE FROM contrato WHERE id_contrato = @Id", connection);
-            command.Parameters.AddWithValue("@Id", id);
+        // public void Delete(int id)
+        // {
+        //     using var connection = _dbConnection.GetConnection();
+        //     using var command = new MySqlCommand("DELETE FROM contrato WHERE id_contrato = @Id", connection);
+        //     command.Parameters.AddWithValue("@Id", id);
 
-            command.ExecuteNonQuery();
-        }
+        //     command.ExecuteNonQuery();
+        // }
 
         //==========================================================Validacion de existencia de un contrato==========================================================
         private void ValidarFechas(DateTime inicio, DateTime fin)
