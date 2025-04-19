@@ -83,6 +83,16 @@
             </select>
         </div>
         <div class="col-md-2">
+            <label>Vence en</label>
+            <select name="venceEnDias" class="form-control">
+                <option value="">Todos</option>
+                <option value="30" selected="@(Context.Request.Query["venceEnDias"] == "30")">30 días</option>
+                <option value="60" selected="@(Context.Request.Query["venceEnDias"] == "60")">60 días</option>
+                <option value="90" selected="@(Context.Request.Query["venceEnDias"] == "90")">90 días</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
             <label>Activo</label>
             <select name="activo" class="form-control">
                 <option value="">Todos</option>
@@ -136,6 +146,8 @@
                         <a asp-action="Eliminar" asp-route-id="@item.IdContrato" class="btn btn-success">Reactivar</a>
                     }
                     <a asp-action="Renovar" asp-route-id="@item.IdContrato" class="btn btn-primary">Renovar Contrato</a>
+                    <a asp-controller="Pago" asp-action="Insertar" class="btn btn-success">Crear Pago</a>
+
                 </td>
             </tr>
         }

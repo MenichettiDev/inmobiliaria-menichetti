@@ -26,14 +26,15 @@ namespace InmobiliariaApp.Controllers
         //     return View(contratos);
         // }
 
-        public IActionResult Listar(int? idInquilino, int? idInmueble, DateTime? fechaDesde, DateTime? fechaHasta, decimal? montoDesde, decimal? montoHasta, string? estado, int? activo)
+        public IActionResult Listar(int? idInquilino, int? idInmueble, DateTime? fechaDesde, DateTime? fechaHasta, decimal? montoDesde, decimal? montoHasta, string? estado, int? activo, int? venceEnDias)
         {
             ViewBag.Inquilinos = _inquilinoRepo.GetAll();
             ViewBag.Inmuebles = _inmuebleRepo.GetAll();
 
-            var contratos = _contratoRepository.ObtenerFiltrados(idInquilino, idInmueble, fechaDesde, fechaHasta, montoDesde, montoHasta, estado, activo);
+            var contratos = _contratoRepository.ObtenerFiltrados(idInquilino, idInmueble, fechaDesde, fechaHasta, montoDesde, montoHasta, estado, activo, venceEnDias);
             return View(contratos);
         }
+
         // Acción para mostrar detalles de un contrato
         public IActionResult Detalles(int id)
         {
@@ -48,41 +49,49 @@ namespace InmobiliariaApp.Controllers
         // Acción para mostrar el formulario de creación
         public IActionResult Insertar()
         {
-            var inquilinos = _inquilinoRepo.GetAll(); // O el método que uses
-            ViewData["Inquilinos"] = new SelectList(inquilinos, "IdInquilino", "NombreCompleto");
-            var inmuebles = _inmuebleRepo.GetAll(); // O el método que uses
-            ViewData["Inmuebles"] = new SelectList(inmuebles, "IdInmueble", "Nombre");
+            var inquilinos = _inquilinoRepo.GetAll();
+            ViewBag.Inquilinos = new SelectList(inquilinos, "IdInquilino", "NombreCompleto");
+            var inmuebles = _inmuebleRepo.GetAll();
+            ViewBag.Inmuebles = new SelectList(inmuebles, "IdInmueble", "NombreInmueble");
 
             return View();
         }
 
-        // Acción para procesar el formulario de creación
         [HttpPost]
         public IActionResult Insertar(Contrato contrato)
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    _contratoRepository.Add(contrato);
-                    TempData["SuccessMessage"] = "Contrato creado exitosamente";
-                    return RedirectToAction("Listar");
+                    // Si el modelo no es válido, volvemos a mostrar el formulario con los datos actuales
+                    var inquilinos = _inquilinoRepo.GetAll();
+                    ViewBag.Inquilinos = new SelectList(inquilinos, "IdInquilino", "NombreCompleto");
+                    var inmuebles = _inmuebleRepo.GetAll();
+                    ViewBag.Inmuebles = new SelectList(inmuebles, "IdInmueble", "NombreInmueble");
+                    
+                    ViewBag.ErrorMessage = "Por favor complete correctamente todos los campos del formulario.";
+
+                    return View(contrato);
                 }
 
-                return View(contrato);
+                _contratoRepository.Add(contrato);
+                TempData["SuccessMessage"] = "Contrato creado correctamente.";
+                return RedirectToAction("Listar");
             }
             catch (Exception ex)
             {
                 ViewBag.ErrorMessage = $"Ocurrió un error al crear el contrato: {ex.Message}";
 
-                var inquilinos = _inquilinoRepo.GetAll(); // O el método que uses
-                ViewData["Inquilinos"] = new SelectList(inquilinos, "IdInquilino", "NombreCompleto");
-                var inmuebles = _inmuebleRepo.GetAll(); // O el método que uses
-                ViewData["Inmuebles"] = new SelectList(inmuebles, "IdInmueble", "Nombre");
+                var inquilinos = _inquilinoRepo.GetAll();
+                ViewBag.Inquilinos = new SelectList(inquilinos, "IdInquilino", "NombreCompleto");
+                var inmuebles = _inmuebleRepo.GetAll();
+                ViewBag.Inmuebles = new SelectList(inmuebles, "IdInmueble", "NombreInmueble");
 
-                return View("Insertar");
+                return View("Insertar", contrato);
             }
         }
+
 
 
 

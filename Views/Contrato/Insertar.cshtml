@@ -4,12 +4,11 @@
         Swal.fire({
             icon: 'error',
             title: '¡Error!',
-            text: @Html.Raw(Json.Serialize(ViewBag.ErrorMessage))
+            text: "@ViewBag.ErrorMessage"
         });
     </script>
 }
-
-
+@* <p style="color:red">@ViewBag.ErrorMessage</p> *@
 
 @model InmobiliariaApp.Models.Contrato
 
@@ -28,7 +27,7 @@
             <div class="form-group">
                 <label asp-for="IdInquilino" class="control-label">Inquilino</label>
                 <select asp-for="IdInquilino" class="form-control" asp-items="ViewBag.Inquilinos">
-                    <option value="">Seleccione un Inquilino</option>
+                    <option value="">Seleccione un inquilino</option>
                 </select>
                 <span asp-validation-for="IdInquilino" class="text-danger"></span>
             </div>
@@ -36,7 +35,7 @@
             <div class="form-group">
                 <label asp-for="IdInmueble" class="control-label">Nombre Inmueble</label>
                 <select asp-for="IdInmueble" class="form-control" asp-items="ViewBag.Inmuebles">
-                    <option value="">Seleccione un Inmueble</option>
+                    <option value="">Seleccione un inmueble</option>
                 </select>
                 <span asp-validation-for="IdInmueble" class="text-danger"></span>
             </div>
@@ -60,6 +59,7 @@
             </div>
 
             <div class="form-group">
+                <a asp-action="Listar" class="btn btn-secondary">Volver a la Lista</a>
                 <input type="submit" value="Insertar" class="btn btn-primary" />
             </div>
         </form>
@@ -67,6 +67,4 @@
 </div>
 
 <div>
-    <a asp-action="Listar">Volver a la Lista</a>
 </div>
-

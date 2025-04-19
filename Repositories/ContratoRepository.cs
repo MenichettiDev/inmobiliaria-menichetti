@@ -16,7 +16,17 @@ namespace InmobiliariaApp.Repositories
         }
 
         //Metodo para obtener contratos filtrados
-        public List<Contrato> ObtenerFiltrados(int? idInquilino, int? idInmueble, DateTime? fechaDesde, DateTime? fechaHasta, decimal? montoDesde, decimal? montoHasta, string? estado, int? activo)
+        public List<Contrato> ObtenerFiltrados(
+            int? idInquilino,
+            int? idInmueble,
+            DateTime? fechaDesde,
+            DateTime? fechaHasta,
+            decimal? montoDesde,
+            decimal? montoHasta,
+            string? estado,
+            int? activo,
+            int? venceEnDias // 👈 nuevo
+            )
         {
             var lista = new List<Contrato>();
             using var conn = _dbConnection.GetConnection();
@@ -69,6 +79,13 @@ namespace InmobiliariaApp.Repositories
                 command.Parameters.AddWithValue("@activo", activo);
             }
 
+            // 👇 NUEVO: contratos que vencen dentro de X días
+            if (venceEnDias.HasValue)
+            {
+                where.Add("c.fecha_fin BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL @venceEnDias DAY)");
+                command.Parameters.AddWithValue("@venceEnDias", venceEnDias.Value);
+            }
+
             if (where.Count > 0)
             {
                 sql += " WHERE " + string.Join(" AND ", where);
@@ -109,53 +126,74 @@ namespace InmobiliariaApp.Repositories
         {
             var contratos = new List<Contrato>();
 
-            using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand(@$"SELECT * FROM contrato c, inquilino i, inmueble f 
-            where c.id_inquilino = i.id_inquilino and c.id_inmueble = f.id_inmueble", connection);
-
-            using var reader = command.ExecuteReader();
-            while (reader.Read())
+            try
             {
-                contratos.Add(new Contrato
-                {
-                    IdContrato = reader.GetInt32("id_contrato"),
-                    IdInquilino = reader.GetInt32("id_inquilino"),
-                    Inquilino = new Inquilino
-                    {
-                        Nombre = reader.GetString("nombre"),
-                        Apellido = reader.GetString("apellido")
-                    },
-                    IdInmueble = reader.GetInt32("id_inmueble"),
-                    Inmueble = new Inmueble
-                    {
-                        Uso = reader.GetString("uso"),
-                        Precio = reader.GetDecimal("precio"),
-                        Estado = reader.GetString("estado"),
-                        Activo = reader.GetInt32("activo"),
-                        NombreInmueble = reader.GetString("nombre_inmueble"),
-                    },
-                    FechaInicio = reader.GetDateTime("fecha_inicio"),
-                    FechaFin = reader.GetDateTime("fecha_fin"),
-                    MontoMensual = reader.GetDecimal("monto_mensual"),
-                    Estado = reader.GetString("estado"),
-                    FechaTerminacionAnticipada = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion_anticipada"))
-                        ? null
-                        : (DateTime?)reader.GetDateTime("fecha_terminacion_anticipada"),
-                    Multa = reader.IsDBNull(reader.GetOrdinal("multa"))
-                        ? null
-                        : (decimal?)reader.GetDecimal("multa"),
-                    CreadoPor = reader.IsDBNull(reader.GetOrdinal("creado_por"))
-                        ? null
-                        : (int?)reader.GetInt32("creado_por"),
-                    ModificadoPor = reader.IsDBNull(reader.GetOrdinal("modificado_por"))
-                        ? null
-                        : (int?)reader.GetInt32("modificado_por"),
-                    EliminadoPor = reader.IsDBNull(reader.GetOrdinal("eliminado_por"))
-                        ? null
-                        : (int?)reader.GetInt32("eliminado_por"),
-                    Activo = reader.GetInt32("activo"),
+                using var connection = _dbConnection.GetConnection();
+                using var command = new MySqlCommand(@"
+            SELECT 
+                c.id_contrato, c.id_inquilino, c.id_inmueble, c.fecha_inicio, c.fecha_fin, 
+                c.monto_mensual, c.estado AS estado_contrato, c.fecha_terminacion_anticipada, 
+                c.multa, c.creado_por, c.modificado_por, c.eliminado_por, c.activo AS activo_contrato,
 
-                });
+                i.nombre, i.apellido,
+
+                f.nombre_inmueble, f.uso, f.precio, f.estado AS estado_inmueble, f.activo AS activo_inmueble
+            FROM contrato c
+            INNER JOIN inquilino i ON c.id_inquilino = i.id_inquilino
+            INNER JOIN inmueble f ON c.id_inmueble = f.id_inmueble
+        ", connection);
+
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    contratos.Add(new Contrato
+                    {
+                        IdContrato = reader.GetInt32("id_contrato"),
+                        IdInquilino = reader.GetInt32("id_inquilino"),
+                        Inquilino = new Inquilino
+                        {
+                            Nombre = reader.GetString("nombre"),
+                            Apellido = reader.GetString("apellido")
+                            // Suponiendo que tenés la propiedad NombreCompleto como calculada
+                        },
+                        IdInmueble = reader.GetInt32("id_inmueble"),
+                        Inmueble = new Inmueble
+                        {
+                            NombreInmueble = reader.GetString("nombre_inmueble"),
+                            Uso = reader.GetString("uso"),
+                            Precio = reader.GetDecimal("precio"),
+                            Estado = reader.GetString("estado_inmueble"),
+                            Activo = reader.GetInt32("activo_inmueble")
+                        },
+                        FechaInicio = reader.GetDateTime("fecha_inicio"),
+                        FechaFin = reader.GetDateTime("fecha_fin"),
+                        MontoMensual = reader.GetDecimal("monto_mensual"),
+                        Estado = reader.GetString("estado_contrato"),
+                        FechaTerminacionAnticipada = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion_anticipada"))
+                            ? null
+                            : (DateTime?)reader.GetDateTime("fecha_terminacion_anticipada"),
+                        Multa = reader.IsDBNull(reader.GetOrdinal("multa"))
+                            ? null
+                            : (decimal?)reader.GetDecimal("multa"),
+                        CreadoPor = reader.IsDBNull(reader.GetOrdinal("creado_por"))
+                            ? null
+                            : (int?)reader.GetInt32("creado_por"),
+                        ModificadoPor = reader.IsDBNull(reader.GetOrdinal("modificado_por"))
+                            ? null
+                            : (int?)reader.GetInt32("modificado_por"),
+                        EliminadoPor = reader.IsDBNull(reader.GetOrdinal("eliminado_por"))
+                            ? null
+                            : (int?)reader.GetInt32("eliminado_por"),
+                        Activo = reader.GetInt32("activo_contrato")
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Podés loguear el error acá si usás logging
+                Console.WriteLine($"Error al obtener contratos: {ex.Message}");
+                // O lanzar de nuevo si querés manejarlo en otra capa
+                throw;
             }
 
             return contratos;
@@ -237,30 +275,46 @@ namespace InmobiliariaApp.Repositories
         // Método para agregar un nuevo contrato
         public void Add(Contrato contrato)
         {
-            // Validaciones
-            ValidarFechas(contrato.FechaInicio, contrato.FechaFin);
-            ValidarMonto(contrato.MontoMensual);
+            try
+            {
+                // Validaciones
+                ValidarFechas(contrato.FechaInicio, contrato.FechaFin);
+                ValidarMonto(contrato.MontoMensual);
 
-            if (InmuebleEstaOcupado(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin))
-                throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
+                if (InmuebleEstaOcupado(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin))
+                    throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
 
-            // Console.WriteLine("Contrato a insertar: " + contrato.IdInmueble + " " + contrato.IdInquilino + " " + contrato.FechaInicio + " " + contrato.FechaFin + " " + contrato.MontoMensual);
-            using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand(
-                "INSERT INTO contrato (id_inquilino, id_inmueble, fecha_inicio, fecha_fin, monto_mensual, " +
-                "creado_por) " +
-                "VALUES (@IdInquilino, @IdInmueble, @FechaInicio, @FechaFin, @MontoMensual, " +
-                " @CreadoPor)", connection);
+                using var connection = _dbConnection.GetConnection();
+                using var command = new MySqlCommand(
+                    "INSERT INTO contrato (id_inquilino, id_inmueble, fecha_inicio, fecha_fin, monto_mensual, creado_por) " +
+                    "VALUES (@IdInquilino, @IdInmueble, @FechaInicio, @FechaFin, @MontoMensual, @CreadoPor)", connection);
 
-            command.Parameters.AddWithValue("@IdInquilino", contrato.IdInquilino);
-            command.Parameters.AddWithValue("@IdInmueble", contrato.IdInmueble);
-            command.Parameters.AddWithValue("@FechaInicio", contrato.FechaInicio);
-            command.Parameters.AddWithValue("@FechaFin", contrato.FechaFin);
-            command.Parameters.AddWithValue("@MontoMensual", contrato.MontoMensual);
-            command.Parameters.AddWithValue("@CreadoPor", contrato.CreadoPor ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@IdInquilino", contrato.IdInquilino);
+                command.Parameters.AddWithValue("@IdInmueble", contrato.IdInmueble);
+                command.Parameters.AddWithValue("@FechaInicio", contrato.FechaInicio);
+                command.Parameters.AddWithValue("@FechaFin", contrato.FechaFin);
+                command.Parameters.AddWithValue("@MontoMensual", contrato.MontoMensual);
+                command.Parameters.AddWithValue("@CreadoPor", contrato.CreadoPor ?? (object)DBNull.Value);
 
-            command.ExecuteNonQuery();
+                command.ExecuteNonQuery();
+            }
+            catch (MySqlException ex)
+            {
+                // Error de base de datos
+                throw new Exception("Error al insertar el contrato en la base de datos. Detalles: " + ex.Message, ex);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Error de lógica, como inmueble ocupado
+                throw new Exception("No se pudo completar la operación: " + ex.Message, ex);
+            }
+            catch (Exception ex)
+            {
+                // Cualquier otro error
+                throw new Exception("Ocurrió un error inesperado al agregar el contrato. Detalles: " + ex.Message, ex);
+            }
         }
+
 
         public void RenovarContrato(Contrato contratoBase, DateTime nuevaFechaInicio, DateTime nuevaFechaFin)
         {
