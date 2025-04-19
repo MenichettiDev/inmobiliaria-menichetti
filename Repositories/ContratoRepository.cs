@@ -17,23 +17,23 @@ namespace InmobiliariaApp.Repositories
 
         //Metodo para obtener contratos filtrados
         public List<Contrato> ObtenerFiltrados(
-            int? idInquilino,
-            int? idInmueble,
-            DateTime? fechaDesde,
-            DateTime? fechaHasta,
-            decimal? montoDesde,
-            decimal? montoHasta,
-            string? estado,
-            int? activo,
-            int? venceEnDias // 👈 nuevo
-            )
+                int? idInquilino,
+                int? idInmueble,
+                DateTime? fechaDesde,
+                DateTime? fechaHasta,
+                decimal? montoDesde,
+                decimal? montoHasta,
+                string? estado,
+                int? activo,
+                int? venceEnDias // 👈 nuevo
+                )
         {
             var lista = new List<Contrato>();
             using var conn = _dbConnection.GetConnection();
             var sql = @"SELECT c.*, i.nombre_inmueble, q.Nombre AS InquilinoNombre, q.Apellido AS InquilinoApellido
-                FROM Contrato c
-                INNER JOIN Inmueble i ON c.id_inmueble = i.id_inmueble
-                INNER JOIN Inquilino q ON c.id_inquilino = q.id_inquilino";
+                    FROM Contrato c
+                    INNER JOIN Inmueble i ON c.id_inmueble = i.id_inmueble
+                    INNER JOIN Inquilino q ON c.id_inquilino = q.id_inquilino";
             var where = new List<string>();
             var command = new MySqlCommand();
             command.Connection = conn;

@@ -7,18 +7,34 @@ namespace InmobiliariaApp.Controllers
     public class PagoController : Controller
     {
         private readonly PagoRepository _pagoRepository;
+        private readonly ContratoRepository _contratoRepository;
 
-        public PagoController(PagoRepository pagoRepository)
+        public PagoController(PagoRepository pagoRepository, ContratoRepository contratoRepository)
         {
             _pagoRepository = pagoRepository;
+            _contratoRepository = contratoRepository;
         }
-
         // Acción para listar todos los pagos
-        public IActionResult Listar()
+        // public IActionResult Listar()
+        // {
+        //     var pagos = _pagoRepository.GetAll();
+        //     return View(pagos);
+        // }
+
+        //Listar con filtros
+        public IActionResult Listar(int? idContrato, int? idInquilino, DateTime? desde, DateTime? hasta, decimal? importeMin, decimal? importeMax)
         {
-            var pagos = _pagoRepository.GetAll();
+            ViewBag.Contratos = _contratoRepository.GetAll(); // para el dropdown
+            var pagos = _pagoRepository.ObtenerFiltrados(idContrato, idInquilino, desde, hasta, importeMin, importeMax);
             return View(pagos);
         }
+        public IActionResult ListarDesde(int id)
+        {
+            var pagos = _pagoRepository.ObtenerPorContrato(id);
+            ViewBag.IdContrato = id;
+            return View("ListarDesde", pagos);
+        }
+
 
         // Acción para mostrar detalles de un pago
         public IActionResult Detalles(int id)
@@ -32,10 +48,18 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de creación
-        public IActionResult Insertar()
+        // GET: Pago/Insertar/5
+        public IActionResult Insertar(int id) // este id es el IdContrato
         {
-            return View();
+            var pago = new Pago
+            {
+                IdContrato = id,
+                FechaPago = DateTime.Today
+            };
+
+            return View("Insertar", pago); // te aseguras de que el campo se llene
         }
+
 
         // Acción para procesar el formulario de creación
         [HttpPost]

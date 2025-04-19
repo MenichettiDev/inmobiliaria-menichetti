@@ -1,0 +1,33 @@
+@model IEnumerable<InmobiliariaApp.Models.Pago>
+@{
+    ViewData["Title"] = "Pagos del Contrato";
+    var idContrato = ViewBag.IdContrato;
+}
+
+<h2>Pagos del Contrato @idContrato</h2>
+
+<a href="@Url.Action("Detalles", "Contrato", new { id = idContrato })" class="btn btn-secondary mb-3">
+    ← Volver al contrato
+</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID Pago</th>
+            <th>Fecha</th>
+            <th>Importe</th>
+            <th>Detalle</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>@p.IdPago</td>
+                <td>@p.FechaPago.ToString("dd/MM/yyyy")</td>
+                <td>@p.Importe.ToString("C")</td>
+                <td>@p.Detalle</td>
+            </tr>
+        }
+    </tbody>
+</table>

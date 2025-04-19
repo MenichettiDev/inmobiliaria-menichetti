@@ -1,42 +1,71 @@
 @model IEnumerable<InmobiliariaApp.Models.Pago>
-
 @{
     ViewData["Title"] = "Lista de Pagos";
 }
 
 <h1>Lista de Pagos</h1>
 
-<p>
-    <a asp-action="Insertar" class="btn btn-success">Crear Nuevo Pago</a>
-</p>
+<form method="get" class="mb-4">
+    <div class="row">
+        <div class="col-md-3">
+            <label>Contrato</label>
+            <select name="idContrato" class="form-control">
+                <option value="">Todos</option>
+                @foreach (var c in ViewBag.Contratos)
+                {
+                    <option value="@c.IdContrato"
+                        selected="@(Context.Request.Query["idContrato"] == c.IdContrato.ToString())">
+                        Contrato @c.IdContrato
+                    </option>
+                }
+            </select>
+        </div>
 
-<table class="table">
+        <div class="col-md-2">
+            <label>Fecha Desde</label>
+            <input type="date" name="desde" value="@Context.Request.Query["desde"]" class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label>Fecha Hasta</label>
+            <input type="date" name="hasta" value="@Context.Request.Query["hasta"]" class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label>Importe Mínimo</label>
+            <input type="number" name="importeMin" value="@Context.Request.Query["importeMin"]" class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label>Importe Máximo</label>
+            <input type="number" name="importeMax" value="@Context.Request.Query["importeMax"]" class="form-control" />
+        </div>
+
+        <div class="col-md-1 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>ID Pago</th>
-            <th>ID Contrato</th>
-            <th>Fecha de Pago</th>
+            <th>Contrato</th>
+            <th>Fecha</th>
             <th>Importe</th>
             <th>Detalle</th>
-            <th>Creado Por</th>
-            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var p in Model)
         {
             <tr>
-                <td>@item.IdPago</td>
-                <td>@item.IdContrato</td>
-                <td>@item.FechaPago.ToShortDateString()</td>
-                <td>@item.Importe.ToString("C")</td>
-                <td>@item.Detalle</td>
-                <td>@item.CreadoPor</td>
-                <td>
-                    <a asp-action="Detalles" asp-route-id="@item.IdPago" class="btn btn-info">Detalles</a> |
-                    <a asp-action="Editar" asp-route-id="@item.IdPago" class="btn btn-warning">Editar</a> |
-                    <a asp-action="Eliminar" asp-route-id="@item.IdPago" class="btn btn-danger">Eliminar</a>
-                </td>
+                <td>@p.IdPago</td>
+                <td>Contrato @p.IdContrato</td>
+                <td>@p.FechaPago.ToShortDateString()</td>
+                <td>@p.Importe.ToString("C")</td>
+                <td>@p.Detalle</td>
             </tr>
         }
     </tbody>

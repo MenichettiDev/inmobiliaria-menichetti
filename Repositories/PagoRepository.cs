@@ -50,6 +50,150 @@ namespace InmobiliariaApp.Repositories
             return pagos;
         }
 
+        public List<Pago> ObtenerFiltrados(
+                int? idContrato,
+                int? idInquilino,
+                DateTime? fechaDesde,
+                DateTime? fechaHasta,
+                decimal? importeMin,
+                decimal? importeMax)
+        {
+            var lista = new List<Pago>();
+            using var conn = _dbConnection.GetConnection();
+
+            var sql = @"SELECT p.*, c.id_inquilino, q.Nombre AS InquilinoNombre, q.Apellido AS InquilinoApellido,
+                    i.nombre_inmueble
+                FROM pago p
+                INNER JOIN contrato c ON p.id_contrato = c.id_contrato
+                INNER JOIN inquilino q ON c.id_inquilino = q.id_inquilino
+                INNER JOIN inmueble i ON c.id_inmueble = i.id_inmueble";
+
+            var where = new List<string>();
+            var command = new MySqlCommand();
+            command.Connection = conn;
+
+            if (idContrato.HasValue)
+            {
+                where.Add("p.id_contrato = @idContrato");
+                command.Parameters.AddWithValue("@idContrato", idContrato);
+            }
+
+            if (idInquilino.HasValue)
+            {
+                where.Add("c.id_inquilino = @idInquilino");
+                command.Parameters.AddWithValue("@idInquilino", idInquilino);
+            }
+
+            if (fechaDesde.HasValue)
+            {
+                where.Add("p.fecha_pago >= @fechaDesde");
+                command.Parameters.AddWithValue("@fechaDesde", fechaDesde);
+            }
+
+            if (fechaHasta.HasValue)
+            {
+                where.Add("p.fecha_pago <= @fechaHasta");
+                command.Parameters.AddWithValue("@fechaHasta", fechaHasta);
+            }
+
+            if (importeMin.HasValue)
+            {
+                where.Add("p.importe >= @importeMin");
+                command.Parameters.AddWithValue("@importeMin", importeMin);
+            }
+
+            if (importeMax.HasValue)
+            {
+                where.Add("p.importe <= @importeMax");
+                command.Parameters.AddWithValue("@importeMax", importeMax);
+            }
+
+            if (where.Count > 0)
+            {
+                sql += " WHERE " + string.Join(" AND ", where);
+            }
+
+            command.CommandText = sql;
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new Pago
+                {
+                    IdPago = (int)reader["id_pago"],
+                    IdContrato = (int)reader["id_contrato"],
+                    FechaPago = (DateTime)reader["fecha_pago"],
+                    Importe = (decimal)reader["importe"],
+                    Detalle = reader["detalle"]?.ToString(),
+                    Contrato = new Contrato
+                    {
+                        IdContrato = (int)reader["id_contrato"],
+                        IdInquilino = (int)reader["id_inquilino"],
+                        Inquilino = new Inquilino
+                        {
+                            Nombre = reader["InquilinoNombre"].ToString()!,
+                            Apellido = reader["InquilinoApellido"].ToString()!
+                        },
+                        Inmueble = new Inmueble
+                        {
+                            NombreInmueble = reader["nombre_inmueble"].ToString()!
+                        }
+                    }
+                });
+            }
+
+            return lista;
+        }
+
+
+        //Obtenemos los pagos de un contrato
+        public List<Pago> ObtenerPorContrato(int idContrato)
+        {
+            var lista = new List<Pago>();
+            using var conn = _dbConnection.GetConnection();
+
+            var sql = @"SELECT p.*, c.id_inquilino, q.Nombre AS InquilinoNombre, q.Apellido AS InquilinoApellido,
+                       i.nombre_inmueble
+                FROM pago p
+                INNER JOIN contrato c ON p.id_contrato = c.id_contrato
+                INNER JOIN inquilino q ON c.id_inquilino = q.id_inquilino
+                INNER JOIN inmueble i ON c.id_inmueble = i.id_inmueble
+                WHERE p.id_contrato = @idContrato";
+
+            using var command = new MySqlCommand(sql, conn);
+            command.Parameters.AddWithValue("@idContrato", idContrato);
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new Pago
+                {
+                    IdPago = (int)reader["id_pago"],
+                    IdContrato = (int)reader["id_contrato"],
+                    FechaPago = (DateTime)reader["fecha_pago"],
+                    Importe = (decimal)reader["importe"],
+                    Detalle = reader["detalle"]?.ToString(),
+                    Contrato = new Contrato
+                    {
+                        IdContrato = (int)reader["id_contrato"],
+                        IdInquilino = (int)reader["id_inquilino"],
+                        Inquilino = new Inquilino
+                        {
+                            Nombre = reader["InquilinoNombre"].ToString()!,
+                            Apellido = reader["InquilinoApellido"].ToString()!
+                        },
+                        Inmueble = new Inmueble
+                        {
+                            NombreInmueble = reader["nombre_inmueble"].ToString()!
+                        }
+                    }
+                });
+            }
+
+            return lista;
+        }
+
+
         // Método para obtener un pago por ID
         public Pago? GetById(int id)
         {
