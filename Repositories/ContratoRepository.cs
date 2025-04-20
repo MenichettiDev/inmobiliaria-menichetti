@@ -275,16 +275,20 @@ namespace InmobiliariaApp.Repositories
         // Método para agregar un nuevo contrato
         public void Add(Contrato contrato)
         {
+            // Validaciones
+            ValidarFechas(contrato.FechaInicio, contrato.FechaFin);
+            ValidarMonto(contrato.MontoMensual);
+
+            if (InmuebleEstaOcupado(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin))
+                throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
+
+            using var connection = _dbConnection.GetConnection();
+            // connection.Open();
+            using var transaction = connection.BeginTransaction();
+
             try
             {
-                // Validaciones
-                ValidarFechas(contrato.FechaInicio, contrato.FechaFin);
-                ValidarMonto(contrato.MontoMensual);
 
-                if (InmuebleEstaOcupado(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin))
-                    throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
-
-                using var connection = _dbConnection.GetConnection();
                 using var command = new MySqlCommand(
                     "INSERT INTO contrato (id_inquilino, id_inmueble, fecha_inicio, fecha_fin, monto_mensual, creado_por) " +
                     "VALUES (@IdInquilino, @IdInmueble, @FechaInicio, @FechaFin, @MontoMensual, @CreadoPor)", connection);
@@ -297,20 +301,30 @@ namespace InmobiliariaApp.Repositories
                 command.Parameters.AddWithValue("@CreadoPor", contrato.CreadoPor ?? (object)DBNull.Value);
 
                 command.ExecuteNonQuery();
+
+                // Obtenemos el ID del contrato recién insertado
+                int contratoId = (int)command.LastInsertedId;
+
+                // Generamos los pagos
+                GenerarPagos(connection, transaction, contratoId, contrato.FechaInicio, contrato.FechaFin, contrato.MontoMensual);
+                transaction.Commit();
             }
             catch (MySqlException ex)
             {
                 // Error de base de datos
+                transaction.Rollback();
                 throw new Exception("Error al insertar el contrato en la base de datos. Detalles: " + ex.Message, ex);
             }
             catch (InvalidOperationException ex)
             {
                 // Error de lógica, como inmueble ocupado
+                transaction.Rollback();
                 throw new Exception("No se pudo completar la operación: " + ex.Message, ex);
             }
             catch (Exception ex)
             {
                 // Cualquier otro error
+                transaction.Rollback();
                 throw new Exception("Ocurrió un error inesperado al agregar el contrato. Detalles: " + ex.Message, ex);
             }
         }
@@ -318,16 +332,19 @@ namespace InmobiliariaApp.Repositories
 
         public void RenovarContrato(Contrato contratoBase, DateTime nuevaFechaInicio, DateTime nuevaFechaFin)
         {
+            // Validaciones
+            ValidarFechas(nuevaFechaInicio, nuevaFechaFin);
+            ValidarMonto(contratoBase.MontoMensual);
+
+            if (InmuebleEstaOcupado(contratoBase.IdInmueble, nuevaFechaInicio, nuevaFechaFin))
+                throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
+
+            using var connection = _dbConnection.GetConnection();
+            // connection.Open();
+            using var transaction = connection.BeginTransaction();
+
             try
             {
-                // Validaciones
-                ValidarFechas(nuevaFechaInicio, nuevaFechaFin);
-                ValidarMonto(contratoBase.MontoMensual);
-
-                if (InmuebleEstaOcupado(contratoBase.IdInmueble, nuevaFechaInicio, nuevaFechaFin))
-                    throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
-
-                using var connection = _dbConnection.GetConnection();
                 using var command = new MySqlCommand(
                     @"INSERT INTO contrato (
                 id_inquilino, 
@@ -354,10 +371,15 @@ namespace InmobiliariaApp.Repositories
                 command.Parameters.AddWithValue("@CreadoPor", contratoBase.CreadoPor ?? (object)DBNull.Value);
 
                 command.ExecuteNonQuery();
+                int contratoId = (int)command.LastInsertedId;
+
+                GenerarPagos(connection, transaction, contratoId, nuevaFechaInicio, nuevaFechaFin, contratoBase.MontoMensual);
+                transaction.Commit();
             }
             catch (Exception ex)
             {
                 // Podés loguear el error si usás un logger, o lanzar uno más específico si preferís
+                transaction.Rollback();
                 Console.WriteLine($"[ERROR] al renovar contrato: {ex.Message}");
                 throw new Exception("Error al renovar el contrato: " + ex.Message, ex);
             }
@@ -465,6 +487,52 @@ namespace InmobiliariaApp.Repositories
 
             var count = Convert.ToInt32(command.ExecuteScalar());
             return count > 0;
+        }
+        //Metodo para generar pagos automaticios==============================================
+        private void GenerarPagos(MySqlConnection connection, MySqlTransaction transaction, int contratoId, DateTime fechaInicio, DateTime fechaFin, decimal montoMensual)
+        {
+            try
+            {
+                using var command = new MySqlCommand(
+                    "INSERT INTO pago (id_contrato, numero_cuota, fecha_estimada, importe) VALUES (@ContratoId, @NumeroCuota, @FechaEstimada, @Importe)",
+                    connection,
+                    transaction);
+
+                var fechaCuota = fechaInicio;
+                int numeroCuota = 1;
+
+                while (fechaCuota <= fechaFin)
+                {
+                    command.Parameters.Clear();
+                    command.Parameters.AddWithValue("@ContratoId", contratoId);
+                    command.Parameters.AddWithValue("@NumeroCuota", numeroCuota);
+                    command.Parameters.AddWithValue("@FechaEstimada", fechaCuota);
+                    command.Parameters.AddWithValue("@Importe", montoMensual);
+                    command.ExecuteNonQuery();
+
+                    fechaCuota = AjustarFechaMensual(fechaInicio, numeroCuota);
+                    numeroCuota++;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Podés loguearlo si tenés logger
+                Console.WriteLine($"[ERROR] al generar pagos del contrato {contratoId}: {ex.Message}");
+                throw new Exception("Error al generar los pagos del contrato: " + ex.Message, ex);
+            }
+        }
+
+        private DateTime AjustarFechaMensual(DateTime fechaBase, int mesesASumar)
+        {
+            var nuevaFecha = fechaBase.AddMonths(mesesASumar);
+
+            // Si el día original no existe en el nuevo mes, se ajusta al último día del mes
+            if (fechaBase.Day > DateTime.DaysInMonth(nuevaFecha.Year, nuevaFecha.Month))
+            {
+                return new DateTime(nuevaFecha.Year, nuevaFecha.Month, DateTime.DaysInMonth(nuevaFecha.Year, nuevaFecha.Month));
+            }
+
+            return new DateTime(nuevaFecha.Year, nuevaFecha.Month, fechaBase.Day);
         }
 
 

@@ -30,7 +30,7 @@ namespace InmobiliariaApp.Repositories
                 {
                     IdPago = reader.GetInt32("id_pago"),
                     IdContrato = reader.GetInt32("id_contrato"),
-                    FechaPago = reader.GetDateTime("fecha_pago"),
+                    FechaPago = reader.GetDateTime("fecha_estimada"),
                     Importe = reader.GetDecimal("importe"),
                     Detalle = reader.IsDBNull(reader.GetOrdinal("detalle"))
                         ? null
@@ -86,13 +86,13 @@ namespace InmobiliariaApp.Repositories
 
             if (fechaDesde.HasValue)
             {
-                where.Add("p.fecha_pago >= @fechaDesde");
+                where.Add("p.fecha_estimada >= @fechaDesde");
                 command.Parameters.AddWithValue("@fechaDesde", fechaDesde);
             }
 
             if (fechaHasta.HasValue)
             {
-                where.Add("p.fecha_pago <= @fechaHasta");
+                where.Add("p.fecha_estimada <= @fechaHasta");
                 command.Parameters.AddWithValue("@fechaHasta", fechaHasta);
             }
 
@@ -122,7 +122,7 @@ namespace InmobiliariaApp.Repositories
                 {
                     IdPago = (int)reader["id_pago"],
                     IdContrato = (int)reader["id_contrato"],
-                    FechaPago = (DateTime)reader["fecha_pago"],
+                    FechaPago = (DateTime)reader["fecha_estimada"],
                     Importe = (decimal)reader["importe"],
                     Detalle = reader["detalle"]?.ToString(),
                     Contrato = new Contrato
@@ -170,8 +170,9 @@ namespace InmobiliariaApp.Repositories
                 {
                     IdPago = (int)reader["id_pago"],
                     IdContrato = (int)reader["id_contrato"],
-                    FechaPago = (DateTime)reader["fecha_pago"],
+                    FechaPago = (DateTime)reader["fecha_estimada"],
                     Importe = (decimal)reader["importe"],
+                    NumeroCuota = (int)reader["numero_cuota"],
                     Detalle = reader["detalle"]?.ToString(),
                     Contrato = new Contrato
                     {
@@ -208,7 +209,7 @@ namespace InmobiliariaApp.Repositories
                 {
                     IdPago = reader.GetInt32("id_pago"),
                     IdContrato = reader.GetInt32("id_contrato"),
-                    FechaPago = reader.GetDateTime("fecha_pago"),
+                    FechaPago = reader.GetDateTime("fecha_estimada"),
                     Importe = reader.GetDecimal("importe"),
                     Detalle = reader.IsDBNull(reader.GetOrdinal("detalle"))
                         ? null
@@ -233,7 +234,7 @@ namespace InmobiliariaApp.Repositories
         {
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                "INSERT INTO pago (id_contrato, fecha_pago, importe, detalle, creado_por, modificado_por, eliminado_por) " +
+                "INSERT INTO pago (id_contrato, fecha_estimada, importe, detalle, creado_por, modificado_por, eliminado_por) " +
                 "VALUES (@ContratoId, @FechaPago, @Importe, @Detalle, @CreadoPor, @ModificadoPor, @EliminadoPor)", connection);
 
             command.Parameters.AddWithValue("@ContratoId", pago.IdContrato);
@@ -252,7 +253,7 @@ namespace InmobiliariaApp.Repositories
         {
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                "UPDATE pago SET id_contrato = @ContratoId, fecha_pago = @FechaPago, importe = @Importe, " +
+                "UPDATE pago SET id_contrato = @ContratoId, fecha_estimada = @FechaPago, importe = @Importe, " +
                 "detalle = @Detalle, creado_por = @CreadoPor, modificado_por = @ModificadoPor, eliminado_por = @EliminadoPor " +
                 "WHERE id_pago = @Id", connection);
 
@@ -277,5 +278,10 @@ namespace InmobiliariaApp.Repositories
 
             command.ExecuteNonQuery();
         }
+
+        
+
+
+
     }
 }
