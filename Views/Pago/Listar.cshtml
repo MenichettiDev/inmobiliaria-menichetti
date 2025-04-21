@@ -93,6 +93,10 @@
                     {
                         <a asp-action="PagoCuota" asp-route-id="@p.IdPago" class="btn btn-success">Pagar</a>
                     }
+                    @if (p.Estado == "Pagado")
+                    {
+                        <a asp-action="Eliminar" asp-route-id="@p.IdPago" class="btn btn-danger">Anular</a>
+                    }
                 </td>
             </tr>
         }

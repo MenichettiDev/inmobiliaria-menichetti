@@ -4,9 +4,9 @@
     ViewData["Title"] = "Eliminar Pago";
 }
 
-<h1>Eliminar Pago</h1>
+<h1>Anular Pago</h1>
 
-<h3>¿Está seguro de que desea eliminar este pago?</h3>
+<h3>¿Está seguro de que desea anular este pago?</h3>
 <div>
     <h4>Pago</h4>
     <hr />
@@ -32,7 +32,7 @@
 
     <form asp-action="Eliminar">
         <input type="hidden" asp-for="IdPago" />
-        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
+        <input type="submit" value="Anular Pago" class="btn btn-danger" /> |
         <a asp-action="Listar" class="btn btn-secondary" >Volver a la Lista</a>
     </form>
 </div>

@@ -298,7 +298,7 @@ namespace InmobiliariaApp.Repositories
         public void Delete(int id)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("DELETE FROM pago WHERE id_pago = @Id", connection);
+            using var command = new MySqlCommand("UPDATE pago SET estado = 'Anulado' where id_pago = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
 
             command.ExecuteNonQuery();
