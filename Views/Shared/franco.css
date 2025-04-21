@@ -1,0 +1,63 @@
+/* ========== GLOBAL ========== */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #F5F5F5;
+    margin: 0;
+    padding: 0;
+}
+
+/* ========== LINKS GENERALES ========== */
+a {
+    color: #1B4F3B;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #FFC72C;
+    text-decoration: underline;
+}
+
+/* ========== BOTONES ========== */
+.btn-primary {
+    background-color: #1B4F3B;
+    border-color: #1B4F3B;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #FFC72C;
+    color: #1B4F3B;
+    font-weight: bold;
+    border-color: #FFC72C;
+}
+
+/* ========== BORDES UTILITARIOS ========== */
+.border-top {
+    border-top: 1px solid #e5e5e5;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* ========== SOMBRAS ========== */
+.box-shadow {
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+}
+
+/* ========== FOOTER CLEAN ========== */
+footer.footer {
+    background-color: transparent;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    border-top: 1px solid #e5e5e5;
+}
+
+/* ========== NAVBAR BRAND (si se usa) ========== */
+a.navbar-brand {
+    white-space: normal;
+    text-align: center;
+    word-break: break-word;
+}

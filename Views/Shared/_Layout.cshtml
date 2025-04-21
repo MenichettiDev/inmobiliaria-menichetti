@@ -9,18 +9,39 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/inmobiliaria_menichetti.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        /* Estilos para el sidebar */
+        /* ========== ESTILOS GLOBALES ========== */
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #F5F5F5;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        a {
+            color: #1B4F3B;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #FFC72C;
+            text-decoration: underline;
+        }
+
+        /* ========== SIDEBAR ========== */
         .sidebar {
-            background-color: #1B4F3B; /* Verde de la camiseta de rugby de Sudáfrica */
+            background-color: #1B4F3B;
             color: #fff;
             height: 100vh;
             position: fixed;
             width: 250px;
             overflow-y: auto;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
         }
 
         .sidebar a {
@@ -32,8 +53,8 @@
         }
 
         .sidebar a:hover {
-            background-color: #FFC72C; /* Amarillo tranquilo */
-            color: #1B4F3B; /* Cambia el texto a verde oscuro */
+            background-color: #FFC72C;
+            color: #1B4F3B;
         }
 
         .sidebar .active {
@@ -41,57 +62,160 @@
             color: #1B4F3B;
         }
 
-        
-        /* Ajuste para el contenido principal */
+        .sidebar a.nav-link {
+            transition: background-color 0.3s ease, transform 0.2s;
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+        }
+
+        .sidebar a.nav-link:hover {
+            background-color: #FFC72C;
+            color: #1C3F2B !important;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+
+
+        /* ========== BOTONES ========== */
+        .btn-primary {
+            background-color: #1B4F3B;
+            border-color: #1B4F3B;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #FFC72C;
+            color: #1B4F3B;
+            font-weight: bold;
+            border-color: #FFC72C;
+        }
+
+        /* ========== FOOTER ========== */
+        footer.footer {
+            background-color: transparent;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #555;
+            border-top: 1px solid #e5e5e5;
+            margin-top: auto;
+        }
+
+        .border-top {
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .box-shadow {
+            box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
+        }
+
+        a.navbar-brand {
+            white-space: normal;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .footer {
+            background-color: #1C3F2B;
+            /* Un verde más oscuro para destacarse */
+            color: #fff;
+            font-size: 0.9rem;
+            padding: 20px 0;
+            /* Un poco de espacio en el pie */
+            width: 100%;
+            /* Asegura que ocupe todo el ancho */
+            position: relative;
+            /* Para que no se quede pegado al contenido */
+            bottom: 0;
+            /* Siempre al final */
+            margin-left: 0;
+            /* Quitar el margen izquierdo que lo limita por el sidebar */
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            /* Sombra para dar profundidad */
+        }
+
+        .footer a {
+            color: #FFC72C;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #fff;
+        }
+
+        .footer .container {
+            max-width: 100%;
+            padding: 0 20px;
+            /* Espaciado a los lados */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer .text-muted {
+            font-size: 0.8rem;
+            text-align: left;
+        }
+
+        .footer .social-icons a {
+            margin-right: 15px;
+        }
+
+
+        /* ========== CONTENIDO PRINCIPAL ========== */
         .main-content {
-            background-color: #4c7053c3; /* Gris muy claro */
-            margin-left: 250px; /* Ancho del sidebar */
-            padding: 20px;
-        }
-
-        /* Estilo para el fondo del contenido principal */
-        main {
-            background-color: #F5F5F5; /* Gris muy claro */
-            border-radius: 8px; /* Bordes redondeados */
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-        }
-
-        /* Footer ajustado */
-        footer {
+            background-color: #4c7053c3;
             margin-left: 250px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: calc(100% - 250px);
+        }
+
+        main {
+            background-color: #F5F5F5;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
         }
     </style>
+
 </head>
 
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
-        <h4 class="text-center py-3" style="color: #FFC72C;">Menichetti Propiedades</h4>
-        <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-        @* @if (Context.Session.GetString("Usuario") != null)
-        { *@
-            <a class="nav-link text-white" asp-controller="Propietario" asp-action="Listar">Propietarios</a>
-            <a class="nav-link text-white" asp-controller="Inquilino" asp-action="Listar">Inquilinos</a>
-            <a class="nav-link text-white" asp-controller="Inmueble" asp-action="Listar">Inmuebles</a>
-            <a class="nav-link text-white" asp-controller="Contrato" asp-action="Listar">Contratos</a>
-            <a class="nav-link text-white" asp-controller="TipoInmueble" asp-action="Listar">Tipos Inmuebles</a>
-            <a class="nav-link text-white" asp-controller="Pago" asp-action="Listar">Pagos</a>
-            <a class="nav-link text-white" asp-controller="Usuario" asp-action="Listar">Usuarios</a>
-        @* }
-        @if (Context.Session.GetString("Rol") == "Administrador")
-        { *@
-            <a class="nav-link text-white" asp-controller="Usuario" asp-action="Listar">Administrar Usuarios</a>
-        @* } *@
+    <div class="sidebar" style="background-color: #1C3F2B; min-height: 100vh; padding: 1rem;">
+        <div class="text-center mb-4">
+            <h4
+                style="color: #FFC72C; font-family: 'Georgia', serif; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                🏠 Menichetti Propiedades
+            </h4>
+            <hr style="border-top: 1px solid #FFC72C; width: 60%; margin: 0.5rem auto;">
+        </div>
+
+        <a class="nav-link text-white mb-2" asp-area="" asp-controller="Home" asp-action="Index">🏡 Inicio</a>
+        <a class="nav-link text-white mb-2" asp-controller="Propietario" asp-action="Listar">👤 Propietarios</a>
+        <a class="nav-link text-white mb-2" asp-controller="Inquilino" asp-action="Listar">👥 Inquilinos</a>
+        <a class="nav-link text-white mb-2" asp-controller="Inmueble" asp-action="Listar">🏢 Inmuebles</a>
+        <a class="nav-link text-white mb-2" asp-controller="Contrato" asp-action="Listar">📄 Contratos</a>
+        <a class="nav-link text-white mb-2" asp-controller="TipoInmueble" asp-action="Listar">📦 Tipos de Inmuebles</a>
+        <a class="nav-link text-white mb-2" asp-controller="Pago" asp-action="Listar">💰 Pagos</a>
+        <a class="nav-link text-white mb-2" asp-controller="Usuario" asp-action="Listar">🔐 Usuarios</a>
+        <a class="nav-link text-white mb-4" asp-controller="Usuario" asp-action="Listar">⚙️ Admin Usuarios</a>
+
         @if (Context.Session.GetString("Usuario") != null)
         {
-            <a class="nav-link text-white" asp-controller="Login" asp-action="Logout">Cerrar Sesión</a>
+            <a class="nav-link text-white" asp-controller="Login" asp-action="Logout">🚪 Cerrar Sesión</a>
         }
         else
         {
-            <a class="nav-link text-white" asp-controller="Login" asp-action="Index">Iniciar Sesión</a>
+            <a class="nav-link text-white" asp-controller="Login" asp-action="Index">🔑 Iniciar Sesión</a>
         }
     </div>
+
+
 
     <!-- Contenido Principal -->
     <div class="main-content">
@@ -101,11 +225,26 @@
             </main>
         </div>
 
-        <footer class="border-top footer text-muted">
-            <div class="container">
-                &copy; 2025 - Menichetti Propiedades - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <footer class="footer mt-auto">
+            <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center py-3">
+                <div class="text-muted small">
+                    &copy; 2025 - Menichetti Propiedades<br />
+                    <span>Av. Siempre Viva 123, Mendoza</span> · <span>Tel: (261) 123-4567</span>
+                </div>
+                <div class="mt-2 mt-md-0">
+                    <a href="https://www.instagram.com" target="_blank" class="text-muted me-3">
+                        <i class="bi bi-instagram fs-5"></i>
+                    </a>
+                    <a href="https://www.facebook.com" target="_blank" class="text-muted me-3">
+                        <i class="bi bi-facebook fs-5"></i>
+                    </a>
+                    <a href="mailto:contacto@menichetti.com" class="text-muted">
+                        <i class="bi bi-envelope-fill fs-5"></i>
+                    </a>
+                </div>
             </div>
         </footer>
+
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
