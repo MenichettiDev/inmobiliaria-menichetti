@@ -28,6 +28,7 @@ namespace InmobiliariaApp.Controllers
 
         public IActionResult Listar(int? idInquilino, int? idInmueble, DateTime? fechaDesde, DateTime? fechaHasta, decimal? montoDesde, decimal? montoHasta, string? estado, int? activo, int? venceEnDias)
         {
+            activo = 1; // Solo activos
             ViewBag.Inquilinos = _inquilinoRepo.GetAll();
             ViewBag.Inmuebles = _inmuebleRepo.GetAll();
 
@@ -47,12 +48,14 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de creación
-        public IActionResult Insertar()
+        public IActionResult Insertar(int? id)
         {
             var inquilinos = _inquilinoRepo.GetAll();
             ViewBag.Inquilinos = new SelectList(inquilinos, "IdInquilino", "NombreCompleto");
             var inmuebles = _inmuebleRepo.GetAll();
-            ViewBag.Inmuebles = new SelectList(inmuebles, "IdInmueble", "NombreInmueble");
+            ViewBag.IdSeleccionado = id;
+            ViewBag.Inmuebles = new SelectList(inmuebles, "IdInmueble", "NombreInmueble", id);
+
 
             return View();
         }

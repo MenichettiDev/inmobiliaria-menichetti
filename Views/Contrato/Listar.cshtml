@@ -80,6 +80,7 @@
                 <option value="vigente" selected="@(Context.Request.Query["estado"] == "vigente")">Vigente</option>
                 <option value="terminado" selected="@(Context.Request.Query["estado"] == "terminado")">Terminado
                 </option>
+                <option value="finalizado" selected="@(Context.Request.Query["estado"] == "vigente")">Cancelado</option>
             </select>
         </div>
         <div class="col-md-2">
@@ -92,14 +93,14 @@
             </select>
         </div>
 
-        <div class="col-md-2">
+        @* <div class="col-md-2">
             <label>Activo</label>
             <select name="activo" class="form-control">
                 <option value="">Todos</option>
                 <option value="1" selected="@(Context.Request.Query["activo"] == "1")">Activo</option>
                 <option value="0" selected="@(Context.Request.Query["activo"] == "0")">Inactivo</option>
             </select>
-        </div>
+        </div> *@
         <div class="col-md-2 d-flex align-items-end">
             <button type="submit" class="btn btn-primary w-100">Filtrar</button>
         </div>

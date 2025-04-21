@@ -61,6 +61,17 @@
             </select>
         </div>
 
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-2">
+            <label>Activo</label>
+            <select name="activo" class="form-control">
+                <option value="1" selected="@(Context.Request.Query["activo"] == "1")">Activo</option>
+                <option value="0" selected="@(Context.Request.Query["activo"] == "0")">Inactivo</option>
+                <option value="">Todos</option>
+            </select>
+        </div>
+
         <div class="col-md-2 d-flex align-items-end">
             <button type="submit" class="btn btn-primary w-100">Filtrar</button>
         </div>
@@ -115,12 +126,13 @@
                     <a asp-action="Editar" asp-route-id="@item.IdInmueble" class="btn btn-warning">Editar</a> |
                     @if (item.Activo == 1)
                     {
-                        <a asp-action="Eliminar" asp-route-id="@item.IdInmueble" class="btn btn-danger">Eliminar</a>
+                        <a asp-action="Eliminar" asp-route-id="@item.IdInmueble" class="btn btn-danger">Suspender</a>
                     }
                     else
                     {
                         <a asp-action="Eliminar" asp-route-id="@item.IdInmueble" class="btn btn-success">Reactivar</a>
                     }
+                    <a asp-controller="Contrato" asp-action="Insertar" asp-route-id="@item.IdInmueble" class="btn btn-success">Crear Contrato</a>
                 </td>
             </tr>
         }
