@@ -494,7 +494,7 @@ namespace InmobiliariaApp.Repositories
             try
             {
                 using var command = new MySqlCommand(
-                    "INSERT INTO pago (id_contrato, numero_cuota, fecha_estimada, importe) VALUES (@ContratoId, @NumeroCuota, @FechaEstimada, @Importe)",
+                    "INSERT INTO pago (id_contrato, numero_cuota, fecha_vencimiento, importe) VALUES (@ContratoId, @NumeroCuota, @FechaVencimiento, @Importe)",
                     connection,
                     transaction);
 
@@ -506,7 +506,7 @@ namespace InmobiliariaApp.Repositories
                     command.Parameters.Clear();
                     command.Parameters.AddWithValue("@ContratoId", contratoId);
                     command.Parameters.AddWithValue("@NumeroCuota", numeroCuota);
-                    command.Parameters.AddWithValue("@FechaEstimada", fechaCuota);
+                    command.Parameters.AddWithValue("@FechaVencimiento", fechaCuota);
                     command.Parameters.AddWithValue("@Importe", montoMensual);
                     command.ExecuteNonQuery();
 

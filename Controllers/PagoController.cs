@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InmobiliariaApp.Controllers
 {
@@ -22,12 +23,15 @@ namespace InmobiliariaApp.Controllers
         // }
 
         //Listar con filtros
-        public IActionResult Listar(int? idContrato, int? idInquilino, DateTime? desde, DateTime? hasta, decimal? importeMin, decimal? importeMax)
+        public IActionResult Listar(int? idContrato, int? idInquilino, DateTime? desde, DateTime? hasta, decimal? importeMin, decimal? importeMax, string estado)
         {
-            ViewBag.Contratos = _contratoRepository.GetAll(); // para el dropdown
-            var pagos = _pagoRepository.ObtenerFiltrados(idContrato, idInquilino, desde, hasta, importeMin, importeMax);
+            ViewBag.Contratos = _contratoRepository.GetAll();
+            ViewBag.EstadoSeleccionado = estado; // para mostrar el seleccionado en el HTML
+
+            var pagos = _pagoRepository.ObtenerFiltrados(idContrato, idInquilino, desde, hasta, importeMin, importeMax, estado);
             return View(pagos);
         }
+
         public IActionResult ListarDesde(int id)
         {
             var pagos = _pagoRepository.ObtenerPorContrato(id);
@@ -47,18 +51,62 @@ namespace InmobiliariaApp.Controllers
             return View(pago);
         }
 
-        // Acción para mostrar el formulario de creación
-        // GET: Pago/Insertar/5
-        public IActionResult Insertar(int id) // este id es el IdContrato
+        public IActionResult PagoCuota(int id)
         {
+            var pago = _pagoRepository.GetById(id);
+
+            if (pago == null)
+            {
+                return NotFound("Pago no encontrado.");
+            }
+
+            return View(pago);
+        }
+
+        [HttpPost]
+        public IActionResult PagoCuota(int id, Pago pago)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("PagoCuota", pago); // vuelve al form con validaciones
+            }
+
+            pago.Estado = "Pagado";
+
+            if (ModelState.IsValid)
+            {
+
+                _pagoRepository.Update(pago);
+
+                ViewData["Mensaje"] = "Pago realizado con éxito.";
+                ViewData["TipoMensaje"] = "success"; // o "error" según corresponda
+                return RedirectToAction("Listar"); // Redirige a la lista de pagos
+            }
+            return View(pago);
+        }
+
+        public IActionResult Insertar()
+        {
+            var contratos = _contratoRepository.GetAll(); // método que deberías tener
+
+            // Creamos una lista de objetos anónimos con Id y Descripción
+            var items = contratos.Select(c => new
+            {
+                Id = c.IdContrato,
+                Descripcion = $"#{c.IdContrato} - {c.Inmueble?.NombreInmueble} ({c.Inmueble?.Direccion})"
+            });
+
+            ViewBag.Contratos = new SelectList(items, "Id", "Descripcion");
+
             var pago = new Pago
             {
-                IdContrato = id,
-                FechaPago = DateTime.Today
+                FechaPago = DateTime.Today,
+                Estado = "Pagado"
             };
 
-            return View("Insertar", pago); // te aseguras de que el campo se llene
+            return View("Insertar", pago);
         }
+
 
 
         // Acción para procesar el formulario de creación
@@ -67,11 +115,19 @@ namespace InmobiliariaApp.Controllers
         {
             if (ModelState.IsValid)
             {
+                pago.FechaPago = DateTime.Today;
+                pago.Estado = "Pagado";
+
                 _pagoRepository.Add(pago);
-                return RedirectToAction("Listar"); // Redirige a la lista de pagos
+                return RedirectToAction("Listar");
             }
+
+            // volver a cargar los contratos si falla el modelo
+            var contratos = _contratoRepository.GetAll();
+            ViewBag.Contratos = new SelectList(contratos, "IdContrato", "Descripcion");
             return View(pago);
         }
+
 
         // Acción para mostrar el formulario de edición
         public IActionResult Editar(int id)
@@ -95,6 +151,7 @@ namespace InmobiliariaApp.Controllers
 
             if (ModelState.IsValid)
             {
+
                 _pagoRepository.Update(pago);
                 return RedirectToAction("Listar"); // Redirige a la lista de pagos
             }

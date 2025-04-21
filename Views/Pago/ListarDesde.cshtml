@@ -14,9 +14,12 @@
     <thead>
         <tr>
             <th>ID Pago</th>
-            <th>Fecha</th>
+            <th>Nro Cuota</th>
+            <th>Fecha Vencimiento</th>
             <th>Importe</th>
             <th>Detalle</th>
+            <th>Acciones</th>
+
         </tr>
     </thead>
     <tbody>
@@ -24,9 +27,20 @@
         {
             <tr>
                 <td>@p.IdPago</td>
-                <td>@p.FechaPago.ToString("dd/MM/yyyy")</td>
+                <td>@p.NumeroCuota</td>
+                <td>@p.FechaVencimiento.ToString("dd/MM/yyyy")</td>
+                <td>@p.FechaPago</td>
                 <td>@p.Importe.ToString("C")</td>
+                <td>@p.Estado</td>
                 <td>@p.Detalle</td>
+                <td>
+                    <a asp-action="Detalles" asp-route-id="@p.IdPago" class="btn btn-info">Detalles</a>
+                    <a asp-action="Editar" asp-route-id="@p.IdPago" class="btn btn-warning">Editar</a>
+                    @if (p.Estado == "Pendiente")
+                    {
+                        <a asp-action="PagoCuota" asp-route-id="@p.IdPago" class="btn btn-success">Pagar</a>
+                    }
+                </td>
             </tr>
         }
     </tbody>

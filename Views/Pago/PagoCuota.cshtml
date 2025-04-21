@@ -4,21 +4,20 @@
     ViewData["Title"] = "Editar Pago";
 }
 
-<h1>Editar Pago</h1>
+<h1>Pago de Cuota de contrato</h1>
 
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Editar">
+        <form asp-action="PagoCuota" asp-route-id="@Model.IdPago">
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdPago" />
 
             <div class="form-group">
                 <label asp-for="IdPago" class="control-label">ID Pago</label>
                 <input asp-for="IdPago" class="form-control" readonly/>
                 <span asp-validation-for="IdPago" class="text-danger"></span>
             </div>
-
             <div class="form-group">
                 <label asp-for="IdContrato" class="control-label">ID Contrato</label>
                 <input asp-for="IdContrato" class="form-control" readonly/>
@@ -26,21 +25,15 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="NumeroCuota" class="control-label">Numero de cuota</label>
+                <label asp-for="NumeroCuota" class="control-label">Nro Cuota</label>
                 <input asp-for="NumeroCuota" class="form-control" readonly/>
                 <span asp-validation-for="NumeroCuota" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="FechaVencimiento" class="control-label">Vencimiento</label>
+                <label asp-for="FechaVencimiento" class="control-label">Fecha de Vencimiento</label>
                 <input asp-for="FechaVencimiento" class="form-control" type="date" readonly/>
                 <span asp-validation-for="FechaVencimiento" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="FechaPago" class="control-label">Fecha de Pago</label>
-                <input asp-for="FechaPago" class="form-control" type="date" readonly/>
-                <span asp-validation-for="FechaPago" class="text-danger"></span>
             </div>
 
             <div class="form-group">
@@ -57,7 +50,7 @@
 
             <div class="form-group">
                 <a asp-action="Listar" class="btn btn-secondary">Volver a la Lista</a>
-                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <input type="submit" value="Cargar Pago" class="btn btn-primary" />
             </div>
         </form>
     </div>
