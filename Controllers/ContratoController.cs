@@ -69,7 +69,7 @@ namespace InmobiliariaApp.Controllers
                     ViewBag.Inquilinos = new SelectList(inquilinos, "IdInquilino", "NombreCompleto");
                     var inmuebles = _inmuebleRepo.GetAll();
                     ViewBag.Inmuebles = new SelectList(inmuebles, "IdInmueble", "NombreInmueble");
-                    
+
                     ViewBag.ErrorMessage = "Por favor complete correctamente todos los campos del formulario.";
 
                     return View(contrato);
@@ -138,36 +138,6 @@ namespace InmobiliariaApp.Controllers
         }
 
 
-
-        // Acción para suspender el contrato
-        [HttpPost]
-        public IActionResult BajaLogica(int id)
-        {
-            var contrato = _contratoRepository.GetById(id);
-            if (contrato == null)
-            {
-                return NotFound(); // Retorna un error 404 si no se encuentra el contrato
-            }
-
-            _contratoRepository.bajaLogica(contrato);
-
-            return RedirectToAction("Listar"); // Redirige a la lista de contrato
-        }
-        // Acción para activar el contrato
-        [HttpPost]
-        public IActionResult AltaLogica(int id)
-        {
-            var contrato = _contratoRepository.GetById(id);
-            if (contrato == null)
-            {
-                return NotFound(); // Retorna un error 404 si no se encuentra el contrato
-            }
-
-            _contratoRepository.altaLogica(contrato);
-
-            return RedirectToAction("Listar"); // Redirige a la lista de contrato
-        }
-
         // Acción para mostrar la vista de confirmación de eliminación
         public IActionResult Eliminar(int id)
         {
@@ -179,12 +149,65 @@ namespace InmobiliariaApp.Controllers
             return View(contrato);
         }
 
-        // Acción para confirmar la eliminación
-        // [HttpPost, ActionName("Eliminar")]
-        // public IActionResult DeleteConfirmed(int id)
+        // Acción para confirmar la terminación anticipada del contrato
+        [HttpPost, ActionName("FinalizarAnticipadamente")]
+        public IActionResult FinalizarAnticipadamenteConfirmed(int id, DateTime fechaTerminacion)
+        {
+            try
+            {
+                var contrato = _contratoRepository.GetById(id);
+                if (contrato == null)
+                {
+                    return NotFound(); // Si el contrato no se encuentra
+                }
+
+                _contratoRepository.TerminarContratoAnticipadamente(id, fechaTerminacion);
+
+                TempData["SuccessMessage"] = "Contrato finalizado anticipadamente con éxito.";
+                return RedirectToAction("Listar");
+            }
+            catch (Exception ex)
+            {
+                // Captura errores y los muestra en la vista
+                ViewBag.ErrorMessage = $"Ocurrió un error al finalizar anticipadamente el contrato: {ex.Message}";
+
+                var contrato = _contratoRepository.GetById(id); // Volver a cargar el contrato para mostrar la vista
+                return View("Eliminar", contrato); // Mostramos la misma vista de confirmación con el error
+            }
+        }
+
+
+
+
+        // Acción para suspender el contrato
+        // [HttpPost]
+        // public IActionResult BajaLogica(int id)
         // {
-        //     _contratoRepository.Delete(id);
-        //     return RedirectToAction("Listar"); // Redirige a la lista de contratos
+        //     var contrato = _contratoRepository.GetById(id);
+        //     if (contrato == null)
+        //     {
+        //         return NotFound(); // Retorna un error 404 si no se encuentra el contrato
+        //     }
+
+        //     _contratoRepository.bajaLogica(contrato);
+
+        //     return RedirectToAction("Listar"); // Redirige a la lista de contrato
         // }
+        // // Acción para activar el contrato
+        // [HttpPost]
+        // public IActionResult AltaLogica(int id)
+        // {
+        //     var contrato = _contratoRepository.GetById(id);
+        //     if (contrato == null)
+        //     {
+        //         return NotFound(); // Retorna un error 404 si no se encuentra el contrato
+        //     }
+
+        //     _contratoRepository.altaLogica(contrato);
+
+        //     return RedirectToAction("Listar"); // Redirige a la lista de contrato
+        // }
+
+
     }
 }

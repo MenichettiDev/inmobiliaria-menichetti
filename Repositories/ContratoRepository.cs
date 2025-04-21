@@ -535,6 +535,105 @@ namespace InmobiliariaApp.Repositories
             return new DateTime(nuevaFecha.Year, nuevaFecha.Month, fechaBase.Day);
         }
 
+        //===============================MULTA y TERMINAR ANTICIPADO========================================================
+        public void TerminarContratoAnticipadamente(int idContrato, DateTime fechaTerminacion)
+        {
+            using var connection = _dbConnection.GetConnection();
+
+            var contrato = GetById(idContrato);
+            if (contrato == null)
+            {
+                throw new Exception("Contrato no encontrado.");
+            }
+
+            // VALIDACIONES
+            if (fechaTerminacion < DateTime.Today)
+            {
+                throw new Exception("La fecha de terminación no puede ser anterior al día de hoy.");
+            }
+
+            if (fechaTerminacion < contrato.FechaInicio || fechaTerminacion > contrato.FechaFin)
+            {
+                throw new Exception("La fecha de terminación debe estar dentro del período del contrato.");
+            }
+
+            if (contrato.Estado != "vigente")
+            {
+                throw new Exception("Solo se pueden finalizar contratos que están vigentes.");
+            }
+
+            if (contrato.FechaTerminacionAnticipada.HasValue)
+            {
+                throw new Exception("Este contrato ya fue terminado anticipadamente.");
+            }
+
+            // Calcular multa
+            var multa = CalcularMulta(fechaTerminacion, contrato.FechaInicio, contrato.MontoMensual);
+
+            // Registrar la multa como un nuevo pago
+            using var command = new MySqlCommand(
+                "INSERT INTO pago (id_contrato, importe, detalle, fecha_vencimiento) VALUES (@IdContrato, @Importe, @Detalle, @FechaVencimiento)",
+                connection);
+
+            command.Parameters.AddWithValue("@IdContrato", idContrato);
+            // command.Parameters.AddWithValue("@FechaPago", fechaTerminacion);
+            command.Parameters.AddWithValue("@Importe", multa);
+            command.Parameters.AddWithValue("@Detalle", $"Multa por terminación anticipada del contrato. Total: {multa}");
+            command.Parameters.AddWithValue("@FechaVencimiento", fechaTerminacion.AddDays(30));
+
+            command.ExecuteNonQuery();
+
+            // Actualizar el contrato
+            using var updateCommand = new MySqlCommand(
+                "UPDATE contrato SET estado = @Estado, fecha_terminacion_anticipada = @FechaTerminacion, multa = @Multa WHERE id_contrato = @IdContrato",
+                connection);
+
+            updateCommand.Parameters.AddWithValue("@Estado", "finalizado");
+            updateCommand.Parameters.AddWithValue("@FechaTerminacion", fechaTerminacion);
+            updateCommand.Parameters.AddWithValue("@Multa", multa);
+            updateCommand.Parameters.AddWithValue("@IdContrato", idContrato);
+
+            updateCommand.ExecuteNonQuery();
+            AnularPagosPosteriores(connection, idContrato, fechaTerminacion);
+
+        }
+
+
+
+
+        public decimal CalcularMulta(DateTime fechaTerminacion, DateTime fechaInicio, decimal montoMensual)
+        {
+            var duracionOriginal = fechaInicio - fechaTerminacion;
+            var fechaMedioContrato = fechaInicio.AddDays(duracionOriginal.Days / 2);
+
+            if (fechaTerminacion < fechaMedioContrato)
+            {
+                // Menos de la mitad del contrato, multa de 2 meses
+                return montoMensual * 2;
+            }
+            else
+            {
+                // Más de la mitad del contrato, multa de 1 mes
+                return montoMensual;
+            }
+        }
+
+        private void AnularPagosPosteriores(MySqlConnection connection, int idContrato, DateTime fechaTerminacion)
+        {
+            using var command = new MySqlCommand(
+                @"UPDATE pago 
+            SET estado = 'anulado' 
+            WHERE id_contrato = @IdContrato 
+            AND fecha_vencimiento > @FechaTerminacion 
+            AND (detalle IS NULL OR detalle NOT LIKE '%multa%')", connection);
+
+            command.Parameters.AddWithValue("@IdContrato", idContrato);
+            command.Parameters.AddWithValue("@FechaTerminacion", fechaTerminacion);
+
+            int rows = command.ExecuteNonQuery();
+            Console.WriteLine($"[INFO] {rows} pagos anulados posteriores a la terminación anticipada.");
+        }
+
 
     }
 }

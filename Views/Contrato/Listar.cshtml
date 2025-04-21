@@ -8,7 +8,7 @@
         Swal.fire({
             icon: 'success',
             title: '¡Éxito!',
-            text: 'El contrato se agregó correctamente',
+            text: 'submit operacion fue exitosa!',
             confirmButtonText: 'Cerrar',
             customClass: {
                 popup: 'rounded shadow'
@@ -137,15 +137,15 @@
                 <td>
                     <a asp-action="Detalles" asp-route-id="@item.IdContrato" class="btn btn-info">Detalles</a> |
                     @* <a asp-action="Editar" asp-route-id="@item.IdContrato" class="btn btn-warning">Editar</a> | *@
-                    @if (item.Activo == 1)
+                    @if (item.Estado == "vigente")
                     {
-                        <a asp-action="Eliminar" asp-route-id="@item.IdContrato" class="btn btn-danger">Dar Baja</a>
+                        <a asp-action="Eliminar" asp-route-id="@item.IdContrato" class="btn btn-danger">Finalizar</a>
                     }
-                    else
+                    @* else
                     {
                         <a asp-action="Eliminar" asp-route-id="@item.IdContrato" class="btn btn-success">Reactivar</a>
-                    }
-                    <a asp-action="Renovar" asp-route-id="@item.IdContrato" class="btn btn-primary">Renovar Contrato</a>
+                    } *@
+                    <a asp-action="Renovar" asp-route-id="@item.IdContrato" class="btn btn-primary">Renovar</a>
                     <a asp-controller="Pago" asp-action="ListarDesde" asp-route-id="@item.IdContrato" class="btn btn-success">Ver Pagos</a>
 
                 </td>
