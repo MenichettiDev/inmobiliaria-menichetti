@@ -14,11 +14,17 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para listar todos los inquilinos
-        public IActionResult Listar()
+        public IActionResult Listar(string? dni, string? apellido, string? email, int page = 1, int pageSize = 10)
         {
-            var inquilinos = _inquilinoRepository.GetAll();
+            var inquilinos = _inquilinoRepository.ObtenerFiltrados(dni, apellido, email, page, pageSize, out int totalItems);
+
+            int totalPaginas = (int)Math.Ceiling((double)totalItems / pageSize);
+            ViewBag.PaginaActual = page;
+            ViewBag.TotalPaginas = totalPaginas;
+
             return View(inquilinos);
         }
+
 
         // Acción para mostrar detalles de un inquilino
         public IActionResult Detalles(int id)

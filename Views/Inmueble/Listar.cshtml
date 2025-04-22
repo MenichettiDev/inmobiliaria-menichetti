@@ -143,3 +143,66 @@
         }
     </tbody>
 </table>
+@* Paginacion *@
+<div class="d-flex justify-content-between mb-3">
+    <div>
+        Página @ViewBag.PaginaActual de @ViewBag.TotalPaginas
+    </div>
+    <div>
+        @if (ViewBag.PaginaActual > 1)
+        {
+            <a class="btn btn-outline-primary" href="@Url.Action("Listar", new {
+                page = ViewBag.PaginaActual - 1,
+                uso = Context.Request.Query["uso"],
+                ambientes = Context.Request.Query["ambientes"],
+                precioDesde = Context.Request.Query["precioDesde"],
+                precioHasta = Context.Request.Query["precioHasta"],
+                estado = Context.Request.Query["estado"],
+                activo = Context.Request.Query["activo"]
+            })">
+                Anterior
+            </a>
+        }
+
+        @if (ViewBag.PaginaActual < ViewBag.TotalPaginas)
+        {
+            <a class="btn btn-outline-primary" href="@Url.Action("Listar", new {
+                page = ViewBag.PaginaActual + 1,
+                uso = Context.Request.Query["uso"],
+                ambientes = Context.Request.Query["ambientes"],
+                precioDesde = Context.Request.Query["precioDesde"],
+                precioHasta = Context.Request.Query["precioHasta"],
+                estado = Context.Request.Query["estado"],
+                activo = Context.Request.Query["activo"]
+            })">
+                Siguiente
+            </a>
+        }
+    </div>
+</div>
+
+<nav aria-label="Paginación de inmuebles" class="mt-4">
+    <ul class="pagination justify-content-center">
+        @{
+            int totalPaginas = ViewBag.TotalPaginas;
+            int paginaActual = ViewBag.PaginaActual;
+        }
+
+        @for (int i = 1; i <= totalPaginas; i++)
+        {
+            var url = Url.Action("Listar", new {
+                page = i,
+                uso = Context.Request.Query["uso"],
+                ambientes = Context.Request.Query["ambientes"],
+                precioDesde = Context.Request.Query["precioDesde"],
+                precioHasta = Context.Request.Query["precioHasta"],
+                estado = Context.Request.Query["estado"],
+                activo = Context.Request.Query["activo"]
+            });
+
+            <li class="page-item @(i == paginaActual ? "active" : "")">
+                <a class="page-link" href="@url">@i</a>
+            </li>
+        }
+    </ul>
+</nav>

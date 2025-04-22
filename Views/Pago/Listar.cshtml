@@ -52,7 +52,8 @@
             <label>Estado</label>
             <select name="estado" class="form-control">
                 <option value="">Todos</option>
-                <option value="Pendiente" selected="@(Context.Request.Query["estado"] == "Pendiente")">Pendiente</option>
+                <option value="Pendiente" selected="@(Context.Request.Query["estado"] == "Pendiente")">Pendiente
+                </option>
                 <option value="Pagado" selected="@(Context.Request.Query["estado"] == "Pagado")">Pagado</option>
                 <option value="Anulado" selected="@(Context.Request.Query["estado"] == "Anulado")">Anulado</option>
             </select>
@@ -112,3 +113,61 @@
         }
     </tbody>
 </table>
+<div class="d-flex justify-content-between">
+    <div>
+        Página @ViewBag.PaginaActual de @ViewBag.TotalPaginas
+    </div>
+    <div>
+        @if (ViewBag.PaginaActual > 1)
+        {
+            <a href="@Url.Action("Listar", new { 
+            page = ViewBag.PaginaActual - 1,
+             idContrato = Context.Request.Query["idContrato"],
+              desde = Context.Request.Query["desde"],
+               hasta = Context.Request.Query["hasta"],
+                importeMin = Context.Request.Query["importeMin"],
+                 importeMax = Context.Request.Query["importeMax"],
+                  estado = Context.Request.Query["estado"] })" 
+                  class="btn btn-outline-primary">Anterior</a>
+        }
+        @if (ViewBag.PaginaActual < ViewBag.TotalPaginas)
+        {
+            <a href="@Url.Action("Listar", new { page = ViewBag.PaginaActual + 1,
+             idContrato = Context.Request.Query["idContrato"],
+              desde = Context.Request.Query["desde"],
+               hasta = Context.Request.Query["hasta"], 
+               importeMin = Context.Request.Query["importeMin"],
+                importeMax = Context.Request.Query["importeMax"],
+                 estado = Context.Request.Query["estado"] })"
+                  class="btn btn-outline-primary">Siguiente</a>
+        }
+    </div>
+</div>
+
+<nav aria-label="Paginación de pagos" class="mt-4">
+    <ul class="pagination justify-content-center">
+        @{
+            int totalPaginas = ViewBag.TotalPaginas;
+            int paginaActual = ViewBag.PaginaActual;
+            string baseUrl = Context.Request.Path + QueryString.Create(Context.Request.Query.ToDictionary(x => x.Key, x => x.Value)).ToString();
+        }
+
+        @for (int i = 1; i <= totalPaginas; i++)
+        {
+            var url = Url.Action("Listar", new {
+                page = i,
+                idContrato = Context.Request.Query["idContrato"],
+                desde = Context.Request.Query["desde"],
+                hasta = Context.Request.Query["hasta"],
+                importeMin = Context.Request.Query["importeMin"],
+                importeMax = Context.Request.Query["importeMax"],
+                estado = Context.Request.Query["estado"]
+            });
+
+            <li class="page-item @(i == paginaActual ? "active" : "")">
+                <a class="page-link" href="@url">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
+

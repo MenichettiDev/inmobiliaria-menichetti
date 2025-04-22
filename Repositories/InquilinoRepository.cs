@@ -44,6 +44,64 @@ namespace InmobiliariaApp.Repositories
             return inquilinos;
         }
 
+        //Paginado
+        public List<Inquilino> ObtenerFiltrados(string? dni, string? apellido, string? email, int page, int pageSize, out int totalItems)
+        {
+            var inquilinos = new List<Inquilino>();
+            totalItems = 0;
+
+            using var connection = _dbConnection.GetConnection();
+
+            string sqlBase = "FROM inquilino WHERE 1=1";
+            var command = new MySqlCommand();
+            command.Connection = connection;
+
+            if (!string.IsNullOrEmpty(dni))
+            {
+                sqlBase += " AND dni LIKE @dni";
+                command.Parameters.AddWithValue("@dni", "%" + dni + "%");
+            }
+
+            if (!string.IsNullOrEmpty(apellido))
+            {
+                sqlBase += " AND apellido LIKE @apellido";
+                command.Parameters.AddWithValue("@apellido", "%" + apellido + "%");
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                sqlBase += " AND email LIKE @email";
+                command.Parameters.AddWithValue("@email", "%" + email + "%");
+            }
+
+            // Total
+            command.CommandText = "SELECT COUNT(*) " + sqlBase;
+            totalItems = Convert.ToInt32(command.ExecuteScalar());
+
+            // Paginado
+            command.CommandText = "SELECT * " + sqlBase + " LIMIT @offset, @limit";
+            command.Parameters.AddWithValue("@offset", (page - 1) * pageSize);
+            command.Parameters.AddWithValue("@limit", pageSize);
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                inquilinos.Add(new Inquilino
+                {
+                    IdInquilino = reader.GetInt32("id_inquilino"),
+                    Dni = reader.GetString("dni"),
+                    Apellido = reader.GetString("apellido"),
+                    Nombre = reader.GetString("nombre"),
+                    Telefono = reader.IsDBNull(reader.GetOrdinal("telefono")) ? null : reader.GetString(reader.GetOrdinal("telefono")),
+                    Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString(reader.GetOrdinal("email"))
+
+                });
+            }
+
+            return inquilinos;
+        }
+
+
         // Método para obtener un inquilino por ID
         public Inquilino? GetById(int id)
         {

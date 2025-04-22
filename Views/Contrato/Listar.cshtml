@@ -154,3 +154,32 @@
         }
     </tbody>
 </table>
+<nav aria-label="Paginación de contratos" class="mt-4">
+    <ul class="pagination justify-content-center">
+        @{
+            int totalPaginas = ViewBag.TotalPaginas;
+            int paginaActual = ViewBag.PaginaActual;
+            string baseUrl = Context.Request.Path + QueryString.Create(Context.Request.Query.ToDictionary(x => x.Key, x => x.Value)).ToString();
+        }
+
+        @for (int i = 1; i <= totalPaginas; i++)
+        {
+            var url = Url.Action("Listar", new {
+                page = i,
+                idInquilino = Context.Request.Query["idInquilino"],
+                idInmueble = Context.Request.Query["idInmueble"],
+                fechaDesde = Context.Request.Query["fechaDesde"],
+                fechaHasta = Context.Request.Query["fechaHasta"],
+                montoDesde = Context.Request.Query["montoDesde"],
+                montoHasta = Context.Request.Query["montoHasta"],
+                estado = Context.Request.Query["estado"],
+                venceEnDias = Context.Request.Query["venceEnDias"]
+            });
+
+            <li class="page-item @(i == paginaActual ? "active" : "")">
+                <a class="page-link" href="@url">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
+

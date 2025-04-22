@@ -2,9 +2,32 @@
 
 @{
     ViewData["Title"] = "Listar Propietarios";
+    var dni = ViewBag.Dni as string;
+    var apellido = ViewBag.Apellido as string;
+    var nombre = ViewBag.Nombre as string;
 }
 
 <h1 class="mb-4"><i class="bi bi-person-circle"></i> Listar Propietarios</h1>
+
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-3">
+        <input type="text" name="dni" class="form-control" placeholder="DNI" value="@dni" />
+    </div>
+    <div class="col-md-3">
+        <input type="text" name="apellido" class="form-control" placeholder="Apellido" value="@apellido" />
+    </div>
+    <div class="col-md-3">
+        <input type="text" name="nombre" class="form-control" placeholder="Nombre" value="@nombre" />
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-filter-circle"></i> Filtrar
+        </button>
+        <a asp-action="Listar" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Limpiar
+        </a>
+    </div>
+</form>
 
 <p>
     <a asp-action="Insertar" class="btn btn-success">
@@ -49,3 +72,15 @@
         }
     </tbody>
 </table>
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        @for (int i = 1; i <= (int)ViewBag.TotalPaginas; i++)
+        {
+            <li class="page-item @(i == (int)ViewBag.PaginaActual ? "active" : "")">
+                <a class="page-link" href="@Url.Action("Listar", new { dni = ViewBag.Dni, apellido = ViewBag.Apellido, nombre = ViewBag.Nombre, pagina = i })">
+                    @i
+                </a>
+            </li>
+        }
+    </ul>
+</nav>

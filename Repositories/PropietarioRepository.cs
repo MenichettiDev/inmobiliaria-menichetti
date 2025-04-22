@@ -44,6 +44,70 @@ namespace InmobiliariaApp.Repositories
             return propietarios;
         }
 
+        //Paginado
+        public List<Propietario> Buscar(string dni, string apellido, string nombre, int offset, int limit)
+        {
+            var propietarios = new List<Propietario>();
+            using var connection = _dbConnection.GetConnection();
+
+            var filtros = new List<string>();
+            if (!string.IsNullOrEmpty(dni)) filtros.Add("dni LIKE @dni");
+            if (!string.IsNullOrEmpty(apellido)) filtros.Add("apellido LIKE @apellido");
+            if (!string.IsNullOrEmpty(nombre)) filtros.Add("nombre LIKE @nombre");
+
+            string whereClause = filtros.Count > 0 ? "WHERE " + string.Join(" AND ", filtros) : "";
+
+            string query = $"SELECT * FROM propietario {whereClause} LIMIT @limit OFFSET @offset";
+            using var command = new MySqlCommand(query, connection);
+
+            if (!string.IsNullOrEmpty(dni)) command.Parameters.AddWithValue("@dni", $"%{dni}%");
+            if (!string.IsNullOrEmpty(apellido)) command.Parameters.AddWithValue("@apellido", $"%{apellido}%");
+            if (!string.IsNullOrEmpty(nombre)) command.Parameters.AddWithValue("@nombre", $"%{nombre}%");
+
+            command.Parameters.AddWithValue("@limit", limit);
+            command.Parameters.AddWithValue("@offset", offset);
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                propietarios.Add(new Propietario
+                {
+                    IdPropietario = reader.GetInt32("id_propietario"),
+                    Dni = reader.GetString("dni"),
+                    Apellido = reader.GetString("apellido"),
+                    Nombre = reader.GetString("nombre"),
+                    Telefono = reader.IsDBNull(reader.GetOrdinal("telefono")) ? null : reader.GetString("telefono"),
+                    Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString("email")
+                });
+            }
+
+            return propietarios;
+        }
+
+
+        public int Contar(string dni, string apellido, string nombre)
+        {
+            using var connection = _dbConnection.GetConnection();
+
+            var filtros = new List<string>();
+            if (!string.IsNullOrEmpty(dni)) filtros.Add("dni LIKE @dni");
+            if (!string.IsNullOrEmpty(apellido)) filtros.Add("apellido LIKE @apellido");
+            if (!string.IsNullOrEmpty(nombre)) filtros.Add("nombre LIKE @nombre");
+
+            string whereClause = filtros.Count > 0 ? "WHERE " + string.Join(" AND ", filtros) : "";
+
+            string query = $"SELECT COUNT(*) FROM propietario {whereClause}";
+            using var command = new MySqlCommand(query, connection);
+
+            if (!string.IsNullOrEmpty(dni)) command.Parameters.AddWithValue("@dni", $"%{dni}%");
+            if (!string.IsNullOrEmpty(apellido)) command.Parameters.AddWithValue("@apellido", $"%{apellido}%");
+            if (!string.IsNullOrEmpty(nombre)) command.Parameters.AddWithValue("@nombre", $"%{nombre}%");
+
+            return Convert.ToInt32(command.ExecuteScalar());
+        }
+
+
+
         // Método para obtener un propietario por ID
         public Propietario? GetById(int id)
         {

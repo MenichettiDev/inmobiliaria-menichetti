@@ -16,56 +16,81 @@ namespace InmobiliariaApp.Repositories
         }
 
 
-
-
-        public List<Inmueble> ObtenerFiltrados(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string? estado)
-        {
+        public List<Inmueble> ObtenerFiltrados(string? uso,
+            int? ambientes,
+            decimal? precioDesde,
+            decimal? precioHasta,
+            string? estado,
+            int? activo, 
+            int page,
+            int pageSize,
+            out int totalItems)
+            {
             var lista = new List<Inmueble>();
+            totalItems = 0;
 
             using var connection = _dbConnection.GetConnection();
 
-            var sql = @"SELECT i.*, p.Nombre, ' ', p.Apellido
-                FROM Inmueble i
-                INNER JOIN Propietario p ON i.id_propietario = p.id_propietario
-                WHERE 1=1";
+            var filtros = @" FROM Inmueble i
+                        INNER JOIN Propietario p ON i.id_propietario = p.id_propietario
+                        WHERE 1=1";
 
-            using var command = new MySqlCommand();
-            command.Connection = connection;
+            using var countCommand = new MySqlCommand();
+            countCommand.Connection = connection;
 
+            // Agregamos filtros dinámicamente
             if (!string.IsNullOrEmpty(uso))
             {
-                sql += " AND i.Uso LIKE @uso";
-                command.Parameters.AddWithValue("@uso", "%" + uso + "%");
+                filtros += " AND i.Uso LIKE @uso";
+                countCommand.Parameters.AddWithValue("@uso", "%" + uso + "%");
             }
 
             if (ambientes.HasValue)
             {
-                sql += " AND i.Ambientes = @ambientes";
-                command.Parameters.AddWithValue("@ambientes", ambientes.Value);
+                filtros += " AND i.Ambientes = @ambientes";
+                countCommand.Parameters.AddWithValue("@ambientes", ambientes.Value);
             }
 
             if (precioDesde.HasValue)
             {
-                sql += " AND i.Precio >= @precioDesde";
-                command.Parameters.AddWithValue("@precioDesde", precioDesde.Value);
+                filtros += " AND i.Precio >= @precioDesde";
+                countCommand.Parameters.AddWithValue("@precioDesde", precioDesde.Value);
             }
 
             if (precioHasta.HasValue)
             {
-                sql += " AND i.Precio <= @precioHasta";
-                command.Parameters.AddWithValue("@precioHasta", precioHasta.Value);
+                filtros += " AND i.Precio <= @precioHasta";
+                countCommand.Parameters.AddWithValue("@precioHasta", precioHasta.Value);
             }
 
             if (!string.IsNullOrEmpty(estado))
             {
-                sql += " AND i.Estado = @estado";
-                command.Parameters.AddWithValue("@estado", estado);
+                filtros += " AND i.Estado = @estado";
+                countCommand.Parameters.AddWithValue("@estado", estado);
             }
 
-            command.CommandText = sql;
+            if (activo.HasValue)
+            {
+                filtros += " AND i.Activo = @activo";
+                countCommand.Parameters.AddWithValue("@activo", activo.Value);
+            }
+
+            // Total count
+            countCommand.CommandText = "SELECT COUNT(*) " + filtros;
+            totalItems = Convert.ToInt32(countCommand.ExecuteScalar());
+
+            // Ahora la consulta real paginada
+            var sql = @"SELECT i.*, p.Nombre, p.Apellido " + filtros + " LIMIT @limit OFFSET @offset";
+
+            using var command = new MySqlCommand(sql, connection);
+
+            foreach (MySqlParameter p in countCommand.Parameters)
+                command.Parameters.Add((MySqlParameter)((ICloneable)p).Clone());
+
+            command.Parameters.AddWithValue("@limit", pageSize);
+            command.Parameters.AddWithValue("@offset", (page - 1) * pageSize);
 
             using var reader = command.ExecuteReader();
-
             while (reader.Read())
             {
                 lista.Add(new Inmueble
@@ -73,22 +98,95 @@ namespace InmobiliariaApp.Repositories
                     IdInmueble = Convert.ToInt32(reader["id_inmueble"]),
                     NombreInmueble = reader["nombre_inmueble"].ToString(),
                     Direccion = reader["Direccion"].ToString(),
-                    Uso = reader["Uso"].ToString()!,
+                    Uso = reader["Uso"].ToString(),
                     Ambientes = Convert.ToInt32(reader["Ambientes"]),
                     Precio = Convert.ToDecimal(reader["Precio"]),
-                    Estado = reader["Estado"].ToString()!,
+                    Estado = reader["Estado"].ToString(),
                     Activo = Convert.ToInt32(reader["Activo"]),
                     Portada = reader["Portada"].ToString(),
                     Duenio = new Propietario
                     {
-                        Nombre = reader["Nombre"].ToString()!,
-                        Apellido = reader["Apellido"].ToString()!,
+                        Nombre = reader["Nombre"].ToString(),
+                        Apellido = reader["Apellido"].ToString()
                     }
                 });
             }
 
             return lista;
         }
+
+
+        // public List<Inmueble> ObtenerFiltrados(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string? estado)
+        // {
+        //     var lista = new List<Inmueble>();
+
+        //     using var connection = _dbConnection.GetConnection();
+
+        //     var sql = @"SELECT i.*, p.Nombre, ' ', p.Apellido
+        //         FROM Inmueble i
+        //         INNER JOIN Propietario p ON i.id_propietario = p.id_propietario
+        //         WHERE 1=1";
+
+        //     using var command = new MySqlCommand();
+        //     command.Connection = connection;
+
+        //     if (!string.IsNullOrEmpty(uso))
+        //     {
+        //         sql += " AND i.Uso LIKE @uso";
+        //         command.Parameters.AddWithValue("@uso", "%" + uso + "%");
+        //     }
+
+        //     if (ambientes.HasValue)
+        //     {
+        //         sql += " AND i.Ambientes = @ambientes";
+        //         command.Parameters.AddWithValue("@ambientes", ambientes.Value);
+        //     }
+
+        //     if (precioDesde.HasValue)
+        //     {
+        //         sql += " AND i.Precio >= @precioDesde";
+        //         command.Parameters.AddWithValue("@precioDesde", precioDesde.Value);
+        //     }
+
+        //     if (precioHasta.HasValue)
+        //     {
+        //         sql += " AND i.Precio <= @precioHasta";
+        //         command.Parameters.AddWithValue("@precioHasta", precioHasta.Value);
+        //     }
+
+        //     if (!string.IsNullOrEmpty(estado))
+        //     {
+        //         sql += " AND i.Estado = @estado";
+        //         command.Parameters.AddWithValue("@estado", estado);
+        //     }
+
+        //     command.CommandText = sql;
+
+        //     using var reader = command.ExecuteReader();
+
+        //     while (reader.Read())
+        //     {
+        //         lista.Add(new Inmueble
+        //         {
+        //             IdInmueble = Convert.ToInt32(reader["id_inmueble"]),
+        //             NombreInmueble = reader["nombre_inmueble"].ToString(),
+        //             Direccion = reader["Direccion"].ToString(),
+        //             Uso = reader["Uso"].ToString()!,
+        //             Ambientes = Convert.ToInt32(reader["Ambientes"]),
+        //             Precio = Convert.ToDecimal(reader["Precio"]),
+        //             Estado = reader["Estado"].ToString()!,
+        //             Activo = Convert.ToInt32(reader["Activo"]),
+        //             Portada = reader["Portada"].ToString(),
+        //             Duenio = new Propietario
+        //             {
+        //                 Nombre = reader["Nombre"].ToString()!,
+        //                 Apellido = reader["Apellido"].ToString()!,
+        //             }
+        //         });
+        //     }
+
+        //     return lista;
+        // }
 
 
         // Método para obtener todos los inmuebles

@@ -15,22 +15,35 @@ namespace InmobiliariaApp.Controllers
             _pagoRepository = pagoRepository;
             _contratoRepository = contratoRepository;
         }
-        // Acción para listar todos los pagos
-        // public IActionResult Listar()
+
+        //Listar con filtros
+        // public IActionResult Listar(int? idContrato, int? idInquilino, DateTime? desde, DateTime? hasta, decimal? importeMin, decimal? importeMax, string estado)
         // {
-        //     var pagos = _pagoRepository.GetAll();
+        //     ViewBag.Contratos = _contratoRepository.GetAll();
+        //     ViewBag.EstadoSeleccionado = estado; // para mostrar el seleccionado en el HTML
+
+        //     var pagos = _pagoRepository.ObtenerFiltrados(idContrato, idInquilino, desde, hasta, importeMin, importeMax, estado);
         //     return View(pagos);
         // }
 
-        //Listar con filtros
-        public IActionResult Listar(int? idContrato, int? idInquilino, DateTime? desde, DateTime? hasta, decimal? importeMin, decimal? importeMax, string estado)
+        // Listar con filtros y paginación
+        public IActionResult Listar(int? idContrato, int? idInquilino, DateTime? desde, DateTime? hasta, decimal? importeMin, decimal? importeMax, string estado, int page = 1, int pageSize = 10)
         {
             ViewBag.Contratos = _contratoRepository.GetAll();
             ViewBag.EstadoSeleccionado = estado; // para mostrar el seleccionado en el HTML
 
-            var pagos = _pagoRepository.ObtenerFiltrados(idContrato, idInquilino, desde, hasta, importeMin, importeMax, estado);
+            // Obtener los pagos paginados desde el repositorio
+            var pagos = _pagoRepository.ObtenerFiltradosPaginados(idContrato, idInquilino, desde, hasta, importeMin, importeMax, estado, page, pageSize);
+
+            // Total de registros para calcular el número de páginas
+            var totalPagos = _pagoRepository.ObtenerTotalPagos(idContrato, idInquilino, desde, hasta, importeMin, importeMax, estado);
+
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalPagos / (double)pageSize);
+            ViewBag.PaginaActual = page;
+
             return View(pagos);
         }
+
 
         public IActionResult ListarDesde(int id)
         {

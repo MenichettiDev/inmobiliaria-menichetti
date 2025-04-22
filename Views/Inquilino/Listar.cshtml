@@ -1,7 +1,11 @@
 @model IEnumerable<InmobiliariaApp.Models.Inquilino>
-
 @{
     ViewData["Title"] = "Listar Inquilinos";
+    var filtroDni = Context.Request.Query["dni"];
+    var filtroApellido = Context.Request.Query["apellido"];
+    var filtroEmail = Context.Request.Query["email"];
+    var paginaActual = ViewBag.PaginaActual as int? ?? 1;
+    var totalPaginas = ViewBag.TotalPaginas as int? ?? 1;
 }
 
 <h1 class="mb-4"><i class="bi bi-person-fill"></i> Listar Inquilinos</h1>
@@ -11,6 +15,25 @@
         <i class="bi bi-person-plus-fill"></i> Crear Nuevo Inquilino
     </a>
 </p>
+
+<form method="get" class="mb-3 p-3 bg-light rounded shadow-sm">
+    <div class="row g-2">
+        <div class="col-md-3">
+            <input name="dni" class="form-control" placeholder="Filtrar por DNI" value="@filtroDni" />
+        </div>
+        <div class="col-md-3">
+            <input name="apellido" class="form-control" placeholder="Filtrar por Apellido" value="@filtroApellido" />
+        </div>
+        <div class="col-md-3">
+            <input name="email" class="form-control" placeholder="Filtrar por Email" value="@filtroEmail" />
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-funnel-fill"></i> Filtrar
+            </button>
+        </div>
+    </div>
+</form>
 
 <table class="table table-bordered table-hover shadow-sm align-middle">
     <thead class="table-dark">
@@ -35,17 +58,22 @@
                 <td>@item.Telefono</td>
                 <td>@item.Email</td>
                 <td class="text-nowrap">
-                    <a asp-action="Detalles" asp-route-id="@item.IdInquilino" class="btn btn-outline-info btn-sm" title="Detalles">
-                        <i class="bi bi-info-circle-fill"></i>
-                    </a>
-                    <a asp-action="Editar" asp-route-id="@item.IdInquilino" class="btn btn-outline-warning btn-sm" title="Editar">
-                        <i class="bi bi-pencil-fill"></i>
-                    </a>
-                    <a asp-action="Eliminar" asp-route-id="@item.IdInquilino" class="btn btn-outline-danger btn-sm" title="Eliminar">
-                        <i class="bi bi-trash-fill"></i>
-                    </a>
+                    <a asp-action="Detalles" asp-route-id="@item.IdInquilino" class="btn btn-outline-info btn-sm"><i class="bi bi-info-circle-fill"></i></a>
+                    <a asp-action="Editar" asp-route-id="@item.IdInquilino" class="btn btn-outline-warning btn-sm"><i class="bi bi-pencil-fill"></i></a>
+                    <a asp-action="Eliminar" asp-route-id="@item.IdInquilino" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash-fill"></i></a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<nav>
+    <ul class="pagination justify-content-center">
+        @for (int i = 1; i <= totalPaginas; i++)
+        {
+            <li class="page-item @(i == paginaActual ? "active" : "")">
+                <a class="page-link" href="?dni=@filtroDni&apellido=@filtroApellido&email=@filtroEmail&page=@i">@i</a>
+            </li>
+        }
+    </ul>
+</nav>

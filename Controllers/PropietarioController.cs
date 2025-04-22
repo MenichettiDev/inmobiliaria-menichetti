@@ -26,16 +26,27 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para listar todos los propietarios
-        public IActionResult Listar()
+        public IActionResult Listar(string dni, string apellido, string nombre, int pagina = 1, int tamanioPagina = 10)
         {
-            // if (!UsuarioAutenticado())
-            // {
-            //     return RedirectToAction("Index", "Login"); // Redirigir al login si no está autenticado
-            // }
+            // Obtener el total de registros con los filtros
+            int totalRegistros = _propietarioRepository.Contar(dni, apellido, nombre);
 
-            var propietarios = _propietarioRepository.GetAll();
+            // Calcular el offset para la paginación
+            int offset = (pagina - 1) * tamanioPagina;
+
+            // Obtener los propietarios paginados
+            var propietarios = _propietarioRepository.Buscar(dni, apellido, nombre, offset, tamanioPagina);
+
+            // Calcular el número total de páginas
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)tamanioPagina);
+            ViewBag.Dni = dni;
+            ViewBag.Apellido = apellido;
+            ViewBag.Nombre = nombre;
+
             return View(propietarios);
         }
+
 
         // Acción para mostrar detalles de un propietario
         public IActionResult Detalles(int id)

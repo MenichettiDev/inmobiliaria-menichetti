@@ -15,6 +15,212 @@ namespace InmobiliariaApp.Repositories
             _dbConnection = dbConnection;
         }
 
+        //Metodos para filtarr y paginar
+        // Método para obtener contratos paginados
+        public List<Contrato> ObtenerContratosPaginados(
+            int? idInquilino,
+            int? idInmueble,
+            DateTime? fechaDesde,
+            DateTime? fechaHasta,
+            decimal? montoDesde,
+            decimal? montoHasta,
+            string? estado,
+            int? activo,
+            int? venceEnDias,
+            int page,
+            int pageSize)
+        {
+            var lista = new List<Contrato>();
+            try
+            {
+                using var conn = _dbConnection.GetConnection();
+                var sql = @"SELECT c.*, i.nombre_inmueble, q.Nombre AS InquilinoNombre, q.Apellido AS InquilinoApellido
+                    FROM Contrato c
+                    INNER JOIN Inmueble i ON c.id_inmueble = i.id_inmueble
+                    INNER JOIN Inquilino q ON c.id_inquilino = q.id_inquilino";
+
+                var where = new List<string>();
+                var command = new MySqlCommand();
+                command.Connection = conn;
+
+                if (idInquilino.HasValue)
+                {
+                    where.Add("c.id_inquilino = @idInquilino");
+                    command.Parameters.AddWithValue("@idInquilino", idInquilino);
+                }
+                if (idInmueble.HasValue)
+                {
+                    where.Add("c.id_inmueble = @idInmueble");
+                    command.Parameters.AddWithValue("@idInmueble", idInmueble);
+                }
+                if (fechaDesde.HasValue)
+                {
+                    where.Add("c.fecha_inicio >= @fechaDesde");
+                    command.Parameters.AddWithValue("@fechaDesde", fechaDesde);
+                }
+                if (fechaHasta.HasValue)
+                {
+                    where.Add("c.fecha_fin <= @fechaHasta");
+                    command.Parameters.AddWithValue("@fechaHasta", fechaHasta);
+                }
+                if (montoDesde.HasValue)
+                {
+                    where.Add("c.monto_mensual >= @montoDesde");
+                    command.Parameters.AddWithValue("@montoDesde", montoDesde);
+                }
+                if (montoHasta.HasValue)
+                {
+                    where.Add("c.monto_mensual <= @montoHasta");
+                    command.Parameters.AddWithValue("@montoHasta", montoHasta);
+                }
+                if (!string.IsNullOrEmpty(estado))
+                {
+                    where.Add("c.estado = @estado");
+                    command.Parameters.AddWithValue("@estado", estado);
+                }
+                if (activo.HasValue)
+                {
+                    where.Add("c.activo = @activo");
+                    command.Parameters.AddWithValue("@activo", activo);
+                }
+                if (venceEnDias.HasValue)
+                {
+                    where.Add("c.fecha_fin BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL @venceEnDias DAY)");
+                    command.Parameters.AddWithValue("@venceEnDias", venceEnDias.Value);
+                }
+
+                if (where.Count > 0)
+                {
+                    sql += " WHERE " + string.Join(" AND ", where);
+                }
+
+                // Agregar paginación con LIMIT y OFFSET
+                sql += " LIMIT @pageSize OFFSET @offset";
+
+                // Parametrizar la paginación
+                command.Parameters.AddWithValue("@pageSize", pageSize);
+                command.Parameters.AddWithValue("@offset", (page - 1) * pageSize);
+
+                command.CommandText = sql;
+
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(new Contrato
+                    {
+                        IdContrato = (int)reader["id_contrato"],
+                        IdInquilino = (int)reader["id_inquilino"],
+                        IdInmueble = (int)reader["id_inmueble"],
+                        FechaInicio = (DateTime)reader["fecha_inicio"],
+                        FechaFin = (DateTime)reader["fecha_fin"],
+                        MontoMensual = (decimal)reader["monto_mensual"],
+                        Estado = reader["estado"].ToString()!,
+                        FechaTerminacionAnticipada = reader["fecha_terminacion_anticipada"] as DateTime?,
+                        Multa = reader["multa"] as decimal?,
+                        Activo = Convert.ToInt32(reader["activo"]),
+                        Inquilino = new Inquilino
+                        {
+                            Nombre = reader["InquilinoNombre"].ToString()!,
+                            Apellido = reader["InquilinoApellido"].ToString()!
+                        },
+                        Inmueble = new Inmueble { NombreInmueble = reader["nombre_inmueble"].ToString() }
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] al obtener contratos paginados: {ex.Message}");
+            }
+
+            return lista;
+        }
+
+        // Método para obtener el total de contratos (para calcular la paginación)
+        public int ObtenerTotalContratos(
+            int? idInquilino,
+            int? idInmueble,
+            DateTime? fechaDesde,
+            DateTime? fechaHasta,
+            decimal? montoDesde,
+            decimal? montoHasta,
+            string? estado,
+            int? activo,
+            int? venceEnDias)
+        {
+            try
+            {
+                using var conn = _dbConnection.GetConnection();
+                var sql = @"SELECT COUNT(*) 
+                    FROM Contrato c
+                    INNER JOIN Inmueble i ON c.id_inmueble = i.id_inmueble
+                    INNER JOIN Inquilino q ON c.id_inquilino = q.id_inquilino";
+
+                var where = new List<string>();
+                var command = new MySqlCommand();
+                command.Connection = conn;
+
+                if (idInquilino.HasValue)
+                {
+                    where.Add("c.id_inquilino = @idInquilino");
+                    command.Parameters.AddWithValue("@idInquilino", idInquilino);
+                }
+                if (idInmueble.HasValue)
+                {
+                    where.Add("c.id_inmueble = @idInmueble");
+                    command.Parameters.AddWithValue("@idInmueble", idInmueble);
+                }
+                if (fechaDesde.HasValue)
+                {
+                    where.Add("c.fecha_inicio >= @fechaDesde");
+                    command.Parameters.AddWithValue("@fechaDesde", fechaDesde);
+                }
+                if (fechaHasta.HasValue)
+                {
+                    where.Add("c.fecha_fin <= @fechaHasta");
+                    command.Parameters.AddWithValue("@fechaHasta", fechaHasta);
+                }
+                if (montoDesde.HasValue)
+                {
+                    where.Add("c.monto_mensual >= @montoDesde");
+                    command.Parameters.AddWithValue("@montoDesde", montoDesde);
+                }
+                if (montoHasta.HasValue)
+                {
+                    where.Add("c.monto_mensual <= @montoHasta");
+                    command.Parameters.AddWithValue("@montoHasta", montoHasta);
+                }
+                if (!string.IsNullOrEmpty(estado))
+                {
+                    where.Add("c.estado = @estado");
+                    command.Parameters.AddWithValue("@estado", estado);
+                }
+                if (activo.HasValue)
+                {
+                    where.Add("c.activo = @activo");
+                    command.Parameters.AddWithValue("@activo", activo);
+                }
+                if (venceEnDias.HasValue)
+                {
+                    where.Add("c.fecha_fin BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL @venceEnDias DAY)");
+                    command.Parameters.AddWithValue("@venceEnDias", venceEnDias.Value);
+                }
+
+                if (where.Count > 0)
+                {
+                    sql += " WHERE " + string.Join(" AND ", where);
+                }
+
+                command.CommandText = sql;
+
+                return Convert.ToInt32(command.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] al obtener total de contratos: {ex.Message}");
+                return 0;
+            }
+        }
+
         //Metodo para obtener contratos filtrados
         public List<Contrato> ObtenerFiltrados(
                 int? idInquilino,

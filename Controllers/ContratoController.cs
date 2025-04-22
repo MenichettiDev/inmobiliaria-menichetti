@@ -19,24 +19,51 @@ namespace InmobiliariaApp.Controllers
             _contratoRepository = contratoRepository;
         }
 
-        // Acción para listar todos los contratos
-        // public IActionResult Listar()
+
+
+        // public IActionResult Listar(int? idInquilino, int? idInmueble, DateTime? fechaDesde, DateTime? fechaHasta, decimal? montoDesde, decimal? montoHasta, string? estado, int? activo, int? venceEnDias)
         // {
-        //     var contratos = _contratoRepository.GetAll();
+        //     activo = 1; // Solo activos
+        //     ViewBag.Inquilinos = _inquilinoRepo.GetAll();
+        //     ViewBag.Inmuebles = _inmuebleRepo.GetAll();
+
+        //     var contratos = _contratoRepository.ObtenerFiltrados(idInquilino, idInmueble, fechaDesde, fechaHasta, montoDesde, montoHasta, estado, activo, venceEnDias);
         //     return View(contratos);
         // }
 
-        public IActionResult Listar(int? idInquilino, int? idInmueble, DateTime? fechaDesde, DateTime? fechaHasta, decimal? montoDesde, decimal? montoHasta, string? estado, int? activo, int? venceEnDias)
+        // Acción para mostrar detalles de un contrato
+
+        public IActionResult Listar(
+            int? idInquilino,
+            int? idInmueble,
+            DateTime? fechaDesde,
+            DateTime? fechaHasta,
+            decimal? montoDesde,
+            decimal? montoHasta,
+            string? estado,
+            int? activo,
+            int? venceEnDias,
+            int page = 1,
+            int pageSize = 10)
         {
             activo = 1; // Solo activos
             ViewBag.Inquilinos = _inquilinoRepo.GetAll();
             ViewBag.Inmuebles = _inmuebleRepo.GetAll();
 
-            var contratos = _contratoRepository.ObtenerFiltrados(idInquilino, idInmueble, fechaDesde, fechaHasta, montoDesde, montoHasta, estado, activo, venceEnDias);
-            return View(contratos);
+            // Obtener contratos paginados desde el repositorio
+            var contratosPaginados = _contratoRepository.ObtenerContratosPaginados(
+                idInquilino, idInmueble, fechaDesde, fechaHasta, montoDesde, montoHasta, estado, activo, venceEnDias, page, pageSize);
+
+            // Total de registros para calcular el número de páginas
+            var totalRegistros = _contratoRepository.ObtenerTotalContratos(
+                idInquilino, idInmueble, fechaDesde, fechaHasta, montoDesde, montoHasta, estado, activo, venceEnDias);
+
+            ViewBag.TotalPaginas = (int)Math.Ceiling(totalRegistros / (double)pageSize);
+            ViewBag.PaginaActual = page;
+
+            return View(contratosPaginados);
         }
 
-        // Acción para mostrar detalles de un contrato
         public IActionResult Detalles(int id)
         {
             var contrato = _contratoRepository.GetById(id);
