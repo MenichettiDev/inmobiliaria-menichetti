@@ -52,7 +52,6 @@
                 <option value="">Todos</option>
                 <option value="Disponible" selected="@(Context.Request.Query["estado"] == "Disponible")">Disponible</option>
                 <option value="Suspendido" selected="@(Context.Request.Query["estado"] == "Suspendido")">Suspendido</option>
-                <option value="Ocupado" selected="@(Context.Request.Query["estado"] == "Ocupado")">Ocupado</option>
             </select>
         </div>
 
@@ -109,7 +108,7 @@
                 <td><span class="badge bg-secondary">@item.Ambientes</span></td>
                 <td>@item.Precio.ToString("C")</td>
                 <td>
-                    <span class="badge @(item.Estado == "Disponible" ? "bg-success" : item.Estado == "Ocupado" ? "bg-danger" : "bg-warning text-dark")">
+                    <span class="badge @(item.Estado == "Disponible" ? "bg-success" : item.Estado == "Suspendido" ? "bg-danger" : "bg-warning text-dark")">
                         @item.Estado
                     </span>
                 </td>

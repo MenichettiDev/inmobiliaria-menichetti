@@ -15,8 +15,8 @@ namespace InmobiliariaApp.Models
         public int IdTipoInmueble { get; set; } // Clave foránea
         public int Ambientes { get; set; }
         public decimal Precio { get; set; }
-        public string? Estado { get; set; } // "disponible", "suspendido", "ocupado"
-        public int Activo { get; set; } // "disponible", "suspendido", "ocupado"
+        public string? Estado { get; set; } // "disponible", "suspendido"
+        public int Activo { get; set; } // "disponible", "suspendido", 
 
         public string? Portada { get; set; }
         [ForeignKey(nameof(Imagen.InmuebleId))]
