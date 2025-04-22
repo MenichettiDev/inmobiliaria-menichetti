@@ -4,32 +4,40 @@
     ViewData["Title"] = "Lista de Tipos de Inmueble";
 }
 
-<h1>Tipos de Inmueble</h1>
+<h1 class="mb-4"><i class="bi bi-house-door-fill"></i> Tipos de Inmueble</h1>
 
 <p>
-    <a asp-action="Insertar" class="btn btn-success">Nuevo Tipo</a>
+    <a asp-action="Insertar" class="btn btn-success">
+        <i class="bi bi-plus-circle-fill"></i> Nuevo Tipo
+    </a>
 </p>
 
 <table class="table table-bordered table-striped">
-    <thead>
+    <thead class="table-dark">
         <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <th>Acciones</th>
+            <th><i class="bi bi-gear-fill"></i> Acciones</th>
         </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.IdTipoInmueble</td>
-            <td>@item.Nombre</td>
-            <td>
-                <a asp-action="Detalles" asp-route-id="@item.IdTipoInmueble" class="btn btn-info btn-sm">Detalles</a>
-                <a asp-action="Editar" asp-route-id="@item.IdTipoInmueble" class="btn btn-warning btn-sm">Editar</a>
-                <a asp-action="Eliminar" asp-route-id="@item.IdTipoInmueble" class="btn btn-danger btn-sm">Eliminar</a>
-            </td>
-        </tr>
-    }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.IdTipoInmueble</td>
+                <td>@item.Nombre</td>
+                <td class="text-nowrap">
+                    <a asp-action="Detalles" asp-route-id="@item.IdTipoInmueble" class="btn btn-outline-info btn-sm" title="Detalles">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </a>
+                    <a asp-action="Editar" asp-route-id="@item.IdTipoInmueble" class="btn btn-outline-warning btn-sm" title="Editar">
+                        <i class="bi bi-pencil-fill"></i>
+                    </a>
+                    <a asp-action="Eliminar" asp-route-id="@item.IdTipoInmueble" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                        <i class="bi bi-trash-fill"></i>
+                    </a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

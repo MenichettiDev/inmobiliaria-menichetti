@@ -1,91 +1,89 @@
 @model IEnumerable<InmobiliariaApp.Models.Contrato>
 
-
-@* Si vengo con esta data muestro el modal *@
 @if (TempData["SuccessMessage"] != null)
 {
     <script>
         Swal.fire({
             icon: 'success',
             title: '¡Éxito!',
-            text: 'submit operacion fue exitosa!',
+            text: 'La operación fue exitosa!',
             confirmButtonText: 'Cerrar',
             customClass: {
                 popup: 'rounded shadow'
             }
         });
-
     </script>
 }
-
-
-
 
 @{
     ViewData["Title"] = "Lista de Contratos";
 }
 
-<h1>Lista de Contratos</h1>
+<h1 class="mb-4"><i class="bi bi-file-earmark-text"></i> Lista de Contratos</h1>
 
 <p>
-    <a asp-action="Insertar" class="btn btn-success">Crear Nuevo Contrato</a>
+    <a asp-action="Insertar" class="btn btn-success">
+        <i class="bi bi-plus-circle-fill"></i> Crear Nuevo Contrato
+    </a>
 </p>
 
-<form method="get" class="mb-4">
-    <div class="row">
+<form method="get" class="mb-4 p-3 bg-light rounded shadow-sm">
+    <div class="row g-2">
         <div class="col-md-3">
-            <label>Inquilino</label>
-            <select name="idInquilino" class="form-control">
+            <label class="form-label">Inquilino</label>
+            <select name="idInquilino" class="form-select">
                 <option value="">Todos</option>
                 @foreach (var i in ViewBag.Inquilinos)
                 {
-                    <option value="@i.IdInquilino"
-                        selected="@(Context.Request.Query["idInquilino"] == i.IdInquilino.ToString())">@i.Nombre @i.Apellido
-                    </option>
+                    <option value="@i.IdInquilino" selected="@(Context.Request.Query["idInquilino"] == i.IdInquilino.ToString())">@i.Nombre @i.Apellido</option>
                 }
             </select>
         </div>
+
         <div class="col-md-3">
-            <label>Inmueble</label>
-            <select name="idInmueble" class="form-control">
+            <label class="form-label">Inmueble</label>
+            <select name="idInmueble" class="form-select">
                 <option value="">Todos</option>
                 @foreach (var i in ViewBag.Inmuebles)
                 {
-                    <option value="@i.IdInmueble"
-                        selected="@(Context.Request.Query["idInmueble"] == i.IdInmueble.ToString())">@i.NombreInmueble
-                    </option>
+                    <option value="@i.IdInmueble" selected="@(Context.Request.Query["idInmueble"] == i.IdInmueble.ToString())">@i.NombreInmueble</option>
                 }
             </select>
         </div>
+
         <div class="col-md-2">
-            <label>Fecha Desde</label>
+            <label class="form-label">Fecha Desde</label>
             <input type="date" name="fechaDesde" value="@Context.Request.Query["fechaDesde"]" class="form-control" />
         </div>
+
         <div class="col-md-2">
-            <label>Fecha Hasta</label>
+            <label class="form-label">Fecha Hasta</label>
             <input type="date" name="fechaHasta" value="@Context.Request.Query["fechaHasta"]" class="form-control" />
         </div>
+
         <div class="col-md-2">
-            <label>Monto Mayor a</label>
+            <label class="form-label">Monto Mayor a</label>
             <input type="number" name="montoDesde" value="@Context.Request.Query["montoDesde"]" class="form-control" />
         </div>
+
         <div class="col-md-2">
-            <label>Monto Menor a</label>
+            <label class="form-label">Monto Menor a</label>
             <input type="number" name="montoHasta" value="@Context.Request.Query["montoHasta"]" class="form-control" />
         </div>
+
         <div class="col-md-2">
-            <label>Estado</label>
-            <select name="estado" class="form-control">
+            <label class="form-label">Estado</label>
+            <select name="estado" class="form-select">
                 <option value="">Todos</option>
                 <option value="vigente" selected="@(Context.Request.Query["estado"] == "vigente")">Vigente</option>
-                <option value="terminado" selected="@(Context.Request.Query["estado"] == "terminado")">Terminado
-                </option>
-                <option value="finalizado" selected="@(Context.Request.Query["estado"] == "vigente")">Cancelado</option>
+                <option value="terminado" selected="@(Context.Request.Query["estado"] == "terminado")">Terminado</option>
+                <option value="finalizado" selected="@(Context.Request.Query["estado"] == "finalizado")">Cancelado</option>
             </select>
         </div>
+
         <div class="col-md-2">
-            <label>Vence en</label>
-            <select name="venceEnDias" class="form-control">
+            <label class="form-label">Vence en</label>
+            <select name="venceEnDias" class="form-select">
                 <option value="">Todos</option>
                 <option value="30" selected="@(Context.Request.Query["venceEnDias"] == "30")">30 días</option>
                 <option value="60" selected="@(Context.Request.Query["venceEnDias"] == "60")">60 días</option>
@@ -93,26 +91,22 @@
             </select>
         </div>
 
-        @* <div class="col-md-2">
-            <label>Activo</label>
-            <select name="activo" class="form-control">
-                <option value="">Todos</option>
-                <option value="1" selected="@(Context.Request.Query["activo"] == "1")">Activo</option>
-                <option value="0" selected="@(Context.Request.Query["activo"] == "0")">Inactivo</option>
-            </select>
-        </div> *@
         <div class="col-md-2 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
-        </div>
-        <div class="col-md-2 d-flex align-items-end">
-            <a href="@Url.Action("Listar", "Contrato")" class="btn btn-secondary w-100">Limpiar Filtros</a>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-funnel-fill"></i> Filtrar
+            </button>
         </div>
 
+        <div class="col-md-2 d-flex align-items-end">
+            <a href="@Url.Action("Listar", "Contrato")" class="btn btn-secondary w-100">
+                <i class="bi bi-x-circle-fill"></i> Limpiar Filtros
+            </a>
+        </div>
     </div>
 </form>
 
-<table class="table table-striped">
-    <thead>
+<table class="table table-bordered table-hover shadow-sm align-middle">
+    <thead class="table-dark">
         <tr>
             <th>ID Contrato</th>
             <th>Inquilino</th>
@@ -121,7 +115,7 @@
             <th>Fecha Fin</th>
             <th>Monto Mensual</th>
             <th>Estado</th>
-            <th>Acciones</th>
+            <th><i class="bi bi-gear-fill"></i> Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -134,21 +128,27 @@
                 <td>@item.FechaInicio.ToShortDateString()</td>
                 <td>@item.FechaFin.ToShortDateString()</td>
                 <td>@item.MontoMensual.ToString("C")</td>
-                <td>@item.Estado</td>
                 <td>
-                    <a asp-action="Detalles" asp-route-id="@item.IdContrato" class="btn btn-info">Detalles</a> |
-                    @* <a asp-action="Editar" asp-route-id="@item.IdContrato" class="btn btn-warning">Editar</a> | *@
+                    <span class="badge @(item.Estado == "vigente" ? "bg-success" : item.Estado == "terminado" ? "bg-danger" : "bg-secondary")">
+                        @item.Estado
+                    </span>
+                </td>
+                <td class="text-nowrap">
+                    <a asp-action="Detalles" asp-route-id="@item.IdContrato" class="btn btn-outline-info btn-sm" title="Detalles">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </a>
                     @if (item.Estado == "vigente")
                     {
-                        <a asp-action="Eliminar" asp-route-id="@item.IdContrato" class="btn btn-danger">Finalizar</a>
+                        <a asp-action="Eliminar" asp-route-id="@item.IdContrato" class="btn btn-outline-danger btn-sm" title="Finalizar">
+                            <i class="bi bi-x-circle"></i>
+                        </a>
                     }
-                    @* else
-                    {
-                        <a asp-action="Eliminar" asp-route-id="@item.IdContrato" class="btn btn-success">Reactivar</a>
-                    } *@
-                    <a asp-action="Renovar" asp-route-id="@item.IdContrato" class="btn btn-primary">Renovar</a>
-                    <a asp-controller="Pago" asp-action="ListarDesde" asp-route-id="@item.IdContrato" class="btn btn-success">Ver Pagos</a>
-
+                    <a asp-action="Renovar" asp-route-id="@item.IdContrato" class="btn btn-outline-primary btn-sm" title="Renovar">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </a>
+                    <a asp-controller="Pago" asp-action="ListarDesde" asp-route-id="@item.IdContrato" class="btn btn-outline-success btn-sm" title="Ver Pagos">
+                        <i class="bi bi-wallet2"></i>
+                    </a>
                 </td>
             </tr>
         }

@@ -5,28 +5,28 @@
     var rnd = new Random();
 }
 
-<h1>Lista de Inmuebles</h1>
+<h1 class="mb-4"><i class="bi bi-building"></i> Lista de Inmuebles</h1>
 
 <p>
-    <a asp-action="Insertar" class="btn btn-success">Crear Nuevo Inmueble</a>
+    <a asp-action="Insertar" class="btn btn-success">
+        <i class="bi bi-plus-circle-fill"></i> Crear Nuevo Inmueble
+    </a>
 </p>
 
-<form method="get" class="mb-4">
-    <div class="row">
+<form method="get" class="mb-4 p-3 bg-light rounded shadow-sm">
+    <div class="row g-2">
         <div class="col-md-2">
-            <label>Uso</label>
-            <select name="uso" class="form-control">
+            <label class="form-label">Uso</label>
+            <select name="uso" class="form-select">
                 <option value="">Todos</option>
-                <option value="Comercial" selected="@(Context.Request.Query["uso"] == "Comercial")">Comercial
-                </option>
-                <option value="Residencial" selected="@(Context.Request.Query["uso"] == "Residencial")">Residencial
-                </option>
+                <option value="Comercial" selected="@(Context.Request.Query["uso"] == "Comercial")">Comercial</option>
+                <option value="Residencial" selected="@(Context.Request.Query["uso"] == "Residencial")">Residencial</option>
             </select>
         </div>
 
         <div class="col-md-2">
-            <label>Ambientes</label>
-            <select name="ambientes" class="form-control">
+            <label class="form-label">Ambientes</label>
+            <select name="ambientes" class="form-select">
                 <option value="">Todos</option>
                 @for (int i = 1; i <= 5; i++)
                 {
@@ -36,36 +36,29 @@
             </select>
         </div>
 
-
         <div class="col-md-2">
-            <label>Precio Desde</label>
-            <input type="number" name="precioDesde" value="@Context.Request.Query["precioDesde"]"
-                class="form-control" />
+            <label class="form-label">Precio Desde</label>
+            <input type="number" name="precioDesde" value="@Context.Request.Query["precioDesde"]" class="form-control" />
         </div>
 
         <div class="col-md-2">
-            <label>Precio Hasta</label>
-            <input type="number" name="precioHasta" value="@Context.Request.Query["precioHasta"]"
-                class="form-control" />
+            <label class="form-label">Precio Hasta</label>
+            <input type="number" name="precioHasta" value="@Context.Request.Query["precioHasta"]" class="form-control" />
         </div>
 
         <div class="col-md-2">
-            <label>Disponibilidad</label>
-            <select name="estado" class="form-control">
+            <label class="form-label">Disponibilidad</label>
+            <select name="estado" class="form-select">
                 <option value="">Todos</option>
-                <option value="Disponible" selected="@(Context.Request.Query["estado"] == "Disponible")">Disponible
-                </option>
-                <option value="Suspendido" selected="@(Context.Request.Query["estado"] == "Suspendido")">Suspendido
-                </option>
+                <option value="Disponible" selected="@(Context.Request.Query["estado"] == "Disponible")">Disponible</option>
+                <option value="Suspendido" selected="@(Context.Request.Query["estado"] == "Suspendido")">Suspendido</option>
                 <option value="Ocupado" selected="@(Context.Request.Query["estado"] == "Ocupado")">Ocupado</option>
             </select>
         </div>
 
-    </div>
-    <div class="row mt-2">
         <div class="col-md-2">
-            <label>Activo</label>
-            <select name="activo" class="form-control">
+            <label class="form-label">Activo</label>
+            <select name="activo" class="form-select">
                 <option value="1" selected="@(Context.Request.Query["activo"] == "1")">Activo</option>
                 <option value="0" selected="@(Context.Request.Query["activo"] == "0")">Inactivo</option>
                 <option value="">Todos</option>
@@ -73,66 +66,78 @@
         </div>
 
         <div class="col-md-2 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-funnel-fill"></i> Filtrar
+            </button>
         </div>
     </div>
 </form>
 
-
-<table class="table table-striped">
-    <thead>
+<table class="table table-bordered table-hover shadow-sm align-middle">
+    <thead class="table-dark">
         <tr>
-            <th>Portada</th>
+            <th><i class="bi bi-image"></i></th>
             <th>Nombre</th>
-            @* <th>ID Inmueble</th> *@
             <th>Propietario</th>
             <th>Dirección</th>
             <th>Uso</th>
             <th>Ambientes</th>
             <th>Precio</th>
             <th>Estado</th>
-            <th>Acciones</th>
+            <th><i class="bi bi-gear-fill"></i> Acciones</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
-                <td>
+                <td class="text-center">
                     @if (!String.IsNullOrEmpty(item.Portada))
                     {
                         var x = item.Portada + "?" + rnd.Next();
-                        <img width="38" src="@x" />
+                        <img width="50" height="40" src="@x" class="rounded border" />
                     }
                     else
                     {
-                        <i class="bi bi-house"></i>
+                        <i class="bi bi-house-fill fs-4 text-secondary"></i>
                     }
-
                 </td>
-                @* <td>@item.IdInmueble</td> *@
                 <td>@item.NombreInmueble</td>
                 <td>@item.Duenio?.NombreCompleto</td>
                 <td>@item.Direccion</td>
-                <td>@item.Uso</td>
-                <td>@item.Ambientes</td>
+                <td><span class="badge bg-info text-dark">@item.Uso</span></td>
+                <td><span class="badge bg-secondary">@item.Ambientes</span></td>
                 <td>@item.Precio.ToString("C")</td>
-                <td>@item.Estado</td>
                 <td>
-                    <a asp-action="Imagenes" asp-route-id="@item.IdInmueble" class="btn btn-secondary">
-                        <i class="fa-solid fa-images"></i>Imagenes
+                    <span class="badge @(item.Estado == "Disponible" ? "bg-success" : item.Estado == "Ocupado" ? "bg-danger" : "bg-warning text-dark")">
+                        @item.Estado
+                    </span>
+                </td>
+                <td class="text-nowrap">
+                    <a asp-action="Imagenes" asp-route-id="@item.IdInmueble" class="btn btn-outline-secondary btn-sm" title="Imágenes">
+                        <i class="bi bi-images"></i>
                     </a>
-                    <a asp-action="Detalles" asp-route-id="@item.IdInmueble" class="btn btn-info">Detalles</a> |
-                    <a asp-action="Editar" asp-route-id="@item.IdInmueble" class="btn btn-warning">Editar</a> |
+                    <a asp-action="Detalles" asp-route-id="@item.IdInmueble" class="btn btn-outline-info btn-sm" title="Detalles">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </a>
+                    <a asp-action="Editar" asp-route-id="@item.IdInmueble" class="btn btn-outline-warning btn-sm" title="Editar">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
                     @if (item.Activo == 1)
                     {
-                        <a asp-action="Eliminar" asp-route-id="@item.IdInmueble" class="btn btn-danger">Suspender</a>
+                        <a asp-action="Eliminar" asp-route-id="@item.IdInmueble" class="btn btn-outline-danger btn-sm" title="Suspender">
+                            <i class="bi bi-slash-circle"></i>
+                        </a>
                     }
                     else
                     {
-                        <a asp-action="Eliminar" asp-route-id="@item.IdInmueble" class="btn btn-success">Reactivar</a>
+                        <a asp-action="Eliminar" asp-route-id="@item.IdInmueble" class="btn btn-outline-success btn-sm" title="Reactivar">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </a>
                     }
-                    <a asp-controller="Contrato" asp-action="Insertar" asp-route-id="@item.IdInmueble" class="btn btn-success">Crear Contrato</a>
+                    <a asp-controller="Contrato" asp-action="Insertar" asp-route-id="@item.IdInmueble" class="btn btn-outline-primary btn-sm" title="Crear contrato">
+                        <i class="bi bi-file-earmark-plus-fill"></i>
+                    </a>
                 </td>
             </tr>
         }
