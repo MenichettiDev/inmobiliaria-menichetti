@@ -2,46 +2,64 @@
 
 @{
     ViewData["Title"] = "Detalles del Inmueble";
+    var tieneImagenes = Model.Imagenes != null && Model.Imagenes.Any();
 }
 
-<h1>Detalles del Inmueble</h1>
+<!-- HERO Portada -->
+@if (!string.IsNullOrEmpty(Model.Portada))
+{
+    <div class="position-relative mb-4" style="height: 350px; overflow: hidden; border-radius: 1rem;">
+        <img src="@Model.Portada" class="w-100 h-100" style="object-fit: cover;" />
+        <div class="position-absolute top-0 start-0 w-100 h-100" style="background-color: rgba(0, 0, 0, 0.4);"></div>
+        <h1 class="position-absolute bottom-0 start-0 text-white p-4" style="font-size: 2.2rem;">
+            @Model.NombreInmueble
+        </h1>
+    </div>
+}
 
-<div>
-    <h4>Inmueble</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">ID Inmueble</dt>
-        <dd class="col-sm-10">@Model.IdInmueble</dd>
+<!-- CONTENIDO PRINCIPAL -->
+<div class="row g-4">
+    <!-- MINI GALERÍA -->
+    <div class="col-md-6">
+        @if (tieneImagenes)
+        {
+            <div class="d-flex overflow-auto gap-3 pb-2">
+                @foreach (var img in Model.Imagenes)
+                {
+                    <img src="@img.Url" alt="Imagen inmueble" class="rounded shadow-sm" style="height: 150px; width: auto; object-fit: cover;" />
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-muted text-center p-3 border rounded">No hay más imágenes</div>
+        }
+    </div>
 
-        <dt class="col-sm-2">Nombre Inmueble</dt>
-        <dd class="col-sm-10">@Model.NombreInmueble</dd>
-
-        <dt class="col-sm-2">Propietario</dt>
-        <dd class="col-sm-10">@Model.Duenio.NombreCompleto</dd>
-
-        <dt class="col-sm-2">Dirección</dt>
-        <dd class="col-sm-10">@Model.Direccion</dd>
-
-        <dt class="col-sm-2">Coordenadas</dt>
-        <dd class="col-sm-10">@Model.Coordenadas</dd>
-
-        <dt class="col-sm-2">Uso</dt>
-        <dd class="col-sm-10">@Model.Uso</dd>
-
-        <dt class="col-sm-2">Tipo de Inmueble</dt>
-        <dd class="col-sm-10">@Model.Tipo.Nombre</dd>
-
-        <dt class="col-sm-2">Ambientes</dt>
-        <dd class="col-sm-10">@Model.Ambientes</dd>
-
-        <dt class="col-sm-2">Precio</dt>
-        <dd class="col-sm-10">@Model.Precio.ToString("C")</dd>
-
-        <dt class="col-sm-2">Estado</dt>
-        <dd class="col-sm-10">@Model.Estado</dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Editar" asp-route-id="@Model.IdInmueble">Editar</a> |
-    <a asp-action="Listar">Volver a la Lista</a>
+    <!-- DETALLES EN CARD -->
+    <div class="col-md-6">
+        <div class="card shadow-sm p-4 transition-card" style="background-color: #007A3D; color: white; border-radius: 1rem;">
+            <h4 class="card-title mb-3">Detalles del Inmueble</h4>
+            <ul class="list-unstyled mb-3">
+                <li><strong>Dirección:</strong> @Model.Direccion</li>
+                <li><strong>Ambientes:</strong> @Model.Ambientes</li>
+                <li><strong>Uso:</strong> @Model.Uso</li>
+                <li><strong>Tipo:</strong> @Model.Tipo?.Nombre</li>
+                <li><strong>Precio:</strong> @Model.Precio.ToString("C")</li>
+                <li><strong>Estado:</strong> 
+                    <span class="badge @(Model.Estado == "disponible" ? "bg-success" : "bg-danger")">@Model.Estado</span>
+                </li>
+                <li><strong>Coordenadas:</strong> @Model.Coordenadas</li>
+                <li><strong>Propietario:</strong> @Model.Duenio?.NombreCompleto</li>
+            </ul>
+            <div class="mt-2">
+                <a asp-action="Editar" asp-route-id="@Model.IdInmueble" class="btn btn-light btn-sm me-2">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a asp-action="Listar" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

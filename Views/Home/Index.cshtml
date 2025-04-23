@@ -1,8 +1,154 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    var rnd = new Random();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+
+<h1 class="mb-4"><i class="bi bi-building"></i> Lista de Inmuebles</h1>
+
+<style>
+
+    
+    .transition-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border-radius: 1rem;
+    }
+
+    .transition-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        background-color: #f8f9fa;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .card-text {
+        font-size: 0.9rem;
+    }
+</style>
+
+<form method="get" class="mb-4 p-3 bg-light rounded shadow-sm">
+    <div class="row g-2">
+        <div class="col-md-2">
+            <label class="form-label">Uso</label>
+            <select name="uso" class="form-select">
+                <option value="">Todos</option>
+                <option value="Comercial" selected="@(Context.Request.Query["uso"] == "Comercial")">Comercial</option>
+                <option value="Residencial" selected="@(Context.Request.Query["uso"] == "Residencial")">Residencial
+                </option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Ambientes</label>
+            <select name="ambientes" class="form-select">
+                <option value="">Todos</option>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    var selected = Context.Request.Query["ambientes"] == i.ToString() ? "selected" : "";
+                    @:<option value="@i" @selected>@i</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Precio Desde</label>
+            <input type="number" name="precioDesde" value="@Context.Request.Query["precioDesde"]"
+                class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Precio Hasta</label>
+            <input type="number" name="precioHasta" value="@Context.Request.Query["precioHasta"]"
+                class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Disponibilidad</label>
+            <select name="estado" class="form-select">
+                <option value="Disponible" selected="@(Context.Request.Query["estado"] == "Disponible")">Disponible
+                </option>
+                <option value="Suspendido" selected="@(Context.Request.Query["estado"] == "Suspendido")">Suspendido
+                </option>
+                <option value="">Todos</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Activo</label>
+            <select name="activo" class="form-select">
+                <option value="1" selected="@(Context.Request.Query["activo"] == "1")">Activo</option>
+                <option value="0" selected="@(Context.Request.Query["activo"] == "0")">Inactivo</option>
+                <option value="">Todos</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Fecha Desde</label>
+            <input type="date" name="fechaDesde" value="@Context.Request.Query["fechaDesde"]" class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Fecha Hasta</label>
+            <input type="date" name="fechaHasta" value="@Context.Request.Query["fechaHasta"]" class="form-control" />
+        </div>
+
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-funnel-fill"></i> Filtrar
+            </button>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <a href="@Url.Action("Index", "Home")" class="btn btn-secondary w-100">
+                <i class="bi bi-x-circle"></i> Limpiar
+            </a>
+        </div>
+
+    </div>
+</form>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    @foreach (var item in Model)
+    {
+        <div class="col">
+            <a href="@Url.Action("Detalles", "Inmueble", new { id = item.IdInmueble })"
+                class="card shadow-sm h-100 text-decoration-none text-dark border-0 transition-card"
+                style="cursor: pointer;">
+
+                @if (!String.IsNullOrEmpty(item.Portada))
+                {
+                    var x = item.Portada + "?" + rnd.Next();
+                    <img src="@x" class="card-img-top rounded-top" style="height: 180px; object-fit: cover;" />
+                }
+                else
+                {
+                    <div class="d-flex align-items-center justify-content-center bg-light rounded-top" style="height: 180px;">
+                        <i class="bi bi-house fs-1 text-secondary"></i>
+                    </div>
+                }
+
+                <div class="card-body">
+                    <h5 class="card-title">@item.NombreInmueble</h5>
+                    <p class="card-text small">
+                        <strong>Dirección:</strong> @item.Direccion<br />
+                        <strong>Precio:</strong> @item.Precio.ToString("C")<br />
+                        <strong>Ambientes:</strong> @item.Ambientes<br />
+                        <strong>Uso:</strong> @item.Uso<br />
+                        <strong>Estado:</strong>
+                        <span
+                            class="badge @(item.Estado == "Disponible" ? "bg-success" : item.Estado == "Suspendido" ? "bg-danger" : "bg-warning text-dark")">
+                            @item.Estado
+                        </span>
+                    </p>
+                </div>
+            </a>
+        </div>
+    }
+
 </div>
