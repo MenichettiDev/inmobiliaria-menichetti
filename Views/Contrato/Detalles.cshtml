@@ -36,6 +36,20 @@
 
         <dt class="col-sm-2">Multa</dt>
         <dd class="col-sm-10">@Model.Multa?.ToString("C")</dd>
+
+        @* Solo visible para administradores *@
+        @if (User.IsInRole("Administrador"))
+        {
+            <dt>Creado por</dt>
+            <dd>@ViewBag.CreadoPorNombre</dd>
+
+            @* <dt>Modificado por</dt>
+            <dd>@ViewBag.ModificadoPorNombre</dd> *@
+
+            <dt>Eliminado por</dt>
+            <dd>@ViewBag.EliminadoPorNombre</dd>
+        }
+
     </dl>
 </div>
 <div>

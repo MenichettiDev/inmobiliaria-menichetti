@@ -10,9 +10,11 @@ namespace InmobiliariaApp.Controllers
     {
         private readonly PagoRepository _pagoRepository;
         private readonly ContratoRepository _contratoRepository;
+        private readonly UsuarioRepository _usuarioRepo;
 
-        public PagoController(PagoRepository pagoRepository, ContratoRepository contratoRepository)
+        public PagoController(PagoRepository pagoRepository, ContratoRepository contratoRepository, UsuarioRepository usuarioRepo)
         {
+            _usuarioRepo = usuarioRepo;
             _pagoRepository = pagoRepository;
             _contratoRepository = contratoRepository;
         }
@@ -53,6 +55,11 @@ namespace InmobiliariaApp.Controllers
             {
                 return NotFound(); // Retorna un error 404 si no se encuentra el pago
             }
+
+            ViewBag.CreadoPorNombre = ObtenerNombreUsuario(pago.CreadoPor);
+            ViewBag.ModificadoPorNombre = ObtenerNombreUsuario(pago.ModificadoPor);
+            ViewBag.EliminadoPorNombre = ObtenerNombreUsuario(pago.EliminadoPor);
+
             return View(pago);
         }
 
@@ -178,8 +185,17 @@ namespace InmobiliariaApp.Controllers
         [HttpPost, ActionName("Eliminar")]
         public IActionResult DeleteConfirmed(int id)
         {
+
             _pagoRepository.Delete(id);
             return RedirectToAction("Listar"); // Redirige a la lista de pagos
+        }
+
+        private string ObtenerNombreUsuario(int? idUsuario)
+        {
+            if (!idUsuario.HasValue) return "---";
+
+            var usuario = _usuarioRepo.GetById(idUsuario.Value);
+            return usuario != null ? $"{usuario.Email}" : "Desconocido";
         }
     }
 }

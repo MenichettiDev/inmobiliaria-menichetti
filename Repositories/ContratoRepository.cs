@@ -479,8 +479,9 @@ namespace InmobiliariaApp.Repositories
         }
 
         // Método para agregar un nuevo contrato
-        public void Add(Contrato contrato)
+        public void Add(Contrato contrato, int userId) 
         {
+        
             // Validaciones
             ValidarFechas(contrato.FechaInicio, contrato.FechaFin);
             ValidarMonto(contrato.MontoMensual);
@@ -504,7 +505,7 @@ namespace InmobiliariaApp.Repositories
                 command.Parameters.AddWithValue("@FechaInicio", contrato.FechaInicio);
                 command.Parameters.AddWithValue("@FechaFin", contrato.FechaFin);
                 command.Parameters.AddWithValue("@MontoMensual", contrato.MontoMensual);
-                command.Parameters.AddWithValue("@CreadoPor", contrato.CreadoPor ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@CreadoPor", userId);
 
                 command.ExecuteNonQuery();
 
@@ -512,7 +513,7 @@ namespace InmobiliariaApp.Repositories
                 int contratoId = (int)command.LastInsertedId;
 
                 // Generamos los pagos
-                GenerarPagos(connection, transaction, contratoId, contrato.FechaInicio, contrato.FechaFin, contrato.MontoMensual);
+                GenerarPagos(connection, transaction, contratoId, contrato.FechaInicio, contrato.FechaFin, contrato.MontoMensual, userId);
                 transaction.Commit();
             }
             catch (MySqlException ex)
@@ -536,7 +537,7 @@ namespace InmobiliariaApp.Repositories
         }
 
 
-        public void RenovarContrato(Contrato contratoBase, DateTime nuevaFechaInicio, DateTime nuevaFechaFin)
+        public void RenovarContrato(Contrato contratoBase, DateTime nuevaFechaInicio, DateTime nuevaFechaFin, int userId)
         {
             // Validaciones
             ValidarFechas(nuevaFechaInicio, nuevaFechaFin);
@@ -574,12 +575,12 @@ namespace InmobiliariaApp.Repositories
                 command.Parameters.AddWithValue("@FechaInicio", nuevaFechaInicio);
                 command.Parameters.AddWithValue("@FechaFin", nuevaFechaFin);
                 command.Parameters.AddWithValue("@MontoMensual", contratoBase.MontoMensual);
-                command.Parameters.AddWithValue("@CreadoPor", contratoBase.CreadoPor ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@CreadoPor", userId);
 
                 command.ExecuteNonQuery();
                 int contratoId = (int)command.LastInsertedId;
 
-                GenerarPagos(connection, transaction, contratoId, nuevaFechaInicio, nuevaFechaFin, contratoBase.MontoMensual);
+                GenerarPagos(connection, transaction, contratoId, nuevaFechaInicio, nuevaFechaFin, contratoBase.MontoMensual, userId);
                 transaction.Commit();
             }
             catch (Exception ex)
@@ -650,15 +651,6 @@ namespace InmobiliariaApp.Repositories
 
             command.ExecuteNonQuery();
         }
-        // Método para eliminar un contrato
-        // public void Delete(int id)
-        // {
-        //     using var connection = _dbConnection.GetConnection();
-        //     using var command = new MySqlCommand("DELETE FROM contrato WHERE id_contrato = @Id", connection);
-        //     command.Parameters.AddWithValue("@Id", id);
-
-        //     command.ExecuteNonQuery();
-        // }
 
         //==========================================================Validacion de existencia de un contrato==========================================================
         private void ValidarFechas(DateTime inicio, DateTime fin)
@@ -675,6 +667,7 @@ namespace InmobiliariaApp.Repositories
 
         private bool InmuebleEstaOcupado(int idInmueble, DateTime fechaInicio, DateTime fechaFin, int? idContratoActual = null)
         {
+            Console.WriteLine($"[INFO] Verificando si el inmueble {idInmueble} está ocupado entre {fechaInicio} y {fechaFin}.");
             using var connection = _dbConnection.GetConnection();
             var query = @"
                 SELECT COUNT(*) FROM contrato 
@@ -697,12 +690,12 @@ namespace InmobiliariaApp.Repositories
         }
 
         //Metodo para generar pagos automaticios==============================================
-        private void GenerarPagos(MySqlConnection connection, MySqlTransaction transaction, int contratoId, DateTime fechaInicio, DateTime fechaFin, decimal montoMensual)
+        private void GenerarPagos(MySqlConnection connection, MySqlTransaction transaction, int contratoId, DateTime fechaInicio, DateTime fechaFin, decimal montoMensual, int? userId)
         {
             try
             {
                 using var command = new MySqlCommand(
-                    "INSERT INTO pago (id_contrato, numero_cuota, fecha_vencimiento, importe) VALUES (@ContratoId, @NumeroCuota, @FechaVencimiento, @Importe)",
+                    "INSERT INTO pago (id_contrato, numero_cuota, fecha_vencimiento, importe, creado_por) VALUES (@ContratoId, @NumeroCuota, @FechaVencimiento, @Importe, @CreadoPor)",
                     connection,
                     transaction);
 
@@ -716,6 +709,7 @@ namespace InmobiliariaApp.Repositories
                     command.Parameters.AddWithValue("@NumeroCuota", numeroCuota);
                     command.Parameters.AddWithValue("@FechaVencimiento", fechaCuota);
                     command.Parameters.AddWithValue("@Importe", montoMensual);
+                    command.Parameters.AddWithValue("@CreadoPor", userId);
                     command.ExecuteNonQuery();
 
                     fechaCuota = AjustarFechaMensual(fechaInicio, numeroCuota);
@@ -744,67 +738,76 @@ namespace InmobiliariaApp.Repositories
         }
 
         //===============================MULTA y TERMINAR ANTICIPADO========================================================
-        public void TerminarContratoAnticipadamente(int idContrato, DateTime fechaTerminacion)
+        public void TerminarContratoAnticipadamente(int idContrato, DateTime fechaTerminacion, int user)
         {
             using var connection = _dbConnection.GetConnection();
+            // connection.Open();
+            using var transaction = connection.BeginTransaction();
 
-            var contrato = GetById(idContrato);
-            if (contrato == null)
+            try
             {
-                throw new Exception("Contrato no encontrado.");
-            }
+                var contrato = GetById(idContrato);
+                if (contrato == null)
+                    throw new Exception("Contrato no encontrado.");
 
-            // VALIDACIONES
-            if (fechaTerminacion < DateTime.Today)
+                // VALIDACIONES
+                if (fechaTerminacion < DateTime.Today)
+                    throw new Exception("La fecha de terminación no puede ser anterior al día de hoy.");
+
+                if (fechaTerminacion < contrato.FechaInicio || fechaTerminacion > contrato.FechaFin)
+                    throw new Exception("La fecha debe estar dentro del período del contrato.");
+
+                if (contrato.Estado != "vigente")
+                    throw new Exception("Solo se pueden finalizar contratos vigentes.");
+
+                if (contrato.FechaTerminacionAnticipada.HasValue)
+                    throw new Exception("Este contrato ya fue terminado anticipadamente.");
+
+                // Calcular multa
+                var multa = CalcularMulta(fechaTerminacion, contrato.FechaInicio, contrato.MontoMensual);
+
+                // Registrar multa como pago
+                using (var command = new MySqlCommand(
+                    "INSERT INTO pago (id_contrato, importe, detalle, fecha_vencimiento, creado_por) " +
+                    "VALUES (@IdContrato, @Importe, @Detalle, @FechaVencimiento, @CreadoPor)",
+                    connection, transaction))
+                {
+                    command.Parameters.AddWithValue("@IdContrato", idContrato);
+                    command.Parameters.AddWithValue("@Importe", multa);
+                    command.Parameters.AddWithValue("@Detalle", $"Multa por terminación anticipada del contrato. Total: {multa}");
+                    command.Parameters.AddWithValue("@FechaVencimiento", fechaTerminacion.AddDays(30));
+                    command.Parameters.AddWithValue("@CreadoPor", user );
+
+                    command.ExecuteNonQuery();
+                }
+
+                // Actualizar contrato
+                using (var updateCommand = new MySqlCommand(
+                    "UPDATE contrato SET estado = @Estado, fecha_terminacion_anticipada = @FechaTerminacion, multa = @Multa, eliminado_por = @EliminadoPor " +
+                    "WHERE id_contrato = @IdContrato",
+                    connection, transaction))
+                {
+                    updateCommand.Parameters.AddWithValue("@Estado", "cancelado");
+                    updateCommand.Parameters.AddWithValue("@FechaTerminacion", fechaTerminacion);
+                    updateCommand.Parameters.AddWithValue("@Multa", multa);
+                    updateCommand.Parameters.AddWithValue("@EliminadoPor", user);
+                    updateCommand.Parameters.AddWithValue("@IdContrato", idContrato);
+
+                    updateCommand.ExecuteNonQuery();
+                }
+
+                // Anular pagos posteriores
+                AnularPagosPosteriores(connection, transaction, idContrato, fechaTerminacion, user);
+
+                transaction.Commit();
+            }
+            catch (Exception ex)
             {
-                throw new Exception("La fecha de terminación no puede ser anterior al día de hoy.");
+                transaction.Rollback();
+                throw new Exception("Error al terminar el contrato anticipadamente. Detalles: " + ex.Message, ex);
             }
-
-            if (fechaTerminacion < contrato.FechaInicio || fechaTerminacion > contrato.FechaFin)
-            {
-                throw new Exception("La fecha de terminación debe estar dentro del período del contrato.");
-            }
-
-            if (contrato.Estado != "vigente")
-            {
-                throw new Exception("Solo se pueden finalizar contratos que están vigentes.");
-            }
-
-            if (contrato.FechaTerminacionAnticipada.HasValue)
-            {
-                throw new Exception("Este contrato ya fue terminado anticipadamente.");
-            }
-
-            // Calcular multa
-            var multa = CalcularMulta(fechaTerminacion, contrato.FechaInicio, contrato.MontoMensual);
-
-            // Registrar la multa como un nuevo pago
-            using var command = new MySqlCommand(
-                "INSERT INTO pago (id_contrato, importe, detalle, fecha_vencimiento) VALUES (@IdContrato, @Importe, @Detalle, @FechaVencimiento)",
-                connection);
-
-            command.Parameters.AddWithValue("@IdContrato", idContrato);
-            // command.Parameters.AddWithValue("@FechaPago", fechaTerminacion);
-            command.Parameters.AddWithValue("@Importe", multa);
-            command.Parameters.AddWithValue("@Detalle", $"Multa por terminación anticipada del contrato. Total: {multa}");
-            command.Parameters.AddWithValue("@FechaVencimiento", fechaTerminacion.AddDays(30));
-
-            command.ExecuteNonQuery();
-
-            // Actualizar el contrato
-            using var updateCommand = new MySqlCommand(
-                "UPDATE contrato SET estado = @Estado, fecha_terminacion_anticipada = @FechaTerminacion, multa = @Multa WHERE id_contrato = @IdContrato",
-                connection);
-
-            updateCommand.Parameters.AddWithValue("@Estado", "finalizado");
-            updateCommand.Parameters.AddWithValue("@FechaTerminacion", fechaTerminacion);
-            updateCommand.Parameters.AddWithValue("@Multa", multa);
-            updateCommand.Parameters.AddWithValue("@IdContrato", idContrato);
-
-            updateCommand.ExecuteNonQuery();
-            AnularPagosPosteriores(connection, idContrato, fechaTerminacion);
-
         }
+
 
 
 
@@ -826,21 +829,25 @@ namespace InmobiliariaApp.Repositories
             }
         }
 
-        private void AnularPagosPosteriores(MySqlConnection connection, int idContrato, DateTime fechaTerminacion)
+        private void AnularPagosPosteriores(MySqlConnection connection, MySqlTransaction transaction, int idContrato, DateTime fechaTerminacion, int user)
         {
             using var command = new MySqlCommand(
                 @"UPDATE pago 
-            SET estado = 'anulado' 
+            SET estado = 'anulado',
+                eliminado_por = @EliminadoPor 
             WHERE id_contrato = @IdContrato 
             AND fecha_vencimiento > @FechaTerminacion 
-            AND (detalle IS NULL OR detalle NOT LIKE '%multa%')", connection);
+            AND (detalle IS NULL OR detalle NOT LIKE '%multa%')",
+                connection, transaction);
 
             command.Parameters.AddWithValue("@IdContrato", idContrato);
             command.Parameters.AddWithValue("@FechaTerminacion", fechaTerminacion);
+            command.Parameters.AddWithValue("@EliminadoPor", user );
 
             int rows = command.ExecuteNonQuery();
             Console.WriteLine($"[INFO] {rows} pagos anulados posteriores a la terminación anticipada.");
         }
+
 
 
     }

@@ -4,6 +4,7 @@ using InmobiliariaApp.Repositories;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Org.BouncyCastle.Tls;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace InmobiliariaApp.Controllers
 {
@@ -12,9 +13,11 @@ namespace InmobiliariaApp.Controllers
         private readonly ContratoRepository _contratoRepository;
         private readonly InquilinoRepository _inquilinoRepo;
         private readonly InmuebleRepository _inmuebleRepo;
+        private readonly UsuarioRepository _usuarioRepo;
 
-        public ContratoController(ContratoRepository contratoRepository, InquilinoRepository inquilinoRepo, InmuebleRepository inmuebleRepo)
+        public ContratoController(ContratoRepository contratoRepository, InquilinoRepository inquilinoRepo, InmuebleRepository inmuebleRepo, UsuarioRepository usuarioRepo)
         {
+            _usuarioRepo = usuarioRepo;
             _inquilinoRepo = inquilinoRepo;
             _inmuebleRepo = inmuebleRepo;
             _contratoRepository = contratoRepository;
@@ -72,6 +75,11 @@ namespace InmobiliariaApp.Controllers
             {
                 return NotFound(); // Retorna un error 404 si no se encuentra el contrato
             }
+            // Resolver nombres de auditoría
+            ViewBag.CreadoPorNombre = ObtenerNombreUsuario(contrato.CreadoPor);
+            ViewBag.ModificadoPorNombre = ObtenerNombreUsuario(contrato.ModificadoPor);
+            ViewBag.EliminadoPorNombre = ObtenerNombreUsuario(contrato.EliminadoPor);
+
             return View(contrato);
         }
 
@@ -106,7 +114,15 @@ namespace InmobiliariaApp.Controllers
                     return View(contrato);
                 }
 
-                _contratoRepository.Add(contrato);
+                //Claim para obtener el ID del usuario autenticado
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(idClaim))
+                {
+                    return Unauthorized(); // o manejarlo como prefieras
+                }
+                int userId = int.Parse(idClaim);
+
+                _contratoRepository.Add(contrato, userId);
                 TempData["SuccessMessage"] = "Contrato creado correctamente.";
                 return RedirectToAction("Listar");
             }
@@ -148,15 +164,28 @@ namespace InmobiliariaApp.Controllers
             {
                 if (id != contrato.IdContrato)
                 {
-                    return BadRequest(); // ID inconsistente
+                    return BadRequest();
                 }
-                contrato = _contratoRepository.GetById(id); // Obtener el contrato existente
-                if (contrato == null)
+
+                var nuevaFechaInicio = contrato.FechaInicio;
+                var nuevaFechaFin = contrato.FechaFin;
+
+                var contratoExistente = _contratoRepository.GetById(id); 
+                if (contratoExistente == null)
                 {
-                    return NotFound(); // 404 si no existe
+                    return NotFound();
                 }
-                // Crear un nuevo contrato basado en el original, con fechas nuevas
-                _contratoRepository.RenovarContrato(contrato, contrato.FechaInicio, contrato.FechaFin);
+
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(idClaim))
+                {
+                    return Unauthorized();
+                }
+
+                int userId = int.Parse(idClaim);
+
+                _contratoRepository.RenovarContrato(contratoExistente, nuevaFechaInicio, nuevaFechaFin, userId);
+
                 TempData["SuccessMessage"] = "Contrato renovado correctamente.";
                 return RedirectToAction("Listar");
             }
@@ -164,9 +193,10 @@ namespace InmobiliariaApp.Controllers
             {
                 ViewBag.ErrorMessage = $"Ocurrió un error al renovar el contrato: {ex.Message}";
 
-                return View("Renovar", contrato); // Retorna a la vista de renovación con el contrato actual
+                return View("Renovar", contrato);
             }
         }
+
 
 
         // Acción para mostrar la vista de confirmación de eliminación
@@ -182,7 +212,8 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para confirmar la terminación anticipada del contrato
-        [Authorize(Policy = "Administrador")][HttpPost, ActionName("FinalizarAnticipadamente")]
+        [Authorize(Policy = "Administrador")]
+        [HttpPost, ActionName("FinalizarAnticipadamente")]
         public IActionResult FinalizarAnticipadamenteConfirmed(int id, DateTime fechaTerminacion)
         {
             try
@@ -193,9 +224,17 @@ namespace InmobiliariaApp.Controllers
                     return NotFound(); // Si el contrato no se encuentra
                 }
 
-                _contratoRepository.TerminarContratoAnticipadamente(id, fechaTerminacion);
+                //Claim para obtener el ID del usuario autenticado
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(idClaim))
+                {
+                    return Unauthorized(); // o manejarlo como prefieras
+                }
+                int userId = int.Parse(idClaim);
 
-                TempData["SuccessMessage"] = "Contrato finalizado anticipadamente con éxito.";
+                _contratoRepository.TerminarContratoAnticipadamente(id, fechaTerminacion, userId);
+
+                TempData["SuccessMessage"] = "Contrato cancelado anticipadamente con éxito.";
                 return RedirectToAction("Listar");
             }
             catch (Exception ex)
@@ -209,8 +248,13 @@ namespace InmobiliariaApp.Controllers
         }
 
 
+        private string ObtenerNombreUsuario(int? idUsuario)
+        {
+            if (!idUsuario.HasValue) return "---";
 
-
+            var usuario = _usuarioRepo.GetById(idUsuario.Value);
+            return usuario != null ? $"{usuario.Email}" : "Desconocido";
+        }
 
 
     }

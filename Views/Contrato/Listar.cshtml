@@ -77,7 +77,7 @@
                 <option value="">Todos</option>
                 <option value="vigente" selected="@(Context.Request.Query["estado"] == "vigente")">Vigente</option>
                 <option value="terminado" selected="@(Context.Request.Query["estado"] == "terminado")">Terminado</option>
-                <option value="finalizado" selected="@(Context.Request.Query["estado"] == "finalizado")">Cancelado</option>
+                <option value="cancelado" selected="@(Context.Request.Query["estado"] == "cancelado")">Cancelado</option>
             </select>
         </div>
 
@@ -129,7 +129,7 @@
                 <td>@item.FechaFin.ToShortDateString()</td>
                 <td>@item.MontoMensual.ToString("C")</td>
                 <td>
-                    <span class="badge @(item.Estado == "vigente" ? "bg-success" : item.Estado == "terminado" ? "bg-danger" : "bg-secondary")">
+                    <span class="badge @(item.Estado == "vigente" ? "bg-success" : item.Estado == "cancelado" ? "bg-danger" : "bg-secondary")">
                         @item.Estado
                     </span>
                 </td>
