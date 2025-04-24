@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InmobiliariaApp.Controllers
 {
@@ -13,17 +14,8 @@ namespace InmobiliariaApp.Controllers
             _propietarioRepository = propietarioRepository;
         }
 
-        // Método privado para verificar la autenticación
-        private bool UsuarioAutenticado()
-        {
-            return HttpContext.Session.GetString("Usuario") != null;
-        }
+        
 
-        // Método privado para obtener el rol del usuario
-        private string ObtenerRolUsuario()
-        {
-            return HttpContext.Session.GetString("Rol") ?? string.Empty;
-        }
 
         // Acción para listar todos los propietarios
         public IActionResult Listar(string dni, string apellido, string nombre, int pagina = 1, int tamanioPagina = 10)
@@ -131,19 +123,9 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar la vista de confirmación de eliminación
+        [Authorize(Policy = "Administrador")]
         public IActionResult Eliminar(int id)
         {
-            // if (!UsuarioAutenticado())
-            // {
-            //     return RedirectToAction("Index", "Login");
-            // }
-
-            // Solo los administradores pueden eliminar
-            if (ObtenerRolUsuario() != "Admin")
-            {
-                return Forbid(); // Denegar acceso si no es administrador
-            }
-
             var propietario = _propietarioRepository.GetById(id);
             if (propietario == null)
             {
@@ -153,20 +135,10 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para confirmar la eliminación
+        [Authorize(Policy = "Administrador")]
         [HttpPost, ActionName("Eliminar")]
         public IActionResult EliminarConfirmed(int id)
         {
-            // if (!UsuarioAutenticado())
-            // {
-            //     return RedirectToAction("Index", "Login");
-            // }
-
-            // Solo los administradores pueden eliminar
-            if (ObtenerRolUsuario() != "Admin")
-            {
-                return Forbid(); // Denegar acceso si no es administrador
-            }
-
             _propietarioRepository.Delete(id);
             return RedirectToAction("Listar"); // Redirige a la lista de propietarios
         }

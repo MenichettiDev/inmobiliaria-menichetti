@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using InmobiliariaApp.Data;
 using InmobiliariaApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InmobiliariaApp.Repositories
 {
@@ -166,6 +167,7 @@ namespace InmobiliariaApp.Repositories
         }
 
         // Método para eliminar un inquilino
+        [Authorize(Policy = "Administrador")]
         public void Delete(int id)
         {
             using var connection = _dbConnection.GetConnection();

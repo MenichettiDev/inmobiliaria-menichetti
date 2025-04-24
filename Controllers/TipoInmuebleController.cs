@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InmobiliariaApp.Controllers
 {
@@ -62,6 +63,7 @@ namespace InmobiliariaApp.Controllers
             return View(tipo);
         }
 
+        [Authorize(Policy = "Administrador")]
         public IActionResult Eliminar(int id)
         {
             var tipo = _tipoRepository.GetById(id);
@@ -70,6 +72,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         [HttpPost, ActionName("Eliminar")]
+        [Authorize(Policy = "Administrador")]
         public IActionResult EliminarConfirmado(int id)
         {
             _tipoRepository.Delete(id);

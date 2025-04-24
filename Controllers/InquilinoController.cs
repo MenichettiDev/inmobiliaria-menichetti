@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InmobiliariaApp.Controllers
 {
@@ -84,6 +85,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar la vista de confirmación de eliminación
+        [Authorize(Policy = "Administrador")]
         public IActionResult Eliminar(int id)
         {
             var inquilino = _inquilinoRepository.GetById(id);
@@ -95,7 +97,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para confirmar la eliminación
-        [HttpPost, ActionName("Eliminar")]
+        [Authorize(Policy = "Administrador")][HttpPost, ActionName("Eliminar")]
         public IActionResult DeleteConfirmed(int id)
         {
             _inquilinoRepository.Delete(id);

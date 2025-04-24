@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InmobiliariaApp.Controllers
 {
@@ -16,15 +17,6 @@ namespace InmobiliariaApp.Controllers
             _contratoRepository = contratoRepository;
         }
 
-        //Listar con filtros
-        // public IActionResult Listar(int? idContrato, int? idInquilino, DateTime? desde, DateTime? hasta, decimal? importeMin, decimal? importeMax, string estado)
-        // {
-        //     ViewBag.Contratos = _contratoRepository.GetAll();
-        //     ViewBag.EstadoSeleccionado = estado; // para mostrar el seleccionado en el HTML
-
-        //     var pagos = _pagoRepository.ObtenerFiltrados(idContrato, idInquilino, desde, hasta, importeMin, importeMax, estado);
-        //     return View(pagos);
-        // }
 
         // Listar con filtros y paginación
         public IActionResult Listar(int? idContrato, int? idInquilino, DateTime? desde, DateTime? hasta, decimal? importeMin, decimal? importeMax, string estado, int page = 1, int pageSize = 10)
@@ -120,8 +112,6 @@ namespace InmobiliariaApp.Controllers
             return View("Insertar", pago);
         }
 
-
-
         // Acción para procesar el formulario de creación
         [HttpPost]
         public IActionResult Insertar(Pago pago)
@@ -172,6 +162,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar la vista de confirmación de eliminación
+        [Authorize(Policy = "Administrador")]
         public IActionResult Eliminar(int id)
         {
             var pago = _pagoRepository.GetById(id);
@@ -183,6 +174,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para confirmar la eliminación
+        [Authorize(Policy = "Administrador")]
         [HttpPost, ActionName("Eliminar")]
         public IActionResult DeleteConfirmed(int id)
         {

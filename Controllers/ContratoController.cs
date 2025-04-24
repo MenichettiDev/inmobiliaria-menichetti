@@ -3,6 +3,7 @@ using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Org.BouncyCastle.Tls;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InmobiliariaApp.Controllers
 {
@@ -169,6 +170,7 @@ namespace InmobiliariaApp.Controllers
 
 
         // Acción para mostrar la vista de confirmación de eliminación
+        [Authorize(Policy = "Administrador")]
         public IActionResult Eliminar(int id)
         {
             var contrato = _contratoRepository.GetById(id);
@@ -180,7 +182,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para confirmar la terminación anticipada del contrato
-        [HttpPost, ActionName("FinalizarAnticipadamente")]
+        [Authorize(Policy = "Administrador")][HttpPost, ActionName("FinalizarAnticipadamente")]
         public IActionResult FinalizarAnticipadamenteConfirmed(int id, DateTime fechaTerminacion)
         {
             try
@@ -209,34 +211,6 @@ namespace InmobiliariaApp.Controllers
 
 
 
-        // Acción para suspender el contrato
-        // [HttpPost]
-        // public IActionResult BajaLogica(int id)
-        // {
-        //     var contrato = _contratoRepository.GetById(id);
-        //     if (contrato == null)
-        //     {
-        //         return NotFound(); // Retorna un error 404 si no se encuentra el contrato
-        //     }
-
-        //     _contratoRepository.bajaLogica(contrato);
-
-        //     return RedirectToAction("Listar"); // Redirige a la lista de contrato
-        // }
-        // // Acción para activar el contrato
-        // [HttpPost]
-        // public IActionResult AltaLogica(int id)
-        // {
-        //     var contrato = _contratoRepository.GetById(id);
-        //     if (contrato == null)
-        //     {
-        //         return NotFound(); // Retorna un error 404 si no se encuentra el contrato
-        //     }
-
-        //     _contratoRepository.altaLogica(contrato);
-
-        //     return RedirectToAction("Listar"); // Redirige a la lista de contrato
-        // }
 
 
     }

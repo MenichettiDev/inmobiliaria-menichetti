@@ -3,6 +3,7 @@ using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Inmobiliaria_.Net_Core.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InmobiliariaApp.Controllers
 {
@@ -19,37 +20,6 @@ namespace InmobiliariaApp.Controllers
             _tipoInmuebleRepository = tipoInmuebleRepository;
         }
 
-
-        // public IActionResult Listar(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string estado, int? activo)
-        // {
-        //     if (!Request.Query.ContainsKey("activo"))
-        //     {
-        //         activo = 1;
-        //     }
-        //     var inmuebles = _inmuebleRepository.ObtenerFiltrados(uso, ambientes, precioDesde, precioHasta, estado); // o como estés trayendo los datos
-
-        //     if (!string.IsNullOrEmpty(uso))
-        //         inmuebles = inmuebles.Where(i => i.Uso == uso).ToList();
-
-        //     if (ambientes.HasValue)
-        //         inmuebles = inmuebles.Where(i => i.Ambientes == ambientes).ToList();
-
-        //     if (precioDesde.HasValue)
-        //         inmuebles = inmuebles.Where(i => i.Precio >= precioDesde).ToList();
-
-        //     if (precioHasta.HasValue)
-        //         inmuebles = inmuebles.Where(i => i.Precio <= precioHasta).ToList();
-
-        //     if (!string.IsNullOrEmpty(estado))
-        //         inmuebles = inmuebles.Where(i => i.Estado == estado).ToList();
-
-        //     if (activo.HasValue)
-        //         inmuebles = inmuebles.Where(i => i.Activo == activo.Value).ToList();
-
-
-
-        //     return View(inmuebles);
-        // }
 
         public IActionResult Listar(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string estado, int? activo, int page = 1, int pageSize = 10)
         {
@@ -172,6 +142,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar la vista de confirmación de eliminación
+        [Authorize(Policy = "Administrador")]
         public IActionResult Eliminar(int id)
         {
             var inmueble = _inmuebleRepository.GetById(id);
@@ -183,7 +154,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para confirmar la eliminación
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("Delete")][Authorize(Policy = "Administrador")]
         public IActionResult DeleteConfirmed(int id)
         {
             _inmuebleRepository.Delete(id);
