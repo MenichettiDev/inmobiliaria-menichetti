@@ -208,7 +208,7 @@
             <a class="nav-link text-white mb-2" asp-controller="Contrato" asp-action="Listar">📄 Contratos</a>
             <a class="nav-link text-white mb-2" asp-controller="TipoInmueble" asp-action="Listar">📦 Tipos de Inmuebles</a>
             <a class="nav-link text-white mb-2" asp-controller="Pago" asp-action="Listar">💰 Pagos</a>
-            <a class="nav-link text-white mb-4" asp-controller="Usuario" asp-action="Perfil">🔐 Perfil</a>
+            <a class="nav-link text-white mb-4" asp-controller="Usuario" asp-action="Editar">🔐 Perfil</a>
             @if (User.IsInRole("Administrador")){
             <a class="nav-link text-white mb-2" asp-controller="Usuario" asp-action="Listar">⚙️ Admin Usuarios</a>
 					}

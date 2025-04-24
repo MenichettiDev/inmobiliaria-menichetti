@@ -93,12 +93,29 @@ namespace InmobiliariaApp.Controllers
             }
         }
 
-        public IActionResult Editar(int id)
+        [Authorize]
+        public IActionResult Editar(int? id)
         {
-            var usuario = _usuarioRepo.GetById(id);
+            int userId;
+
+            if (id.HasValue)
+            {
+                userId = id.Value;
+            }
+            else
+            {
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (idClaim == null) return Unauthorized(); // o redirigir al login
+                userId = int.Parse(idClaim.Value);
+            }
+
+            var usuario = _usuarioRepo.GetById(userId);
             if (usuario == null) return NotFound();
+
             return View(usuario);
         }
+
+
 
         [HttpPost]
         public IActionResult Editar(int id, Usuario usuario)
@@ -171,6 +188,8 @@ namespace InmobiliariaApp.Controllers
             new Claim(ClaimTypes.Name, usuario.Email),
             // new Claim("FullName", usuario.Nombre + " " + usuario.Apellido),
             new Claim(ClaimTypes.Role, usuario.Rol), // importante si vas a usar roles
+            new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString())
+
         };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
