@@ -30,6 +30,9 @@ public class HomeController : Controller
         if (!Request.Query.ContainsKey("activo"))
             activo = 1;
 
+            if (!Request.Query.ContainsKey("estado"))
+                estado = "Disponible";
+
         var inmuebles = _inmuebleRepository.IndexFiltrados(uso, ambientes, precioDesde, precioHasta,
             estado, activo, fechaDesde, fechaHasta, page, pageSize, out int totalItems);
 

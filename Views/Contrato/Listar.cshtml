@@ -74,10 +74,10 @@
         <div class="col-md-2">
             <label class="form-label">Estado</label>
             <select name="estado" class="form-select">
-                <option value="">Todos</option>
                 <option value="vigente" selected="@(Context.Request.Query["estado"] == "vigente")">Vigente</option>
                 <option value="terminado" selected="@(Context.Request.Query["estado"] == "terminado")">Terminado</option>
                 <option value="cancelado" selected="@(Context.Request.Query["estado"] == "cancelado")">Cancelado</option>
+                <option value="">Todos</option>
             </select>
         </div>
 

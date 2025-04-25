@@ -49,9 +49,9 @@
         <div class="col-md-2">
             <label class="form-label">Disponibilidad</label>
             <select name="estado" class="form-select">
-                <option value="">Todos</option>
                 <option value="Disponible" selected="@(Context.Request.Query["estado"] == "Disponible")">Disponible</option>
                 <option value="Suspendido" selected="@(Context.Request.Query["estado"] == "Suspendido")">Suspendido</option>
+                <option value="">Todos</option>
             </select>
         </div>
 

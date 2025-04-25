@@ -51,6 +51,10 @@ namespace InmobiliariaApp.Controllers
             int pageSize = 10)
         {
             activo = 1; // Solo activos
+            
+            if (!Request.Query.ContainsKey("estado"))
+                estado = "Vigente";
+
             ViewBag.Inquilinos = _inquilinoRepo.GetAll();
             ViewBag.Inmuebles = _inmuebleRepo.GetAll();
 
@@ -170,7 +174,7 @@ namespace InmobiliariaApp.Controllers
                 var nuevaFechaInicio = contrato.FechaInicio;
                 var nuevaFechaFin = contrato.FechaFin;
 
-                var contratoExistente = _contratoRepository.GetById(id); 
+                var contratoExistente = _contratoRepository.GetById(id);
                 if (contratoExistente == null)
                 {
                     return NotFound();

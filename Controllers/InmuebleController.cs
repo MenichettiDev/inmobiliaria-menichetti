@@ -21,10 +21,12 @@ namespace InmobiliariaApp.Controllers
         }
 
 
-        public IActionResult Listar(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string estado, int? activo, int page = 1, int pageSize = 10)
+        public IActionResult Listar(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string estado , int? activo, int page = 1, int pageSize = 10)
         {
             if (!Request.Query.ContainsKey("activo"))
                 activo = 1;
+            if (!Request.Query.ContainsKey("estado"))
+                estado = "Disponible";
 
             var inmuebles = _inmuebleRepository.ObtenerFiltrados(uso, ambientes, precioDesde, precioHasta, estado, activo, page, pageSize, out int totalItems);
 
