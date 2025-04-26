@@ -3,6 +3,7 @@ using InmobiliariaApp.Models;
 using InmobiliariaApp.Repositories;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace InmobiliariaApp.Controllers
 {
@@ -87,8 +88,15 @@ namespace InmobiliariaApp.Controllers
 
             if (ModelState.IsValid)
             {
+//Claim para obtener el ID del usuario autenticado
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(idClaim))
+                {
+                    return Unauthorized(); // o manejarlo como prefieras
+                }
+                int userId = int.Parse(idClaim);
 
-                _pagoRepository.Update(pago);
+                _pagoRepository.PagoCuota(pago, userId);
 
                 ViewData["Mensaje"] = "Pago realizado con éxito.";
                 ViewData["TipoMensaje"] = "success"; // o "error" según corresponda
@@ -128,7 +136,15 @@ namespace InmobiliariaApp.Controllers
                 pago.FechaPago = DateTime.Today;
                 pago.Estado = "Pagado";
 
-                _pagoRepository.Add(pago);
+                //Claim para obtener el ID del usuario autenticado
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(idClaim))
+                {
+                    return Unauthorized(); // o manejarlo como prefieras
+                }
+                int userId = int.Parse(idClaim);
+
+                _pagoRepository.Add(pago, userId);
                 return RedirectToAction("Listar");
             }
 
@@ -161,8 +177,15 @@ namespace InmobiliariaApp.Controllers
 
             if (ModelState.IsValid)
             {
+                //Claim para obtener el ID del usuario autenticado
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(idClaim))
+                {
+                    return Unauthorized(); // o manejarlo como prefieras
+                }
+                int userId = int.Parse(idClaim);
 
-                _pagoRepository.Update(pago);
+                _pagoRepository.Update(pago, userId);
                 return RedirectToAction("Listar"); // Redirige a la lista de pagos
             }
             return View(pago);
@@ -186,7 +209,15 @@ namespace InmobiliariaApp.Controllers
         public IActionResult DeleteConfirmed(int id)
         {
 
-            _pagoRepository.Delete(id);
+            //Claim para obtener el ID del usuario autenticado
+            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(idClaim))
+            {
+                return Unauthorized(); // o manejarlo como prefieras
+            }
+            int userId = int.Parse(idClaim);
+
+            _pagoRepository.Delete(id, userId);
             return RedirectToAction("Listar"); // Redirige a la lista de pagos
         }
 

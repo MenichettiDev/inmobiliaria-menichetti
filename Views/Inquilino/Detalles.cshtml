@@ -8,11 +8,8 @@
 </h1>
 
 <div>
-    <h4>Inquilino</h4>
     <hr />
     <dl class="row">
-        <dt class="col-sm-2">ID</dt>
-        <dd class="col-sm-10">@Model.IdInquilino</dd>
         <dt class="col-sm-2">DNI</dt>
         <dd class="col-sm-10">@Model.Dni</dd>
         <dt class="col-sm-2">Apellido</dt>
@@ -26,6 +23,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Editar" asp-route-id="@Model.IdInquilino" class="btn btn-success">Editar</a> |
+    <a asp-action="Editar" asp-route-id="@Model.IdInquilino" class="btn btn-success">Editar</a> 
     <a asp-action="Listar" class="btn btn-secondary">Volver a la Lista</a>
 </div>

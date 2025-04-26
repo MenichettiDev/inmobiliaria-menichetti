@@ -437,12 +437,12 @@ namespace InmobiliariaApp.Repositories
         }
 
         // Pagos tipo cuotas generados automaticamente
-        public void Add(Pago pago)
+        public void Add(Pago pago, int userId)
         {
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                "INSERT INTO pago (id_contrato, fecha_vencimiento, fecha_pago, importe, detalle, estado, creado_por, modificado_por, eliminado_por) " +
-                "VALUES (@ContratoId, @FechaVencimiento, @FechaPago, @Importe, @Detalle, @Estado, @CreadoPor, @ModificadoPor, @EliminadoPor)", connection);
+                "INSERT INTO pago (id_contrato, fecha_vencimiento, fecha_pago, importe, detalle, estado, creado_por) " +
+                "VALUES (@ContratoId, @FechaVencimiento, @FechaPago, @Importe, @Detalle, @Estado, @CreadoPor)", connection);
 
             command.Parameters.AddWithValue("@ContratoId", pago.IdContrato);
             command.Parameters.AddWithValue("@FechaVencimiento", pago.FechaVencimiento);
@@ -450,44 +450,54 @@ namespace InmobiliariaApp.Repositories
             command.Parameters.AddWithValue("@Importe", pago.Importe);
             command.Parameters.AddWithValue("@Detalle", string.IsNullOrEmpty(pago.Detalle) ? (object)DBNull.Value : pago.Detalle);
             command.Parameters.AddWithValue("@Estado", "Pagado");
-            command.Parameters.AddWithValue("@CreadoPor", pago.CreadoPor ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@ModificadoPor", pago.ModificadoPor ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@EliminadoPor", pago.EliminadoPor ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@CreadoPor", userId);
 
             command.ExecuteNonQuery();
         }
 
 
         // Método para actualizar un pago
-        public void Update(Pago pago)
+        public void Update(Pago pago, int userId)
         {
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand(
-                "UPDATE pago SET id_contrato = @ContratoId, fecha_vencimiento = @FechaVencimiento, fecha_pago = @FechaPago, importe = @Importe, " +
-                "detalle = @Detalle, estado = @Estado, creado_por = @CreadoPor, modificado_por = @ModificadoPor, eliminado_por = @EliminadoPor " +
+                "UPDATE pago SET detalle = @Detalle, modificado_por = @ModificadoPor " +
                 "WHERE id_pago = @Id", connection);
 
             command.Parameters.AddWithValue("@Id", pago.IdPago);
-            command.Parameters.AddWithValue("@ContratoId", pago.IdContrato);
-            command.Parameters.AddWithValue("@FechaVencimiento", pago.FechaVencimiento);
+            command.Parameters.AddWithValue("@Detalle", string.IsNullOrEmpty(pago.Detalle) ? (object)DBNull.Value : pago.Detalle);
+            command.Parameters.AddWithValue("@ModificadoPor", userId);
+
+            command.ExecuteNonQuery();
+        }
+
+        //Metodo para pagar una cuota o un pago comun
+        public void PagoCuota(Pago pago, int userId)
+        {
+            using var connection = _dbConnection.GetConnection();
+            using var command = new MySqlCommand(
+                "UPDATE pago SET fecha_pago = @FechaPago, importe = @Importe, " +
+                "detalle = @Detalle, estado = @Estado, modificado_por = @ModificadoPor " +
+                "WHERE id_pago = @Id", connection);
+
+            command.Parameters.AddWithValue("@Id", pago.IdPago);
             command.Parameters.AddWithValue("@FechaPago", pago.FechaPago);
             command.Parameters.AddWithValue("@Importe", pago.Importe);
             command.Parameters.AddWithValue("@Detalle", string.IsNullOrEmpty(pago.Detalle) ? (object)DBNull.Value : pago.Detalle);
             command.Parameters.AddWithValue("@Estado", pago.Estado ?? "Pagado");
-            command.Parameters.AddWithValue("@CreadoPor", pago.CreadoPor ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@ModificadoPor", pago.ModificadoPor ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@EliminadoPor", pago.EliminadoPor ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@ModificadoPor", userId);
 
             command.ExecuteNonQuery();
         }
 
 
         // Método para eliminar un pago
-        public void Delete(int id)
+        public void Delete(int id, int userId)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("UPDATE pago SET estado = 'Anulado' where id_pago = @Id", connection);
+            using var command = new MySqlCommand("UPDATE pago SET estado = 'Anulado', eliminado_por = @EliminadoPor where id_pago = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
+            command.Parameters.AddWithValue("@EliminadoPor", userId);
 
             command.ExecuteNonQuery();
         }

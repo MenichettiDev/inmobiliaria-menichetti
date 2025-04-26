@@ -64,7 +64,6 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Insertar(Inmueble inmueble)
         {
-            Console.WriteLine("Insertar Inmueble: " + inmueble.ToString());
             if (ModelState.IsValid)
             {
                 _inmuebleRepository.Add(inmueble);

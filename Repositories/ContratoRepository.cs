@@ -16,7 +16,6 @@ namespace InmobiliariaApp.Repositories
         }
 
         //Metodos para filtarr y paginar
-        // Método para obtener contratos paginados
         public List<Contrato> ObtenerContratosPaginados(
             int? idInquilino,
             int? idInmueble,
@@ -593,64 +592,64 @@ namespace InmobiliariaApp.Repositories
         }
 
 
-        // Método para actualizar un contrato
-        public void Update(Contrato contrato)
-        {
-            // Validaciones
-            ValidarFechas(contrato.FechaInicio, contrato.FechaFin);
-            ValidarMonto(contrato.MontoMensual);
+        // Método para actualizar un contrato--No se puede actualizar un contrato
+        // public void Update(Contrato contrato)
+        // {
+        //     // Validaciones
+        //     ValidarFechas(contrato.FechaInicio, contrato.FechaFin);
+        //     ValidarMonto(contrato.MontoMensual);
 
-            if (InmuebleEstaOcupado(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin, contrato.IdContrato))
-                throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
+        //     if (InmuebleEstaOcupado(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin, contrato.IdContrato))
+        //         throw new InvalidOperationException("El inmueble ya tiene un contrato vigente en las fechas seleccionadas.");
 
 
-            using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand(
-                "UPDATE contrato SET id_inquilino = @IdInquilino, id_inmueble = @IdInmueble, fecha_inicio = @FechaInicio, " +
-                "fecha_fin = @FechaFin, monto_mensual = @MontoMensual, estado = @Estado, " +
-                "fecha_terminacion_anticipada = @FechaTerminacionAnticipada, multa = @Multa, " +
-                "creado_por = @CreadoPor, modificado_por = @ModificadoPor, eliminado_por = @EliminadoPor " +
-                "WHERE id_contrato = @IdContrato", connection);
+        //     using var connection = _dbConnection.GetConnection();
+        //     using var command = new MySqlCommand(
+        //         "UPDATE contrato SET id_inquilino = @IdInquilino, id_inmueble = @IdInmueble, fecha_inicio = @FechaInicio, " +
+        //         "fecha_fin = @FechaFin, monto_mensual = @MontoMensual, estado = @Estado, " +
+        //         "fecha_terminacion_anticipada = @FechaTerminacionAnticipada, multa = @Multa, " +
+        //         "creado_por = @CreadoPor, modificado_por = @ModificadoPor, eliminado_por = @EliminadoPor " +
+        //         "WHERE id_contrato = @IdContrato", connection);
 
-            command.Parameters.AddWithValue("@IdContrato", contrato.IdContrato);
-            command.Parameters.AddWithValue("@IdInquilino", contrato.IdInquilino);
-            command.Parameters.AddWithValue("@IdInmueble", contrato.IdInmueble);
-            command.Parameters.AddWithValue("@FechaInicio", contrato.FechaInicio);
-            command.Parameters.AddWithValue("@FechaFin", contrato.FechaFin);
-            command.Parameters.AddWithValue("@MontoMensual", contrato.MontoMensual);
-            command.Parameters.AddWithValue("@Estado", contrato.Estado);
-            command.Parameters.AddWithValue("@FechaTerminacionAnticipada", contrato.FechaTerminacionAnticipada ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Multa", contrato.Multa ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@CreadoPor", contrato.CreadoPor ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@ModificadoPor", contrato.ModificadoPor ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@EliminadoPor", contrato.EliminadoPor ?? (object)DBNull.Value);
+        //     command.Parameters.AddWithValue("@IdContrato", contrato.IdContrato);
+        //     command.Parameters.AddWithValue("@IdInquilino", contrato.IdInquilino);
+        //     command.Parameters.AddWithValue("@IdInmueble", contrato.IdInmueble);
+        //     command.Parameters.AddWithValue("@FechaInicio", contrato.FechaInicio);
+        //     command.Parameters.AddWithValue("@FechaFin", contrato.FechaFin);
+        //     command.Parameters.AddWithValue("@MontoMensual", contrato.MontoMensual);
+        //     command.Parameters.AddWithValue("@Estado", contrato.Estado);
+        //     command.Parameters.AddWithValue("@FechaTerminacionAnticipada", contrato.FechaTerminacionAnticipada ?? (object)DBNull.Value);
+        //     command.Parameters.AddWithValue("@Multa", contrato.Multa ?? (object)DBNull.Value);
+        //     command.Parameters.AddWithValue("@CreadoPor", contrato.CreadoPor ?? (object)DBNull.Value);
+        //     command.Parameters.AddWithValue("@ModificadoPor", contrato.ModificadoPor ?? (object)DBNull.Value);
+        //     command.Parameters.AddWithValue("@EliminadoPor", contrato.EliminadoPor ?? (object)DBNull.Value);
 
-            command.ExecuteNonQuery();
-        }
+        //     command.ExecuteNonQuery();
+        // }
 
-        public void bajaLogica(Contrato contrato)
-        {
-            using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand(
-                "UPDATE contrato SET activo = 0 " +
-                "WHERE id_contrato = @IdContrato", connection);
+        // public void bajaLogica(Contrato contrato)
+        // {
+        //     using var connection = _dbConnection.GetConnection();
+        //     using var command = new MySqlCommand(
+        //         "UPDATE contrato SET activo = 0 " +
+        //         "WHERE id_contrato = @IdContrato", connection);
 
-            command.Parameters.AddWithValue("@IdContrato", contrato.IdContrato);
+        //     command.Parameters.AddWithValue("@IdContrato", contrato.IdContrato);
 
-            command.ExecuteNonQuery();
-        }
+        //     command.ExecuteNonQuery();
+        // }
 
-        public void altaLogica(Contrato contrato)
-        {
-            using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand(
-                "UPDATE contrato SET activo = 1 " +
-                "WHERE id_contrato = @IdContrato", connection);
+        // public void altaLogica(Contrato contrato)
+        // {
+        //     using var connection = _dbConnection.GetConnection();
+        //     using var command = new MySqlCommand(
+        //         "UPDATE contrato SET activo = 1 " +
+        //         "WHERE id_contrato = @IdContrato", connection);
 
-            command.Parameters.AddWithValue("@IdContrato", contrato.IdContrato);
+        //     command.Parameters.AddWithValue("@IdContrato", contrato.IdContrato);
 
-            command.ExecuteNonQuery();
-        }
+        //     command.ExecuteNonQuery();
+        // }
 
         //==========================================================Validacion de existencia de un contrato==========================================================
         private void ValidarFechas(DateTime inicio, DateTime fin)

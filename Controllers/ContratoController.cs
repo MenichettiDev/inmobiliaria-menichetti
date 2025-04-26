@@ -147,59 +147,58 @@ namespace InmobiliariaApp.Controllers
 
 
         // GET: Renovar contrato - muestra el formulario con los datos actuales
-        // GET: Renovar contrato - muestra el formulario con los datos actuales
-        public IActionResult Renovar(int id)
-        {
-            var contrato = _contratoRepository.GetById(id);
+        // public IActionResult Renovar(int id)
+        // {
+        //     var contrato = _contratoRepository.GetById(id);
 
-            if (contrato == null)
-            {
-                return NotFound(); // 404 si no existe
-            }
+        //     if (contrato == null)
+        //     {
+        //         return NotFound(); // 404 si no existe
+        //     }
 
 
-            return View(contrato);
-        }
+        //     return View(contrato);
+        // }
 
-        [HttpPost]
-        public IActionResult Renovar(int id, Contrato contrato)
-        {
-            try
-            {
-                if (id != contrato.IdContrato)
-                {
-                    return BadRequest();
-                }
+        // [HttpPost]
+        // public IActionResult Renovar(int id, Contrato contrato)
+        // {
+        //     try
+        //     {
+        //         if (id != contrato.IdContrato)
+        //         {
+        //             return BadRequest();
+        //         }
 
-                var nuevaFechaInicio = contrato.FechaInicio;
-                var nuevaFechaFin = contrato.FechaFin;
+        //         var nuevaFechaInicio = contrato.FechaInicio;
+        //         var nuevaFechaFin = contrato.FechaFin;
 
-                var contratoExistente = _contratoRepository.GetById(id);
-                if (contratoExistente == null)
-                {
-                    return NotFound();
-                }
+        //         var contratoExistente = _contratoRepository.GetById(id);
+        //         if (contratoExistente == null)
+        //         {
+        //             return NotFound();
+        //         }
 
-                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(idClaim))
-                {
-                    return Unauthorized();
-                }
+        //         var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //         if (string.IsNullOrEmpty(idClaim))
+        //         {
+        //             return Unauthorized();
+        //         }
 
-                int userId = int.Parse(idClaim);
+        //         int userId = int.Parse(idClaim);
 
-                _contratoRepository.RenovarContrato(contratoExistente, nuevaFechaInicio, nuevaFechaFin, userId);
+        //         _contratoRepository.RenovarContrato(contratoExistente, nuevaFechaInicio, nuevaFechaFin, userId);
 
-                TempData["SuccessMessage"] = "Contrato renovado correctamente.";
-                return RedirectToAction("Listar");
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = $"Ocurrió un error al renovar el contrato: {ex.Message}";
+        //         TempData["SuccessMessage"] = "Contrato renovado correctamente.";
+        //         return RedirectToAction("Listar");
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         ViewBag.ErrorMessage = $"Ocurrió un error al renovar el contrato: {ex.Message}";
 
-                return View("Renovar", contrato);
-            }
-        }
+        //         return View("Renovar", contrato);
+        //     }
+        // }
 
 
 
