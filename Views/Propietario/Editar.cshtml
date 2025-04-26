@@ -1,3 +1,10 @@
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
 @model InmobiliariaApp.Models.Propietario
 
 @{
