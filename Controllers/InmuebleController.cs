@@ -12,16 +12,18 @@ namespace InmobiliariaApp.Controllers
         private readonly InmuebleRepository _inmuebleRepository;
         private readonly PropietarioRepository _propietarioRepository;
         private readonly TipoInmuebleRepository _tipoInmuebleRepository;
+        private readonly UsuarioRepository _usuarioRepository;
 
-        public InmuebleController(InmuebleRepository inmuebleRepository, PropietarioRepository propietarioRepository, TipoInmuebleRepository tipoInmuebleRepository)
+        public InmuebleController(InmuebleRepository inmuebleRepository, PropietarioRepository propietarioRepository, TipoInmuebleRepository tipoInmuebleRepository, UsuarioRepository usuarioRepository)
         {
             _inmuebleRepository = inmuebleRepository;
             _propietarioRepository = propietarioRepository;
             _tipoInmuebleRepository = tipoInmuebleRepository;
+            _usuarioRepository = usuarioRepository;
         }
 
 
-        public IActionResult Listar(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string estado , int? activo, int page = 1, int pageSize = 10)
+        public IActionResult Listar(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta, string estado, int? activo, int page = 1, int pageSize = 10)
         {
             if (!Request.Query.ContainsKey("activo"))
                 activo = 1;
@@ -42,11 +44,13 @@ namespace InmobiliariaApp.Controllers
         // Acción para mostrar detalles de un inmueble
         public IActionResult Detalles(int id)
         {
+
             var inmueble = _inmuebleRepository.GetById(id);
             if (inmueble == null)
             {
                 return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
             }
+
             return View(inmueble);
         }
 
@@ -64,12 +68,34 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Insertar(Inmueble inmueble)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _inmuebleRepository.Add(inmueble);
-                return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+                if (ModelState.IsValid)
+                {
+                    _inmuebleRepository.Add(inmueble);
+                    TempData["SuccessMessage"] = "Inmueble creado correctamente.";
+                    return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+                }
+
+                var propietarios = _propietarioRepository.GetAll(); // O el método que uses
+                ViewData["Propietarios"] = new SelectList(propietarios, "IdPropietario", "NombreCompleto");
+                var tiposInmueble = _tipoInmuebleRepository.GetAll(); // O el método que uses
+                ViewData["TipoInmueble"] = new SelectList(tiposInmueble, "IdTipoInmueble", "Nombre");
+
+                return View(inmueble);
+
             }
-            return View(inmueble);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al crear el Inmueble: {ex.Message}";
+
+                var propietarios = _propietarioRepository.GetAll(); // O el método que uses
+                ViewData["Propietarios"] = new SelectList(propietarios, "IdPropietario", "NombreCompleto");
+                var tiposInmueble = _tipoInmuebleRepository.GetAll(); // O el método que uses
+                ViewData["TipoInmueble"] = new SelectList(tiposInmueble, "IdTipoInmueble", "Nombre");
+
+                return View("Insertar", inmueble);
+            }
         }
 
         // Acción para mostrar el formulario de edición
@@ -94,53 +120,35 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Editar(int id, Inmueble inmueble)
         {
-            //     var tiposInmueble = _tipoInmuebleRepository.GetAll(); // O el método que uses
-            //     ViewData["TipoInmueble"] = new SelectList(tiposInmueble, "IdTipoInmueble", "Nombre");
 
-            //     var propietarios = _propietarioRepository.GetAll(); // O el método que uses
-            //     ViewData["Propietarios"] = new SelectList(propietarios, "IdPropietario", "NombreCompleto");
-
-            if (id != inmueble.IdInmueble)
+            try
             {
-                return BadRequest(); // Retorna un error 400 si los IDs no coinciden
-            }
+                if (id != inmueble.IdInmueble)
+                {
+                    return BadRequest(); // Retorna un error 400 si los IDs no coinciden
+                }
 
-            if (ModelState.IsValid)
-            {
-                _inmuebleRepository.Update(inmueble);
-                return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+                if (ModelState.IsValid)
+                {
+                    _inmuebleRepository.Update(inmueble);
+                    TempData["SuccessMessage"] = "Inmueble modificado correctamente.";
+                    return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+                }
+                return View(inmueble);
             }
-            return View(inmueble);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al editar el Inmueble: {ex.Message}";
+
+                var propietarios = _propietarioRepository.GetAll(); // O el método que uses
+                ViewData["Propietarios"] = new SelectList(propietarios, "IdPropietario", "NombreCompleto");
+                var tiposInmueble = _tipoInmuebleRepository.GetAll(); // O el método que uses
+                ViewData["TipoInmueble"] = new SelectList(tiposInmueble, "IdTipoInmueble", "Nombre");
+
+                return View("Editar", inmueble);
+            }
         }
 
-        // Acción para suspender el inmueble
-        [HttpPost]
-        public IActionResult BajaLogica(int id)
-        {
-            var inmueble = _inmuebleRepository.GetById(id);
-            if (inmueble == null)
-            {
-                return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
-            }
-
-            _inmuebleRepository.bajaLogica(inmueble);
-
-            return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
-        }
-        // Acción para activar el inmueble
-        [HttpPost]
-        public IActionResult AltaLogica(int id)
-        {
-            var inmueble = _inmuebleRepository.GetById(id);
-            if (inmueble == null)
-            {
-                return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
-            }
-
-            _inmuebleRepository.altaLogica(inmueble);
-
-            return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
-        }
 
         // Acción para mostrar la vista de confirmación de eliminación
         [Authorize(Policy = "Administrador")]
@@ -155,12 +163,25 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para confirmar la eliminación
-        [HttpPost, ActionName("Delete")][Authorize(Policy = "Administrador")]
+        [HttpPost, ActionName("Delete")]
+        [Authorize(Policy = "Administrador")]
         public IActionResult DeleteConfirmed(int id)
         {
-            _inmuebleRepository.Delete(id);
-            return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+            try
+            {
+                _inmuebleRepository.Delete(id);
+                TempData["SuccessMessage"] = "Inmueble eliminado correctamente.";
+                return RedirectToAction("Listar");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al eliminar el inmueble: {ex.Message}";
+
+                var inmueble = _inmuebleRepository.GetById(id); // Volver a cargar el contrato para mostrar la vista
+                return View("Eliminar", inmueble); // Mostramos la misma vista de confirmación con el error
+            }
         }
+
 
 
         // GET: Inmueble/Imagenes/5
@@ -253,5 +274,41 @@ namespace InmobiliariaApp.Controllers
             }
         }
 
+        // // Acción para suspender el inmueble
+        // [HttpPost]
+        // public IActionResult BajaLogica(int id)
+        // {
+        //     var inmueble = _inmuebleRepository.GetById(id);
+        //     if (inmueble == null)
+        //     {
+        //         return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
+        //     }
+
+        //     _inmuebleRepository.bajaLogica(inmueble);
+
+        //     return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+        // }
+        // // Acción para activar el inmueble
+        // [HttpPost]
+        // public IActionResult AltaLogica(int id)
+        // {
+        //     var inmueble = _inmuebleRepository.GetById(id);
+        //     if (inmueble == null)
+        //     {
+        //         return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
+        //     }
+
+        //     _inmuebleRepository.altaLogica(inmueble);
+
+        //     return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+        // }
+
+        private string ObtenerNombreUsuario(int? idUsuario)
+        {
+            if (!idUsuario.HasValue) return "---";
+
+            var usuario = _usuarioRepository.GetById(idUsuario.Value);
+            return usuario != null ? $"{usuario.Email}" : "Desconocido";
+        }
     }
 }

@@ -79,30 +79,38 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult PagoCuota(int id, Pago pago)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return View("PagoCuota", pago); // vuelve al form con validaciones
-            }
-
-            pago.Estado = "Pagado";
-
-            if (ModelState.IsValid)
-            {
-//Claim para obtener el ID del usuario autenticado
-                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(idClaim))
+                if (!ModelState.IsValid)
                 {
-                    return Unauthorized(); // o manejarlo como prefieras
+                    return View("PagoCuota", pago); // vuelve al form con validaciones
                 }
-                int userId = int.Parse(idClaim);
 
-                _pagoRepository.PagoCuota(pago, userId);
+                pago.Estado = "Pagado";
 
-                ViewData["Mensaje"] = "Pago realizado con éxito.";
-                ViewData["TipoMensaje"] = "success"; // o "error" según corresponda
-                return RedirectToAction("Listar"); // Redirige a la lista de pagos
+                if (ModelState.IsValid)
+                {
+                    //Claim para obtener el ID del usuario autenticado
+                    var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(idClaim))
+                    {
+                        return Unauthorized();
+                    }
+                    int userId = int.Parse(idClaim);
+
+                    _pagoRepository.PagoCuota(pago, userId);
+
+                    TempData["SuccessMessage"] = "Pago cargado exitosamente.";
+                    return RedirectToAction("Listar");
+                }
+                return View(pago);
             }
-            return View(pago);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al crear el Pago: {ex.Message}";
+
+                return View("PagoCuota", pago);
+            }
         }
 
         public IActionResult Insertar()
@@ -127,31 +135,50 @@ namespace InmobiliariaApp.Controllers
             return View("Insertar", pago);
         }
 
-        // Acción para procesar el formulario de creación
+        // Acción para insertar un pago
         [HttpPost]
         public IActionResult Insertar(Pago pago)
         {
-            if (ModelState.IsValid)
+            try
             {
-                pago.FechaPago = DateTime.Today;
-                pago.Estado = "Pagado";
-
-                //Claim para obtener el ID del usuario autenticado
-                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(idClaim))
+                if (ModelState.IsValid)
                 {
-                    return Unauthorized(); // o manejarlo como prefieras
-                }
-                int userId = int.Parse(idClaim);
+                    pago.FechaPago = DateTime.Today;
+                    pago.Estado = "Pagado";
 
-                _pagoRepository.Add(pago, userId);
-                return RedirectToAction("Listar");
+                    //Claim para obtener el ID del usuario autenticado
+                    var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(idClaim))
+                    {
+                        return Unauthorized(); // o manejarlo como prefieras
+                    }
+                    int userId = int.Parse(idClaim);
+
+                    _pagoRepository.Add(pago, userId);
+                    TempData["SuccessMessage"] = "Pago creado correctamente.";
+
+                    return RedirectToAction("Listar");
+                }
+                else
+                {
+                    var contratos = _contratoRepository.GetAll();
+                    ViewBag.Contratos = new SelectList(contratos, "IdContrato", "Descripcion");
+                    ViewBag.ErrorMessage = $"Ocurrió un error al insertar el Pago, revise el llenado de los campos";
+
+                    return View("Insertar", pago);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                var contratos = _contratoRepository.GetAll();
+                ViewBag.Contratos = new SelectList(contratos, "IdContrato", "Descripcion");
+                ViewBag.ErrorMessage = $"Ocurrió un error al insertar el Pago: {ex.Message}";
+
+                return View("Insertar", pago);
+
             }
 
-            // volver a cargar los contratos si falla el modelo
-            var contratos = _contratoRepository.GetAll();
-            ViewBag.Contratos = new SelectList(contratos, "IdContrato", "Descripcion");
-            return View(pago);
         }
 
 
@@ -170,25 +197,36 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Editar(int id, Pago pago)
         {
-            if (id != pago.IdPago)
+            try
             {
-                return BadRequest(); // Retorna un error 400 si los IDs no coinciden
-            }
-
-            if (ModelState.IsValid)
-            {
-                //Claim para obtener el ID del usuario autenticado
-                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(idClaim))
+                if (id != pago.IdPago)
                 {
-                    return Unauthorized(); // o manejarlo como prefieras
+                    return BadRequest(); // Retorna un error 400 si los IDs no coinciden
                 }
-                int userId = int.Parse(idClaim);
 
-                _pagoRepository.Update(pago, userId);
-                return RedirectToAction("Listar"); // Redirige a la lista de pagos
+                if (ModelState.IsValid)
+                {
+                    //Claim para obtener el ID del usuario autenticado
+                    var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(idClaim))
+                    {
+                        return Unauthorized();
+                    }
+                    int userId = int.Parse(idClaim);
+
+                    _pagoRepository.Update(pago, userId);
+                    TempData["SuccessMessage"] = "Pago modificado correctamente.";
+                    return RedirectToAction("Listar"); // Redirige a la lista de pagos
+                }
+                ViewBag.ErrorMessage = $"Ocurrió un error al editar el Pago, revise los campos";
+                return View(pago);
             }
-            return View(pago);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al editar el Pago: {ex.Message}";
+
+                return View("Editar", pago);
+            }
         }
 
         // Acción para mostrar la vista de confirmación de eliminación
@@ -209,16 +247,27 @@ namespace InmobiliariaApp.Controllers
         public IActionResult DeleteConfirmed(int id)
         {
 
-            //Claim para obtener el ID del usuario autenticado
-            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(idClaim))
+            try
             {
-                return Unauthorized(); // o manejarlo como prefieras
-            }
-            int userId = int.Parse(idClaim);
+                //Claim para obtener el ID del usuario autenticado
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(idClaim))
+                {
+                    return Unauthorized(); // o manejarlo como prefieras
+                }
+                int userId = int.Parse(idClaim);
 
-            _pagoRepository.Delete(id, userId);
-            return RedirectToAction("Listar"); // Redirige a la lista de pagos
+                _pagoRepository.Delete(id, userId);
+                TempData["SuccessMessage"] = "Pago anulado correctamente.";
+                return RedirectToAction("Listar"); // Redirige a la lista de pagos
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al anular el Pago: {ex.Message}";
+
+                var pago = _pagoRepository.GetById(id); // Volver a cargar el contrato para mostrar la vista
+                return View("Eliminar", pago); // Mostramos la misma vista de confirmación con el error
+            }
         }
 
         private string ObtenerNombreUsuario(int? idUsuario)

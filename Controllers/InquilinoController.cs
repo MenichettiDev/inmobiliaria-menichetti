@@ -48,12 +48,23 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Insertar(Inquilino inquilino)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _inquilinoRepository.Add(inquilino);
-                return RedirectToAction("Listar"); // Redirige a la lista de inquilinos
+                if (ModelState.IsValid)
+                {
+                    _inquilinoRepository.Add(inquilino);
+                    TempData["SuccessMessage"] = "Inquilino creado correctamente.";
+                    return RedirectToAction("Listar"); // Redirige a la lista de inquilinos
+                }
+                return View(inquilino);
             }
-            return View(inquilino);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al crear el Inquilino: {ex.Message}";
+
+
+                return View("Insertar", inquilino);
+            }
         }
 
         // Acción para mostrar el formulario de edición
@@ -71,17 +82,28 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Editar(int id, Inquilino inquilino)
         {
-            if (id != inquilino.IdInquilino)
+            try
             {
-                return BadRequest(); // Retorna un error 400 si los IDs no coinciden
-            }
+                if (id != inquilino.IdInquilino)
+                {
+                    return BadRequest(); // Retorna un error 400 si los IDs no coinciden
+                }
 
-            if (ModelState.IsValid)
-            {
-                _inquilinoRepository.Update(inquilino);
-                return RedirectToAction("Listar"); // Redirige a la lista de inquilinos
+                if (ModelState.IsValid)
+                {
+                    _inquilinoRepository.Update(inquilino);
+                    TempData["SuccessMessage"] = "Inquilino modificado correctamente.";
+
+                    return RedirectToAction("Listar"); // Redirige a la lista de inquilinos
+                }
+                return View(inquilino);
             }
-            return View(inquilino);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al modificar el Inquilino: {ex.Message}";
+
+                return View("Editar", inquilino);
+            }
         }
 
         // Acción para mostrar la vista de confirmación de eliminación
@@ -97,11 +119,24 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para confirmar la eliminación
-        [Authorize(Policy = "Administrador")][HttpPost, ActionName("Eliminar")]
+        [Authorize(Policy = "Administrador")]
+        [HttpPost, ActionName("Eliminar")]
         public IActionResult DeleteConfirmed(int id)
         {
-            _inquilinoRepository.Delete(id);
-            return RedirectToAction("Listar"); // Redirige a la lista de inquilinos
+            try
+            {
+                _inquilinoRepository.Delete(id);
+                TempData["SuccessMessage"] = "Inquilino eliminado correctamente.";
+
+                return RedirectToAction("Listar"); // Redirige a la lista de inquilinos
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al eliminar el Inquilino: {ex.Message}";
+
+                var inquilino = _inquilinoRepository.GetById(id); // Volver a cargar el contrato para mostrar la vista
+                return View("Eliminar", inquilino); // Mostramos la misma vista de confirmación con el error
+            }
         }
     }
 }

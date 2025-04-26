@@ -23,8 +23,6 @@ namespace InmobiliariaApp.Controllers
             _contratoRepository = contratoRepository;
         }
 
-
-
         // public IActionResult Listar(int? idInquilino, int? idInmueble, DateTime? fechaDesde, DateTime? fechaHasta, decimal? montoDesde, decimal? montoHasta, string? estado, int? activo, int? venceEnDias)
         // {
         //     activo = 1; // Solo activos
@@ -144,8 +142,6 @@ namespace InmobiliariaApp.Controllers
         }
 
 
-
-
         // GET: Renovar contrato - muestra el formulario con los datos actuales
         // public IActionResult Renovar(int id)
         // {
@@ -203,6 +199,7 @@ namespace InmobiliariaApp.Controllers
 
 
         // Acción para mostrar la vista de confirmación de eliminación
+        
         [Authorize(Policy = "Administrador")]
         public IActionResult Eliminar(int id)
         {

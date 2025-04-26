@@ -80,6 +80,7 @@ namespace InmobiliariaApp.Controllers
 
                 // Guardar el usuario en la base de datos
                 _usuarioRepo.Add(usuario);
+                TempData["SuccessMessage"] = "Usuario cargado correctamente.";
 
                 // Redirigir a la lista de usuarios
                 return RedirectToAction("Listar");
@@ -115,8 +116,6 @@ namespace InmobiliariaApp.Controllers
             return View(usuario);
         }
 
-
-
         [HttpPost]
         public IActionResult Editar(int id, Usuario usuario)
         {
@@ -125,6 +124,7 @@ namespace InmobiliariaApp.Controllers
             if (ModelState.IsValid)
             {
                 _usuarioRepo.Update(usuario);
+                TempData["SuccessMessage"] = "Usuario modificado correctamente.";
                 return RedirectToAction("Listar");
             }
             return View(usuario);
@@ -143,6 +143,7 @@ namespace InmobiliariaApp.Controllers
         public IActionResult EliminarConfirmado(int id)
         {
             _usuarioRepo.Delete(id);
+            TempData["SuccessMessage"] = "Usuario eliminado correctamente.";
             return RedirectToAction("Listar");
         }
 

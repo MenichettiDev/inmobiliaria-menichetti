@@ -35,12 +35,22 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Insertar(TipoInmueble tipo)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _tipoRepository.Add(tipo);
-                return RedirectToAction("Listar");
+                if (ModelState.IsValid)
+                {
+                    _tipoRepository.Add(tipo);
+                    TempData["SuccessMessage"] = "Tipo de inmueble cargado correctamente.";
+                    return RedirectToAction("Listar");
+                }
+                return View(tipo);
             }
-            return View(tipo);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al crear el tipo de inmueble: {ex.Message}";
+
+                return View("Insertar", tipo);
+            }
         }
 
         public IActionResult Editar(int id)
@@ -53,14 +63,24 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Editar(int id, TipoInmueble tipo)
         {
-            if (id != tipo.IdTipoInmueble) return BadRequest();
-
-            if (ModelState.IsValid)
+            try
             {
-                _tipoRepository.Update(tipo);
-                return RedirectToAction("Listar");
+                if (id != tipo.IdTipoInmueble) return BadRequest();
+
+                if (ModelState.IsValid)
+                {
+                    _tipoRepository.Update(tipo);
+                    TempData["SuccessMessage"] = "Tipo de inmueble modificado correctamente.";
+                    return RedirectToAction("Listar");
+                }
+                return View(tipo);
             }
-            return View(tipo);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al modificar el tipo de Inmueble: {ex.Message}";
+
+                return View("Editar", tipo);
+            }
         }
 
         [Authorize(Policy = "Administrador")]
@@ -75,8 +95,18 @@ namespace InmobiliariaApp.Controllers
         [Authorize(Policy = "Administrador")]
         public IActionResult EliminarConfirmado(int id)
         {
-            _tipoRepository.Delete(id);
-            return RedirectToAction("Listar");
+            try
+            {
+                _tipoRepository.Delete(id);
+                TempData["SuccessMessage"] = "Tipo de inmueble eliminado correctamente.";
+                return RedirectToAction("Listar");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al eliminar el tipo de Inmueble: {ex.Message}";
+
+                return View("Eliminar", id); // Mostramos la misma vista de confirmación con el error
+            }
         }
     }
 }

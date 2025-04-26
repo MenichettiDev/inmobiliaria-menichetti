@@ -14,8 +14,6 @@ namespace InmobiliariaApp.Controllers
             _propietarioRepository = propietarioRepository;
         }
 
-        
-
 
         // Acción para listar todos los propietarios
         public IActionResult Listar(string dni, string apellido, string nombre, int pagina = 1, int tamanioPagina = 10)
@@ -43,10 +41,6 @@ namespace InmobiliariaApp.Controllers
         // Acción para mostrar detalles de un propietario
         public IActionResult Detalles(int id)
         {
-            // if (!UsuarioAutenticado())
-            // {
-            //     return RedirectToAction("Index", "Login");
-            // }
 
             var propietario = _propietarioRepository.GetById(id);
             if (propietario == null)
@@ -59,10 +53,6 @@ namespace InmobiliariaApp.Controllers
         // Acción para mostrar el formulario de creación
         public IActionResult Insertar()
         {
-            // if (!UsuarioAutenticado())
-            // {
-            //     return RedirectToAction("Index", "Login");
-            // }
 
             return View();
         }
@@ -71,26 +61,28 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Insertar(Propietario propietario)
         {
-            // if (!UsuarioAutenticado())
-            // {
-            //     return RedirectToAction("Index", "Login");
-            // }
 
-            if (ModelState.IsValid)
+            try
             {
-                _propietarioRepository.Add(propietario);
-                return RedirectToAction("Listar"); // Redirige a la lista de propietarios
+                if (ModelState.IsValid)
+                {
+                    _propietarioRepository.Add(propietario);
+                    TempData["SuccessMessage"] = "Propietario cargado correctamente.";
+                    return RedirectToAction("Listar"); // Redirige a la lista de propietarios
+                }
+                return View(propietario);
             }
-            return View(propietario);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al crear el Propietario: {ex.Message}";
+
+                return View("Insertar", propietario);
+            }
         }
 
         // Acción para mostrar el formulario de edición
         public IActionResult Editar(int id)
         {
-            // if (!UsuarioAutenticado())
-            // {
-            //     return RedirectToAction("Index", "Login");
-            // }
 
             var propietario = _propietarioRepository.GetById(id);
             if (propietario == null)
@@ -104,22 +96,28 @@ namespace InmobiliariaApp.Controllers
         [HttpPost]
         public IActionResult Editar(int id, Propietario propietario)
         {
-            // if (!UsuarioAutenticado())
-            // {
-            //     return RedirectToAction("Index", "Login");
-            // }
 
-            if (id != propietario.IdPropietario)
+            try
             {
-                return BadRequest(); // Retorna un error 400 si los IDs no coinciden
-            }
+                if (id != propietario.IdPropietario)
+                {
+                    return BadRequest(); // Retorna un error 400 si los IDs no coinciden
+                }
 
-            if (ModelState.IsValid)
-            {
-                _propietarioRepository.Update(propietario);
-                return RedirectToAction("Listar"); // Redirige a la lista de propietarios
+                if (ModelState.IsValid)
+                {
+                    _propietarioRepository.Update(propietario);
+                    TempData["SuccessMessage"] = "Propietario modificado correctamente.";
+                    return RedirectToAction("Listar"); // Redirige a la lista de propietarios
+                }
+                return View(propietario);
             }
-            return View(propietario);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al modificar el Propietario: {ex.Message}";
+
+                return View("Editar", propietario);
+            }
         }
 
         // Acción para mostrar la vista de confirmación de eliminación
@@ -139,8 +137,19 @@ namespace InmobiliariaApp.Controllers
         [HttpPost, ActionName("Eliminar")]
         public IActionResult EliminarConfirmed(int id)
         {
-            _propietarioRepository.Delete(id);
-            return RedirectToAction("Listar"); // Redirige a la lista de propietarios
+            try
+            {
+                _propietarioRepository.Delete(id);
+                TempData["SuccessMessage"] = "Propietario eliminado correctamente.";
+                return RedirectToAction("Listar"); // Redirige a la lista de propietarios
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al eliminar el propietario: {ex.Message}";
+
+                var propietario = _propietarioRepository.GetById(id); // Volver a cargar el contrato para mostrar la vista
+                return View("Eliminar", propietario?.IdPropietario); // Mostramos la misma vista de confirmación con el error
+            }
         }
     }
 }
