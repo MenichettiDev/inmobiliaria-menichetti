@@ -1,5 +1,21 @@
 @model IEnumerable<InmobiliariaApp.Models.Pago>
 
+
+    @if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: 'La operación fue exitosa!',
+            confirmButtonText: 'Cerrar',
+            customClass: {
+                popup: 'rounded shadow'
+            }
+        });
+    </script>
+}
+
 @{
     ViewData["Title"] = "Lista de Pagos";
 }
