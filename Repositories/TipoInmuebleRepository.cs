@@ -20,7 +20,7 @@ namespace InmobiliariaApp.Repositories
             var tipos = new List<TipoInmueble>();
 
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("SELECT * FROM tipo_inmueble", connection);
+            using var command = new MySqlCommand("SELECT * FROM tipo_inmueble where activo = 'Activo'", connection);
             using var reader = command.ExecuteReader();
 
             while (reader.Read())
@@ -76,7 +76,7 @@ namespace InmobiliariaApp.Repositories
         public void Delete(int id)
         {
             using var connection = _dbConnection.GetConnection();
-            using var command = new MySqlCommand("DELETE FROM tipo_inmueble WHERE id_tipo_inmueble = @id", connection);
+            using var command = new MySqlCommand("UPDATE tipo_inmueble SET activo = 'Inactivo' WHERE id_tipo_inmueble = @id", connection);
             command.Parameters.AddWithValue("@id", id);
 
             command.ExecuteNonQuery();

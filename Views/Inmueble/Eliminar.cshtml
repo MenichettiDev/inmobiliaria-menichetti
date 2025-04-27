@@ -45,10 +45,9 @@
 {
     <form asp-action="BajaLogica" method="post" style="display:inline;">
         <input type="hidden" name="id" value="@Model.IdInmueble" />
-        <button type="submit" class="btn btn-danger"
-                onclick="return confirm('¿Está seguro de que desea eliminar este inmueble?');">
-            Eliminar
-        </button>
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+
+        
     </form>
 }
 else

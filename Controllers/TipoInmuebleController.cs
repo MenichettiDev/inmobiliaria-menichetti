@@ -105,7 +105,8 @@ namespace InmobiliariaApp.Controllers
             {
                 ViewBag.ErrorMessage = $"Ocurrió un error al eliminar el tipo de Inmueble: {ex.Message}";
 
-                return View("Eliminar", id); // Mostramos la misma vista de confirmación con el error
+                var tipo = _tipoRepository.GetById(id);
+                return View("Eliminar", tipo); // Mostramos la misma vista de confirmación con el error
             }
         }
     }

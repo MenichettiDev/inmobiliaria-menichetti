@@ -183,6 +183,60 @@ namespace InmobiliariaApp.Controllers
         }
 
 
+        // // Acción para suspender el inmueble
+        [HttpPost]
+        [Authorize(Policy = "Administrador")]
+        public IActionResult BajaLogica(int id)
+        {
+            try
+            {
+                var inmueble = _inmuebleRepository.GetById(id);
+                if (inmueble == null)
+                {
+                    return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
+                }
+
+                _inmuebleRepository.bajaLogica(inmueble);
+                TempData["SuccessMessage"] = "Inmueble dado de baja correctamente.";
+
+                return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al dar de baja el inmueble: {ex.Message}";
+
+                var inmueble = _inmuebleRepository.GetById(id); // Volver a cargar el contrato para mostrar la vista
+                return View("Eliminar", inmueble); // Mostramos la misma vista de confirmación con el error
+            }
+        }
+        // Acción para activar el inmueble
+        [HttpPost]
+        [Authorize(Policy = "Administrador")]
+        public IActionResult AltaLogica(int id)
+        {
+            try
+            {
+                var inmueble = _inmuebleRepository.GetById(id);
+                if (inmueble == null)
+                {
+                    return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
+                }
+
+                _inmuebleRepository.altaLogica(inmueble);
+                TempData["SuccessMessage"] = "Inmueble reactivado correctamente.";
+
+                return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al reactivar el inmueble: {ex.Message}";
+
+                var inmueble = _inmuebleRepository.GetById(id); // Volver a cargar el contrato para mostrar la vista
+                return View("Eliminar", inmueble); // Mostramos la misma vista de confirmación con el error
+            }
+        }
+
+
 
         // GET: Inmueble/Imagenes/5
         public ActionResult Imagenes(int id, [FromServices] ImagenRepository _imagenRepository)
@@ -273,35 +327,6 @@ namespace InmobiliariaApp.Controllers
                 return RedirectToAction(nameof(Imagenes), new { id = entidad.InmuebleId });
             }
         }
-
-        // // Acción para suspender el inmueble
-        // [HttpPost]
-        // public IActionResult BajaLogica(int id)
-        // {
-        //     var inmueble = _inmuebleRepository.GetById(id);
-        //     if (inmueble == null)
-        //     {
-        //         return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
-        //     }
-
-        //     _inmuebleRepository.bajaLogica(inmueble);
-
-        //     return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
-        // }
-        // // Acción para activar el inmueble
-        // [HttpPost]
-        // public IActionResult AltaLogica(int id)
-        // {
-        //     var inmueble = _inmuebleRepository.GetById(id);
-        //     if (inmueble == null)
-        //     {
-        //         return NotFound(); // Retorna un error 404 si no se encuentra el inmueble
-        //     }
-
-        //     _inmuebleRepository.altaLogica(inmueble);
-
-        //     return RedirectToAction("Listar"); // Redirige a la lista de inmuebles
-        // }
 
         private string ObtenerNombreUsuario(int? idUsuario)
         {
