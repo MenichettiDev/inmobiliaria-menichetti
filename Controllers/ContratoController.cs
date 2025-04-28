@@ -49,7 +49,7 @@ namespace InmobiliariaApp.Controllers
             int pageSize = 10)
         {
             activo = 1; // Solo activos
-            
+
             if (!Request.Query.ContainsKey("estado"))
                 estado = "Vigente";
 
@@ -103,6 +103,10 @@ namespace InmobiliariaApp.Controllers
         {
             try
             {
+                if (contrato.FechaInicio.Date < DateTime.Now.Date)
+                {
+                    ViewBag.ErrorMessage = "La fecha de inicio no puede ser anterior al día de hoy.";
+                }
                 if (!ModelState.IsValid)
                 {
                     // Si el modelo no es válido, volvemos a mostrar el formulario con los datos actuales
@@ -199,7 +203,7 @@ namespace InmobiliariaApp.Controllers
 
 
         // Acción para mostrar la vista de confirmación de eliminación
-        
+
         [Authorize(Policy = "Administrador")]
         public IActionResult Eliminar(int id)
         {

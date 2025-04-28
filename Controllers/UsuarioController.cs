@@ -116,19 +116,85 @@ namespace InmobiliariaApp.Controllers
             return View(usuario);
         }
 
+        //Editar validando cambio de contraseña
         [HttpPost]
-        public IActionResult Editar(int id, Usuario usuario)
+        public IActionResult Editar(Usuario usuario, string PasswordActual, string NuevaPassword, string ConfirmarPassword)
         {
-            if (id != usuario.IdUsuario) return BadRequest();
 
-            if (ModelState.IsValid)
+            try
             {
-                _usuarioRepo.Update(usuario);
-                TempData["SuccessMessage"] = "Usuario modificado correctamente.";
+                var usuarioExistente = _usuarioRepo.GetById(usuario.IdUsuario);
+                if (usuarioExistente == null)
+                {
+                    ViewBag.ErrorMessage = "Usuario no encontrado.";
+                    return View(usuario);
+                }
+
+                usuarioExistente.Email = usuario.Email;
+                usuarioExistente.Rol = usuario.Rol;
+
+                // Solo si quiere cambiar la contraseña
+                if (!string.IsNullOrEmpty(PasswordActual) || !string.IsNullOrEmpty(NuevaPassword) || !string.IsNullOrEmpty(ConfirmarPassword))
+                {
+                    // Hasheamos la contraseña actual para compararla
+                    string hashedActual = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                        password: PasswordActual,
+                        salt: Encoding.ASCII.GetBytes(_configuration["Salt"]),
+                        prf: KeyDerivationPrf.HMACSHA1,
+                        iterationCount: 10000,
+                        numBytesRequested: 256 / 8));
+
+                    if (hashedActual != usuarioExistente.Password)
+                    {
+                        ViewBag.ErrorMessage = "La contraseña actual es incorrecta.";
+                        return View(usuario);
+                    }
+
+                    if (NuevaPassword != ConfirmarPassword)
+                    {
+                        ViewBag.ErrorMessage = "La nueva contraseña y la confirmación no coinciden.";
+                        return View(usuario);
+                    }
+
+                    // Hasheamos la nueva contraseña antes de guardarla
+                    string hashedNueva = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                        password: NuevaPassword,
+                        salt: Encoding.ASCII.GetBytes(_configuration["Salt"]),
+                        prf: KeyDerivationPrf.HMACSHA1,
+                        iterationCount: 10000,
+                        numBytesRequested: 256 / 8));
+
+                    usuarioExistente.Password = hashedNueva;
+                }
+
+                usuario = usuarioExistente;
+                _usuarioRepo.Update(usuarioExistente);
+
+                TempData["SuccessMessage"] = "Usuario actualizado correctamente.";
                 return RedirectToAction("Listar");
             }
-            return View(usuario);
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Ocurrió un error al editar el Usuario: {ex.Message}";
+
+                return View("Editar", usuario);
+            }
+
         }
+
+        // [HttpPost]
+        // public IActionResult Editar(int id, Usuario usuario)
+        // {
+        //     if (id != usuario.IdUsuario) return BadRequest();
+
+        //     if (ModelState.IsValid)
+        //     {
+        //         _usuarioRepo.Update(usuario);
+        //         TempData["SuccessMessage"] = "Usuario modificado correctamente.";
+        //         return RedirectToAction("Listar");
+        //     }
+        //     return View(usuario);
+        // }
 
         [Authorize(Policy = "Administrador")]
         public IActionResult Eliminar(int id)

@@ -20,11 +20,11 @@
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
+    @* <div class="form-group">
         <label asp-for="Password"></label>
         <input asp-for="Password" class="form-control" type="password" />
         <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
+    </div> *@
 
     @if (User.IsInRole("Administrador"))
     {
@@ -43,6 +43,38 @@
         <input type="hidden" asp-for="Rol" />
     }
 
+    <div class="form-check mb-3">
+        <input type="checkbox" class="form-check-input" id="cambiarPassword" onchange="togglePasswordFields()" />
+        <label class="form-check-label" for="cambiarPassword">Cambiar contraseña</label>
+    </div>
+
+    <div id="passwordFields" style="display: none;">
+        <div class="form-group">
+            <label for="PasswordActual">Contraseña actual</label>
+            <input type="password" name="PasswordActual" id="PasswordActual" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="NuevaPassword">Nueva contraseña</label>
+            <input type="password" name="NuevaPassword" id="NuevaPassword" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="ConfirmarPassword">Confirmar nueva contraseña</label>
+            <input type="password" name="ConfirmarPassword" id="ConfirmarPassword" class="form-control" />
+        </div>
+    </div>
+
     <button type="submit" class="btn btn-primary">Actualizar</button>
     <a asp-action="Listar" class="btn btn-secondary">Cancelar</a>
+    
 </form>
+
+
+@section Scripts {
+    <script>
+        function togglePasswordFields() {
+            var check = document.getElementById('cambiarPassword');
+            var passwordFields = document.getElementById('passwordFields');
+            passwordFields.style.display = check.checked ? 'block' : 'none';
+        }
+    </script>
+}
