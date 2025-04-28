@@ -25,16 +25,16 @@ public class HomeController : Controller
 
 
     public IActionResult Index(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta,
-    string estado, int? activo, DateTime? fechaDesde, DateTime? fechaHasta, int page = 1, int pageSize = 10)
+    string estado, int? activo, DateTime? fechaDesde, DateTime? fechaHasta, int idPropietario, int page = 1, int pageSize = 10)
     {
         if (!Request.Query.ContainsKey("activo"))
             activo = 1;
 
-            if (!Request.Query.ContainsKey("estado"))
-                estado = "Disponible";
+        if (!Request.Query.ContainsKey("estado"))
+            estado = "Disponible";
 
         var inmuebles = _inmuebleRepository.IndexFiltrados(uso, ambientes, precioDesde, precioHasta,
-            estado, activo, fechaDesde, fechaHasta, page, pageSize, out int totalItems);
+            estado, activo, fechaDesde, fechaHasta, idPropietario, page, pageSize, out int totalItems);
 
         int totalPaginas = (int)Math.Ceiling((double)totalItems / pageSize);
 
@@ -43,6 +43,21 @@ public class HomeController : Controller
 
         return View(inmuebles);
     }
+
+    [HttpGet]
+    public IActionResult BuscarPropietarios(string term)
+    {
+        var propietarios = _propietarioRepository.BuscarPorNombre(term);
+
+        var resultado = propietarios.Select(p => new
+        {
+            id = p.IdPropietario,
+            nombre = $"{p.Nombre} {p.Apellido}"
+        });
+
+        return Json(resultado);
+    }
+
 
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

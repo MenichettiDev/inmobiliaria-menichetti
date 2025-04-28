@@ -400,6 +400,7 @@ namespace InmobiliariaApp.Repositories
     int? activo,
     DateTime? fechaDesde,
     DateTime? fechaHasta,
+    int? idPropietario,
     int page,
     int pageSize,
     out int totalItems)
@@ -466,6 +467,11 @@ namespace InmobiliariaApp.Repositories
                 countCommand.Parameters.AddWithValue("@fechaHasta", fechaHasta.Value);
             }
 
+            if (idPropietario.HasValue)
+            {
+                filtros += " AND i.id_propietario = @idPropietario";
+                countCommand.Parameters.AddWithValue("@idPropietario", idPropietario.Value);
+            }
 
 
             // Total count

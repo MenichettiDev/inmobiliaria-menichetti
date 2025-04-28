@@ -180,5 +180,37 @@ namespace InmobiliariaApp.Repositories
 
             command.ExecuteNonQuery();
         }
+
+        public List<Propietario> BuscarPorNombre(string term)
+        {
+            var propietarios = new List<Propietario>();
+
+            using var connection = _dbConnection.GetConnection();
+            using var command = new MySqlCommand(
+                @"SELECT id_propietario, nombre, apellido
+            FROM propietario
+            WHERE CONCAT(nombre, ' ', apellido) LIKE @Term
+            ORDER BY nombre
+            LIMIT 10", connection);
+
+            command.Parameters.AddWithValue("@Term", $"%{term}%");
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                var propietario = new Propietario
+                {
+                    IdPropietario = reader.GetInt32("id_propietario"),
+                    Nombre = reader.GetString("nombre"),
+                    Apellido = reader.GetString("apellido")
+                };
+
+                propietarios.Add(propietario);
+            }
+
+            return propietarios;
+        }
+
+
     }
 }
