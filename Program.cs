@@ -89,6 +89,8 @@ builder.Services.AddScoped<ImagenRepository>();
 
 var app = builder.Build();
 
+app.UseStaticFiles(); // Esta línea es necesaria para servir archivos estáticos como imágenes
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -28,7 +28,8 @@ namespace InmobiliariaApp.Repositories
                     IdUsuario = reader.GetInt32("id_usuario"),
                     Email = reader.GetString("email"),
                     Password = reader.GetString("password"),
-                    Rol = reader.GetString("rol")
+                    Rol = reader.GetString("rol"),
+                    FotoPerfil = reader.IsDBNull(reader.GetOrdinal("foto_archivo")) ? null : reader.GetString(reader.GetOrdinal("foto_archivo"))
                 });
             }
             return usuarios;
@@ -49,7 +50,9 @@ namespace InmobiliariaApp.Repositories
                     IdUsuario = reader.GetInt32("id_usuario"),
                     Email = reader.GetString("email"),
                     Password = reader.GetString("password"),
-                    Rol = reader.GetString("rol")
+                    Rol = reader.GetString("rol"),
+                    FotoPerfil = reader.IsDBNull(reader.GetOrdinal("foto_archivo")) ? null : reader.GetString(reader.GetOrdinal("foto_archivo"))
+
                 };
             }
             return null;
@@ -70,7 +73,9 @@ namespace InmobiliariaApp.Repositories
                     IdUsuario = reader.GetInt32("id_usuario"),
                     Email = reader.GetString("email"),
                     Password = reader.GetString("password"),
-                    Rol = reader.GetString("rol")
+                    Rol = reader.GetString("rol"),
+                    FotoPerfil = reader.IsDBNull(reader.GetOrdinal("foto_archivo")) ? null : reader.GetString(reader.GetOrdinal("foto_archivo"))
+
                 };
             }
 
@@ -117,6 +122,16 @@ namespace InmobiliariaApp.Repositories
 
             command.ExecuteNonQuery();
         }
+
+        public void ActualizarFotoPerfil(int idUsuario, string fotoPerfilUrl)
+        {
+            using var connection = _dbConnection.GetConnection();
+            using var command = new MySqlCommand("UPDATE usuario SET foto_archivo = @fotoPerfil WHERE id_usuario = @id", connection);
+            command.Parameters.AddWithValue("@fotoPerfil", fotoPerfilUrl);
+            command.Parameters.AddWithValue("@id", idUsuario);
+            command.ExecuteNonQuery();
+        }
+
 
     }
 }

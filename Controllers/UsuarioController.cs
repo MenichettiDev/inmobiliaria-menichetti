@@ -113,6 +113,9 @@ namespace InmobiliariaApp.Controllers
             var usuario = _usuarioRepo.GetById(userId);
             if (usuario == null) return NotFound();
 
+            // Pasamos el userId al ViewBag
+            ViewBag.UserId = userId;
+
             return View(usuario);
         }
 
@@ -182,19 +185,6 @@ namespace InmobiliariaApp.Controllers
 
         }
 
-        // [HttpPost]
-        // public IActionResult Editar(int id, Usuario usuario)
-        // {
-        //     if (id != usuario.IdUsuario) return BadRequest();
-
-        //     if (ModelState.IsValid)
-        //     {
-        //         _usuarioRepo.Update(usuario);
-        //         TempData["SuccessMessage"] = "Usuario modificado correctamente.";
-        //         return RedirectToAction("Listar");
-        //     }
-        //     return View(usuario);
-        // }
 
         [Authorize(Policy = "Administrador")]
         public IActionResult Eliminar(int id)
@@ -281,6 +271,55 @@ namespace InmobiliariaApp.Controllers
             return RedirectToAction("Login", "Usuario");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ActualizarFoto(int IdUsuario, IFormFile FotoPerfilFile, [FromServices] IWebHostEnvironment environment)
+        {
+            try
+            {
+                if (FotoPerfilFile != null && FotoPerfilFile.Length > 0)
+                {
+                    var usuario = _usuarioRepo.GetById(IdUsuario);
+
+                    if (usuario == null)
+                    {
+                        return Json(new { success = false, message = "Usuario no encontrado." });
+                    }
+
+                    // Borrar foto anterior si existe
+                    if (!string.IsNullOrEmpty(usuario.FotoPerfil))
+                    {
+                        var rutaFoto = Path.Combine(environment.WebRootPath, usuario.FotoPerfil.TrimStart('/'));
+                        if (System.IO.File.Exists(rutaFoto))
+                        {
+                            System.IO.File.Delete(rutaFoto);
+                        }
+                    }
+
+                    var uploadsPath = Path.Combine(environment.WebRootPath, "Uploads", "Usuarios");
+                    if (!Directory.Exists(uploadsPath))
+                        Directory.CreateDirectory(uploadsPath);
+
+                    var fileName = $"perfil_{IdUsuario}{Path.GetExtension(FotoPerfilFile.FileName)}";
+                    var filePath = Path.Combine(uploadsPath, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        FotoPerfilFile.CopyTo(stream);
+                    }
+
+                    var fotoUrl = Path.Combine("/Uploads/Usuarios/", fileName).Replace("\\", "/");
+                    _usuarioRepo.ActualizarFotoPerfil(IdUsuario, fotoUrl);
+
+                    return Json(new { success = true, fotoUrl = fotoUrl }); // Retorna la nueva URL de la foto
+                }
+
+                return Json(new { success = false, message = "No se ha recibido la foto." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al actualizar la foto: " + ex.Message });
+            }
+        }
 
     }
 }
