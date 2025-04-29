@@ -25,13 +25,14 @@ public class HomeController : Controller
 
 
     public IActionResult Index(string? uso, int? ambientes, decimal? precioDesde, decimal? precioHasta,
-    string estado, int? activo, DateTime? fechaDesde, DateTime? fechaHasta, int idPropietario, int page = 1, int pageSize = 10)
+    string estado, int? activo, DateTime? fechaDesde, DateTime? fechaHasta, int? idPropietario, int page = 1, int pageSize = 10)
     {
         if (!Request.Query.ContainsKey("activo"))
             activo = 1;
 
         if (!Request.Query.ContainsKey("estado"))
             estado = "Disponible";
+
 
         var inmuebles = _inmuebleRepository.IndexFiltrados(uso, ambientes, precioDesde, precioHasta,
             estado, activo, fechaDesde, fechaHasta, idPropietario, page, pageSize, out int totalItems);
