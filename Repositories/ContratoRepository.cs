@@ -584,7 +584,6 @@ namespace InmobiliariaApp.Repositories
             }
             catch (Exception ex)
             {
-                // Podés loguear el error si usás un logger, o lanzar uno más específico si preferís
                 transaction.Rollback();
                 Console.WriteLine($"[ERROR] al renovar contrato: {ex.Message}");
                 throw new Exception("Error al renovar el contrato: " + ex.Message, ex);

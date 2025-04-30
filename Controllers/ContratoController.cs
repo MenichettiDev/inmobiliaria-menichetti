@@ -232,7 +232,7 @@ namespace InmobiliariaApp.Controllers
                 var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(idClaim))
                 {
-                    return Unauthorized(); // o manejarlo como prefieras
+                    return Unauthorized(); 
                 }
                 int userId = int.Parse(idClaim);
 
