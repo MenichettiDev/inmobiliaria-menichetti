@@ -11,6 +11,7 @@ using System.Configuration;
 
 namespace InmobiliariaApp.Controllers
 {
+    [Authorize]
     public class UsuarioController : Controller
     {
         private readonly UsuarioRepository _usuarioRepo;
@@ -22,12 +23,14 @@ namespace InmobiliariaApp.Controllers
             _configuration = config;
         }
 
+        [Authorize]
         public IActionResult Listar()
         {
             var usuarios = _usuarioRepo.GetAll();
             return View(usuarios);
         }
 
+        [Authorize]
         public IActionResult Detalles(int id)
         {
             var usuario = _usuarioRepo.GetById(id);
@@ -35,7 +38,8 @@ namespace InmobiliariaApp.Controllers
             return View(usuario);
         }
 
-        // GET: Usuario/Insertar
+        // GET: Usuario/Inserta
+        [Authorize]
         public IActionResult Insertar()
         {
             return View();
@@ -43,6 +47,7 @@ namespace InmobiliariaApp.Controllers
 
         // POST: Usuario/Insertar
         [HttpPost]
+        [Authorize]
         public IActionResult Insertar(Usuario usuario)
         {
             try
@@ -121,11 +126,25 @@ namespace InmobiliariaApp.Controllers
 
         //Editar validando cambio de contraseña
         [HttpPost]
+        [Authorize]
         public IActionResult Editar(Usuario usuario, string PasswordActual, string NuevaPassword, string ConfirmarPassword)
         {
 
             try
             {
+                // Obtener el ID del usuario autenticado desde las claims
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (idClaim == null) return Unauthorized();
+
+                int userIdActual = int.Parse(idClaim.Value);
+
+                // Verificar si el usuario está intentando editarse a sí mismo o es admin
+                bool esAdmin = User.IsInRole("Administrador");
+                if (userIdActual != usuario.IdUsuario && !esAdmin)
+                {
+                    return Forbid(); // o RedirectToAction("Restringido", "Home");
+                }
+
                 var usuarioExistente = _usuarioRepo.GetById(usuario.IdUsuario);
                 if (usuarioExistente == null)
                 {
@@ -134,7 +153,12 @@ namespace InmobiliariaApp.Controllers
                 }
 
                 usuarioExistente.Email = usuario.Email;
-                usuarioExistente.Rol = usuario.Rol;
+
+                // Solo los administradores pueden cambiar el rol
+                if (esAdmin)
+                {
+                    usuarioExistente.Rol = usuario.Rol;
+                }
 
                 // Solo si quiere cambiar la contraseña
                 if (!string.IsNullOrEmpty(PasswordActual) || !string.IsNullOrEmpty(NuevaPassword) || !string.IsNullOrEmpty(ConfirmarPassword))
@@ -204,6 +228,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de login
+        [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
@@ -265,6 +290,7 @@ namespace InmobiliariaApp.Controllers
             }
         }
 
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -272,6 +298,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> ActualizarFoto(int IdUsuario, IFormFile FotoPerfilFile, [FromServices] IWebHostEnvironment environment)
         {
             try

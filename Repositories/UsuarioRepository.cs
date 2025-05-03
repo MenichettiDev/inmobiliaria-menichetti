@@ -127,7 +127,7 @@ namespace InmobiliariaApp.Repositories
         {
             using var connection = _dbConnection.GetConnection();
             using var command = new MySqlCommand("UPDATE usuario SET foto_archivo = @fotoPerfil WHERE id_usuario = @id", connection);
-            command.Parameters.AddWithValue("@fotoPerfil", fotoPerfilUrl);
+            command.Parameters.AddWithValue("@fotoPerfil", (object?)fotoPerfilUrl ?? DBNull.Value);
             command.Parameters.AddWithValue("@id", idUsuario);
             command.ExecuteNonQuery();
         }

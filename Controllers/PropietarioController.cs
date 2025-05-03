@@ -16,6 +16,7 @@ namespace InmobiliariaApp.Controllers
 
 
         // Acción para listar todos los propietarios
+        [Authorize]
         public IActionResult Listar(string dni, string apellido, string nombre, int pagina = 1, int tamanioPagina = 10)
         {
             // Obtener el total de registros con los filtros
@@ -39,6 +40,7 @@ namespace InmobiliariaApp.Controllers
 
 
         // Acción para mostrar detalles de un propietario
+        [Authorize]
         public IActionResult Detalles(int id)
         {
 
@@ -51,6 +53,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de creación
+        [Authorize]
         public IActionResult Insertar()
         {
 
@@ -58,7 +61,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para procesar el formulario de creación
-        [HttpPost]
+        [HttpPost][Authorize]
         public IActionResult Insertar(Propietario propietario)
         {
 
@@ -81,6 +84,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de edición
+        [Authorize]
         public IActionResult Editar(int id)
         {
 
@@ -93,7 +97,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para procesar el formulario de edición
-        [HttpPost]
+        [HttpPost][Authorize]
         public IActionResult Editar(int id, Propietario propietario)
         {
 

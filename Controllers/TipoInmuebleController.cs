@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace InmobiliariaApp.Controllers
 {
+    [Authorize]
     public class TipoInmuebleController : Controller
     {
         private readonly TipoInmuebleRepository _tipoRepository;

@@ -7,6 +7,7 @@ using System.Security.Claims;
 
 namespace InmobiliariaApp.Controllers
 {
+    [Authorize]
     public class PagoController : Controller
     {
         private readonly PagoRepository _pagoRepository;

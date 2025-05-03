@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace InmobiliariaApp.Controllers
 {
+    [Authorize]
     public class ContratoController : Controller
     {
         private readonly ContratoRepository _contratoRepository;

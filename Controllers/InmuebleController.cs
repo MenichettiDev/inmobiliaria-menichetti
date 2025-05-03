@@ -55,6 +55,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de creación
+        [Authorize]
         public IActionResult Insertar()
         {
             var propietarios = _propietarioRepository.GetAll(); // O el método que uses
@@ -65,7 +66,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para procesar el formulario de creación
-        [HttpPost]
+        [HttpPost][Authorize]
         public IActionResult Insertar(Inmueble inmueble)
         {
             try
@@ -99,6 +100,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de edición
+        [Authorize]
         public IActionResult Editar(int id)
         {
             var inmueble = _inmuebleRepository.GetById(id);
@@ -117,7 +119,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para procesar el formulario de edición
-        [HttpPost]
+        [HttpPost][Authorize]
         public IActionResult Editar(int id, Inmueble inmueble)
         {
 
@@ -248,7 +250,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // POST: Inmueble/Portada
-        [HttpPost]
+        [HttpPost][Authorize]
         // [ValidateAntiForgeryToken]
         public ActionResult Portada(Imagen entidad, [FromServices] IWebHostEnvironment environment)
         {

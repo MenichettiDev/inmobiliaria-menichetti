@@ -39,6 +39,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
         }
 
         // Acción para mostrar detalles de una imagen
+        [Authorize]
         public IActionResult Detalles(int id)
         {
             var imagen = _imagenRepositorio.ObtenerPorId(id);
@@ -49,6 +50,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
         }
 
         // Acción para mostrar formulario de subida de imágenes
+        [Authorize]
         public IActionResult Subir(int id)
         {
             ViewBag.InmuebleId = id;
@@ -56,7 +58,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
         }
 
         // Acción para procesar la subida de imágenes
-        [HttpPost]
+        [HttpPost][Authorize]
         public async Task<IActionResult> Subir(int id, List<IFormFile> imagenes)
         {
             try
@@ -126,6 +128,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
         }
 
         // Acción para mostrar formulario de edición
+        [Authorize]
         public IActionResult Editar(int id)
         {
             var imagen = _imagenRepositorio.ObtenerPorId(id);
@@ -136,7 +139,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
         }
 
         // Acción para procesar edición de imagen
-        [HttpPost]
+        [HttpPost][Authorize]
         public IActionResult Editar(int id, Imagen imagen)
         {
             if (id != imagen.IdImagen)
@@ -152,6 +155,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
         }
 
         // Acción para confirmar eliminación
+        [Authorize(Policy = "Administrador")]
         public IActionResult Eliminar(int id)
         {
             var imagen = _imagenRepositorio.ObtenerPorId(id);
@@ -162,7 +166,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
         }
 
         // Acción para procesar eliminación
-        [HttpPost, ActionName("Eliminar")]
+        [HttpPost, ActionName("Eliminar")][Authorize(Policy = "Administrador")]
         // [Authorize(Policy = "Administrador")] se comenta porque no anda
         public IActionResult EliminarConfirmado(int id)
         {

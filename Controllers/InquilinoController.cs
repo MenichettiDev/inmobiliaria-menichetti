@@ -15,6 +15,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para listar todos los inquilinos
+        [Authorize]
         public IActionResult Listar(string? dni, string? apellido, string? email, int page = 1, int pageSize = 10)
         {
             var inquilinos = _inquilinoRepository.ObtenerFiltrados(dni, apellido, email, page, pageSize, out int totalItems);
@@ -28,6 +29,7 @@ namespace InmobiliariaApp.Controllers
 
 
         // Acción para mostrar detalles de un inquilino
+        [Authorize]
         public IActionResult Detalles(int id)
         {
             var inquilino = _inquilinoRepository.GetById(id);
@@ -39,12 +41,14 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de creación
+        [Authorize]
         public IActionResult Insertar()
         {
             return View();
         }
 
         // Acción para procesar el formulario de creación
+        [Authorize]
         [HttpPost]
         public IActionResult Insertar(Inquilino inquilino)
         {
@@ -68,6 +72,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para mostrar el formulario de edición
+        [Authorize]
         public IActionResult Editar(int id)
         {
             var inquilino = _inquilinoRepository.GetById(id);
@@ -79,7 +84,7 @@ namespace InmobiliariaApp.Controllers
         }
 
         // Acción para procesar el formulario de edición
-        [HttpPost]
+        [HttpPost][Authorize]
         public IActionResult Editar(int id, Inquilino inquilino)
         {
             try
