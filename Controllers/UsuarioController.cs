@@ -299,19 +299,36 @@ namespace InmobiliariaApp.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> ActualizarFoto(int IdUsuario, IFormFile FotoPerfilFile, [FromServices] IWebHostEnvironment environment)
+        public async Task<IActionResult> ActualizarFoto(int IdUsuario, IFormFile FotoPerfilFile, bool EliminarFoto, [FromServices] IWebHostEnvironment environment)
         {
             try
             {
-                if (FotoPerfilFile != null && FotoPerfilFile.Length > 0)
+                var usuario = _usuarioRepo.GetById(IdUsuario);
+                if (usuario == null)
                 {
-                    var usuario = _usuarioRepo.GetById(IdUsuario);
+                    return Json(new { success = false, message = "Usuario no encontrado." });
+                }
 
-                    if (usuario == null)
+                // Eliminar foto si se solicitó
+                if (EliminarFoto)
+                {
+                    if (!string.IsNullOrEmpty(usuario.FotoPerfil))
                     {
-                        return Json(new { success = false, message = "Usuario no encontrado." });
+                        var rutaFoto = Path.Combine(environment.WebRootPath, usuario.FotoPerfil.TrimStart('/'));
+                        if (System.IO.File.Exists(rutaFoto))
+                        {
+                            System.IO.File.Delete(rutaFoto);
+                        }
+
+                        _usuarioRepo.ActualizarFotoPerfil(IdUsuario, null);
                     }
 
+                    return Json(new { success = true, fotoUrl = "/img/defaultUser.jpg" });
+                }
+
+                // Lógica existente para actualizar la foto
+                if (FotoPerfilFile != null && FotoPerfilFile.Length > 0)
+                {
                     // Borrar foto anterior si existe
                     if (!string.IsNullOrEmpty(usuario.FotoPerfil))
                     {
@@ -347,6 +364,7 @@ namespace InmobiliariaApp.Controllers
                 return Json(new { success = false, message = "Error al actualizar la foto: " + ex.Message });
             }
         }
+
 
     }
 }

@@ -89,7 +89,6 @@
                         <img id="previewFoto"
                             src="@(string.IsNullOrEmpty(Model.FotoPerfil) ? "/img/defaultUser.jpg" : Model.FotoPerfil)"
                             class="img-thumbnail mb-3" style="width: 180px; height: 180px; object-fit: cover;" />
-
                     </div>
 
                     <div class="form-group mb-3">
@@ -98,9 +97,17 @@
                     </div>
 
                     <input type="hidden" name="IdUsuario" value="@Model.IdUsuario" />
+                    <input type="hidden" id="EliminarFoto" name="EliminarFoto" value="false" />
 
                     <button type="submit" class="btn btn-success w-100">Actualizar Foto</button>
+                    @if (!string.IsNullOrEmpty(Model.FotoPerfil) && Model.FotoPerfil != "/img/defaultUser.jpg")
+                    {
+                        <button type="button" class="btn btn-danger w-100 mt-2" onclick="eliminarFoto()">Eliminar Foto</button>
+                    }
+
+
                 </form>
+
             </div>
         }
 
@@ -116,6 +123,13 @@
 
 @section Scripts {
     <script>
+        function eliminarFoto() {
+            document.getElementById('EliminarFoto').value = 'true';
+
+            $("#formActualizarFoto").submit();
+        }
+
+
         function togglePasswordFields() {
             var check = document.getElementById('cambiarPassword');
             var passwordFields = document.getElementById('passwordFields');
@@ -148,10 +162,18 @@
                     success: function (response) {
                         // Si el backend responde correctamente, actualizar la imagen de perfil
                         $('#previewFoto').attr('src', response.fotoUrl); // Actualizar la imagen de la vista
-                        notyf.success('Imágenes subidas con éxito');
+                        notyf.success('Accion realizada con éxito');
+
+                        // Ocultar el botón de eliminar si la foto se eliminó o mostrar si la foto es nueva
+                        if (response.fotoUrl === "/img/defaultUser.jpg") {
+                            $("button.btn-danger").hide();  // Ocultar el botón de eliminar foto
+                        } else if (response.fotoUrl !== "/img/defaultUser.jpg") {
+                            $("button.btn-danger").show(); // Mostrar el botón de eliminar foto
+                        }
+
                     },
                     error: function () {
-                        notyf.error('Error al subir las imágenes');
+                        notyf.error('Error al ejecutar la acción');
                     }
                 });
             });
